@@ -121,7 +121,25 @@ public abstract class GraphQLTest
 			String part = path[index];
 			int parsedPart = Integer.parseInt(part);
 
-			return parsedPart < data.size() ? data.get(parsedPart) : null;
+			if(parsedPart >= data.size()) return null;
+			Object partData = data.get(parsedPart);
+
+			if(index == path.length - 1)
+			{
+				return partData;
+			}
+			else if(partData instanceof List)
+			{
+				return pick((List) partData, path, index + 1);
+			}
+			else if(partData instanceof Map)
+			{
+				return pick((Map) partData, path, index + 1);
+			}
+			else
+			{
+				throw new AssertionError("Can not traverse down into object at key " + part + ": " + partData);
+			}
 		}
 	}
 }

@@ -5,24 +5,28 @@ import java.util.Arrays;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import se.l4.commons.types.conversion.ConversionFunction;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 
-public class MethodDataFetcher<T>
+public class MethodDataFetcher<I, T>
 	implements DataFetcher<T>
 {
 	private final DataFetchingSupplier<Object> contextGetter;
 	private final Method method;
 	private final DataFetchingSupplier<?>[] parameters;
+	private final ConversionFunction<I, T> returnTypeConversion;
 
 	public MethodDataFetcher(
 		DataFetchingSupplier<Object> contextGetter,
 		Method method,
-		DataFetchingSupplier<?>[] parameters
+		DataFetchingSupplier<?>[] parameters,
+		ConversionFunction<I, T> returnTypeConversion
 	)
 	{
 		this.contextGetter = contextGetter;
 		this.method = method;
 		this.parameters = parameters;
+		this.returnTypeConversion = returnTypeConversion;
 	}
 
 	@Override
@@ -31,11 +35,14 @@ public class MethodDataFetcher<T>
 		throws Exception
 	{
 		Object context = contextGetter.get(environment);
-		return (T) method.invoke(
+
+		I result = (I) method.invoke(
 			context,
 			Arrays.stream(parameters)
 				.map(p -> p.get(environment))
 				.toArray()
 		);
+
+		return returnTypeConversion.convert(result);
 	}
 }

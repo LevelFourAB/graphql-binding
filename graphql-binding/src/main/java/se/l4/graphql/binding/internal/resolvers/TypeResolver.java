@@ -3,8 +3,10 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.ArrayList;
 import java.util.List;
 
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
+import se.l4.commons.types.conversion.ConversionFunction;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -66,7 +68,11 @@ public class TypeResolver
 			builder.newField()
 				.over(field)
 				.setType(fieldType.getGraphQLType())
-				.withDataFetcher(new FieldDataFetcher<>(contextGetter, field.getField()))
+				.withDataFetcher(new FieldDataFetcher<>(
+					contextGetter,
+					field.getField(),
+					fieldType.getConversion()
+				))
 				.done();
 		}
 
@@ -97,11 +103,12 @@ public class TypeResolver
 
 			for(ParameterRef parameter : parameters)
 			{
+				ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
+
 				// Resolve the supplier to use for the parameter
 				String name = context.getParameterName(parameter);
-				arguments.add(env -> env.getArgument(name));
+				arguments.add(new ArgumentResolver(name, (ConversionFunction) argumentType.getConversion()));
 
-				ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
 
 				// Register the argument
 				fieldBuilder.newArgument()
@@ -113,9 +120,35 @@ public class TypeResolver
 			fieldBuilder.withDataFetcher(new MethodDataFetcher<>(
 				contextGetter,
 				method.getMethod(),
-				arguments.toArray(DataFetchingSupplier[]::new)
+				arguments.toArray(DataFetchingSupplier[]::new),
+				fieldType.getConversion()
 			))
 				.done();
+		}
+	}
+
+	private static class ArgumentResolver
+		implements DataFetchingSupplier<Object>
+	{
+		private final String name;
+		private final ConversionFunction<Object, Object> conversion;
+
+		public ArgumentResolver(String name, ConversionFunction<Object, Object> conversion)
+		{
+			this.name = name;
+			this.conversion = conversion;
+		}
+
+		@Override
+		public Object get(DataFetchingEnvironment env)
+		{
+			Object value = env.getArgument(name);
+			if(value == null)
+			{
+				return null;
+			}
+
+			return conversion.convert(value);
 		}
 	}
 }

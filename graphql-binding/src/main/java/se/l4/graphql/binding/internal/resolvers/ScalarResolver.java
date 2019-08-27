@@ -21,6 +21,10 @@ import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
+/**
+ * Custom resolver that is registered whenever a scalar that uses
+ * {@link GraphQLScalar} is added.
+ */
 public class ScalarResolver
 	implements GraphQLOutputResolver, GraphQLInputResolver
 {
@@ -43,10 +47,17 @@ public class ScalarResolver
 		return Optional.of(resolve(encounter, encounter.getType()));
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GraphQLScalarType resolve(ResolverContext ctx, TypeRef type)
 	{
 		return ctx.breadcrumb(Breadcrumb.forType(type), () -> {
 			TypeRef scalarType = Types.reference(scalar.getClass());
+
+			/*
+			 * Resolve the name by first looking for an annotation of the
+			 * GraphQLScalar implementation and then resolving against the
+			 * Java type of the scalar.
+			 */
 			String name;
 			Optional<GraphQLName> nameAnnotation = scalarType.findAnnotation(GraphQLName.class);
 			if(nameAnnotation.isPresent())
@@ -59,6 +70,7 @@ public class ScalarResolver
 				name = ctx.getTypeName(type);
 			}
 
+			// Resolve the interface and the GraphQL type and request a conversion to iit
 			TypeRef scalarInterface = scalarType.getInterface(GraphQLScalar.class).get();
 			TypeRef graphQLType = scalarInterface.getTypeParameter(1).get();
 
@@ -66,21 +78,29 @@ public class ScalarResolver
 			Conversion inputConversion = ctx.getTypeConverter()
 				.getDynamicConversion(Object.class, graphQLType.getErasedType());
 
+			// Create the GraphQL type representing the scalar
 			return GraphQLScalarType.newScalar()
 				.name(name)
 				.description(ctx.getDescription(scalarType))
-				.coercing(new ScalarCoercionWrapper<>((GraphQLScalar) scalar, inputConversion))
+				.coercing(new CustomCoercing<>((GraphQLScalar) scalar, inputConversion))
 				.build();
 		});
 	}
 
-	public static class ScalarCoercionWrapper<JavaType, GraphQLType>
+	/**
+	 * Implementation of {@link Coercing} that delegates work to an instance
+	 * of {@link GraphQLScalar}.
+	 *
+	 * @param <JavaType>
+	 * @param <GraphQLType>
+	 */
+	public static class CustomCoercing<JavaType, GraphQLType>
 		implements Coercing<JavaType, GraphQLType>
 	{
 		private final GraphQLScalar<JavaType, GraphQLType> scalar;
 		private final Conversion<Object, GraphQLType> inputConversion;
 
-		public ScalarCoercionWrapper(
+		public CustomCoercing(
 			GraphQLScalar<JavaType, GraphQLType> scalar,
 			Conversion<Object, GraphQLType> inputConversion
 		)
@@ -90,6 +110,7 @@ public class ScalarResolver
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public GraphQLType serialize(Object dataFetcherResult)
 			throws CoercingSerializeException
 		{

@@ -1,9 +1,8 @@
 package se.l4.graphql.binding.resolver.query;
 
-import java.util.Optional;
-
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLType;
+import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 
 /**
  * Resolver responsible for creating a {@link GraphQLType} for a certain
@@ -17,5 +16,5 @@ public interface GraphQLOutputResolver
 	 * @param encounter
 	 * @return
 	 */
-	Optional<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter);
+	ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter);
 }

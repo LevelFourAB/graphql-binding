@@ -1,8 +1,7 @@
 package se.l4.graphql.binding.resolver.input;
 
-import java.util.Optional;
-
 import graphql.schema.GraphQLInputType;
+import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 
 /**
  * Resolver responsible for creating a {@link GraphQLInputType} for a certain
@@ -16,5 +15,5 @@ public interface GraphQLInputResolver
 	 * @param encounter
 	 * @return
 	 */
-	Optional<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter);
+	ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter);
 }

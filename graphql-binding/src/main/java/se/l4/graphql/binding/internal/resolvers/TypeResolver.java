@@ -2,8 +2,8 @@ package se.l4.graphql.binding.internal.resolvers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
@@ -14,6 +14,7 @@ import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
@@ -27,14 +28,14 @@ public class TypeResolver
 		env -> env.getSource();
 
 	@Override
-	public Optional<GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());
 
 		resolve(encounter, encounter.getType(), DEFAULT_FETCHING, builder);
 
-		return Optional.of(builder.build());
+		return ResolvedGraphQLType.forType(builder.build());
 	}
 
 	public static void resolve(
@@ -60,9 +61,11 @@ public class TypeResolver
 				);
 			}
 
+			ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(field.getType());
+
 			builder.newField()
 				.over(field)
-				.setType(context.resolveOutput(field.getType()))
+				.setType(fieldType.getGraphQLType())
 				.withDataFetcher(new FieldDataFetcher<>(contextGetter, field.getField()))
 				.done();
 		}
@@ -83,9 +86,11 @@ public class TypeResolver
 				);
 			}
 
+			ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(method.getReturnType());
+
 			GraphQLFieldBuilder<?> fieldBuilder = builder.newField()
 				.over(method)
-				.setType(context.resolveOutput(method.getReturnType()));
+				.setType(fieldType.getGraphQLType());
 
 			List<ParameterRef> parameters = method.getParameters();
 			List<DataFetchingSupplier<?>> arguments = new ArrayList<>();
@@ -96,10 +101,12 @@ public class TypeResolver
 				String name = context.getParameterName(parameter);
 				arguments.add(env -> env.getArgument(name));
 
+				ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
+
 				// Register the argument
 				fieldBuilder.newArgument()
 					.over(parameter)
-					.setType(context.resolveInput(parameter.getType()))
+					.setType(argumentType.getGraphQLType())
 					.done();
 			}
 

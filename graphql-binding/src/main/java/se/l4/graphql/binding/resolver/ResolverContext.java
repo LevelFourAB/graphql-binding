@@ -1,6 +1,5 @@
 package se.l4.graphql.binding.resolver;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import graphql.schema.GraphQLInputType;
@@ -124,7 +123,7 @@ public interface ResolverContext
 	 * @param type
 	 * @return
 	 */
-	GraphQLOutputType resolveOutput(TypeRef type);
+	ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(TypeRef type);
 
 	/**
 	 * Convert a Java type into a GraphQL type, allowing the type to be
@@ -133,9 +132,9 @@ public interface ResolverContext
 	 * @param type
 	 * @return
 	 */
-	Optional<GraphQLOutputType> maybeResolveOutput(TypeRef type);
+	ResolvedGraphQLType<? extends GraphQLOutputType> maybeResolveOutput(TypeRef type);
 
-	GraphQLInputType resolveInput(TypeRef type);
+	ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(TypeRef type);
 
-	Optional<GraphQLInputType> maybeResolveInput(TypeRef type);
+	ResolvedGraphQLType<? extends GraphQLInputType> maybeResolveInput(TypeRef type);
 }

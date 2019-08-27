@@ -15,6 +15,7 @@ import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
@@ -36,15 +37,15 @@ public class ScalarResolver
 	}
 
 	@Override
-	public Optional<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		return Optional.of(resolve(encounter, encounter.getType()));
+		return ResolvedGraphQLType.forType(resolve(encounter, encounter.getType()));
 	}
 
 	@Override
-	public Optional<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		return Optional.of(resolve(encounter, encounter.getType()));
+		return ResolvedGraphQLType.forType(resolve(encounter, encounter.getType()));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

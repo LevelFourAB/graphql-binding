@@ -1,11 +1,12 @@
 package se.l4.graphql.binding.internal.resolvers;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLType;
-import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.commons.types.conversion.ConversionFunction;
+import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -16,16 +17,36 @@ public class ListResolver
 	implements GraphQLOutputResolver
 {
 	@Override
-	public Optional<GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResolvedGraphQLType<GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		GraphQLType componentType = encounter.getType().getTypeParameter(0)
+		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getTypeParameter(0)
 			.map(encounter::resolveOutput)
-			.orElseThrow(() -> new GraphQLMappingException(
+			.orElseThrow(() -> encounter.newError(
 				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
 			));
 
-		return Optional.of(
-			GraphQLList.list(componentType)
-		);
+		return ResolvedGraphQLType.forType(
+			GraphQLList.list(componentType.getGraphQLType())
+		).withConversion(new ListConverter(componentType.getConversion()));
+	}
+
+	private static class ListConverter<I, O>
+		implements ConversionFunction<Collection<I>, Collection<O>>
+	{
+		private final ConversionFunction<I, O> conversion;
+
+		public ListConverter(ConversionFunction<I, O> conversion)
+		{
+			this.conversion = conversion;
+		}
+
+		@Override
+		public Collection<O> convert(Collection<I> object)
+		{
+			return object.stream()
+				.map(conversion::convert)
+				.collect(Collectors.toList());
+		}
 	}
 }

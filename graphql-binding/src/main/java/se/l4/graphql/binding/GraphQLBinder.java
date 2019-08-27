@@ -1,9 +1,8 @@
 package se.l4.graphql.binding;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import graphql.schema.GraphQLSchema;
+import se.l4.commons.types.InstanceFactory;
+import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 
 /**
  * Mapper for taking annotated classes and interfaces and turning them into
@@ -11,16 +10,34 @@ import graphql.schema.GraphQLSchema;
  */
 public class GraphQLBinder
 {
-	private final Set<Class<?>> types;
+	private final InternalGraphQLSchemaBuilder builder;
 
 	public GraphQLBinder()
 	{
-		types = new HashSet<>();
+		builder = new InternalGraphQLSchemaBuilder();
+	}
+
+	public GraphQLBinder withInstanceFactory(InstanceFactory factory)
+	{
+		builder.setInstanceFactory(factory);
+		return this;
 	}
 
 	public GraphQLBinder withType(Class<?> type)
 	{
-		types.add(type);
+		builder.addType(type);
+		return this;
+	}
+
+	public GraphQLBinder withRoot(Object instance)
+	{
+		builder.addRootType(instance.getClass(), () -> instance);
+		return this;
+	}
+
+	public <T> GraphQLBinder withScalar(Class<T> scalar, GraphQLScalar<T, ?> binding)
+	{
+		builder.addScalar(scalar, binding);
 		return this;
 	}
 
@@ -31,6 +48,6 @@ public class GraphQLBinder
 	 */
 	public GraphQLSchema build()
 	{
-		throw new UnsupportedOperationException();
+		return builder.build();
 	}
 }

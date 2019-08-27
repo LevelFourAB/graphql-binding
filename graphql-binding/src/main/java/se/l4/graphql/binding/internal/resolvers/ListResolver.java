@@ -3,10 +3,13 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.conversion.ConversionFunction;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
+import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -14,7 +17,7 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
  * Resolver for a list.
  */
 public class ListResolver
-	implements GraphQLOutputResolver
+	implements GraphQLOutputResolver, GraphQLInputResolver
 {
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -22,6 +25,21 @@ public class ListResolver
 	{
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getTypeParameter(0)
 			.map(encounter::resolveOutput)
+			.orElseThrow(() -> encounter.newError(
+				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
+			));
+
+		return ResolvedGraphQLType.forType(
+			GraphQLList.list(componentType.getGraphQLType())
+		).withConversion(new ListConverter(componentType.getConversion()));
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
+	{
+		ResolvedGraphQLType<? extends GraphQLInputType> componentType = encounter.getType().getTypeParameter(0)
+			.map(encounter::resolveInput)
 			.orElseThrow(() -> encounter.newError(
 				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
 			));

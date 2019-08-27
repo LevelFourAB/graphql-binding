@@ -1,10 +1,12 @@
 package se.l4.graphql.binding.resolver;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.InstanceFactory;
+import se.l4.commons.types.conversion.TypeConverter;
 import se.l4.commons.types.reflect.Annotated;
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -64,6 +66,14 @@ public interface ResolverContext
 	 * @return
 	 */
 	InstanceFactory getInstanceFactory();
+
+	/**
+	 * Get type converter being used. Can be used to convert between different
+	 * primitives.
+	 *
+	 * @return
+	 */
+	TypeConverter getTypeConverter();
 
 	/**
 	 * Get the name of the type.

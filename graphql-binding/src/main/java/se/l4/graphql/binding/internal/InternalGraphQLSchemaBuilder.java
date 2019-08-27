@@ -3,30 +3,41 @@ package se.l4.graphql.binding.internal;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import graphql.Scalars;
+import graphql.language.BooleanValue;
+import graphql.language.FloatValue;
+import graphql.language.IntValue;
+import graphql.language.StringValue;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLInputType;
-import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLType;
 import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.Types;
+import se.l4.commons.types.conversion.StandardTypeConverter;
+import se.l4.commons.types.conversion.TypeConverter;
 import se.l4.commons.types.reflect.Annotated;
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
+import se.l4.graphql.binding.internal.resolvers.ListResolver;
+import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.internal.resolvers.TypeResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.ResolverContext;
@@ -48,6 +59,8 @@ public class InternalGraphQLSchemaBuilder
 	private final Map<TypeRef, GraphQLOutputType> builtOutputTypes;
 	private final Map<TypeRef, GraphQLInputType> builtInputTypes;
 
+	private final TypeConverter typeConverter;
+
 	private InstanceFactory instanceFactory;
 
 	public InternalGraphQLSchemaBuilder()
@@ -63,6 +76,13 @@ public class InternalGraphQLSchemaBuilder
 		builtInputTypes = new HashMap<>();
 		builtOutputTypes = new HashMap<>();
 
+		typeConverter = new StandardTypeConverter();
+		typeConverter.addConversion(StringValue.class, String.class, value -> value.getValue());
+		typeConverter.addConversion(BooleanValue.class, Boolean.class, value -> value.isValue());
+		typeConverter.addConversion(IntValue.class, BigInteger.class, value -> value.getValue());
+		typeConverter.addConversion(FloatValue.class, BigDecimal.class, value -> value.getValue());
+
+		// Register the built-in scalars
 		registerBuiltin(Scalars.GraphQLString, String.class);
 		registerBuiltin(Scalars.GraphQLChar, char.class, Character.class);
 
@@ -72,9 +92,13 @@ public class InternalGraphQLSchemaBuilder
 		registerBuiltin(Scalars.GraphQLShort, short.class, Short.class);
 		registerBuiltin(Scalars.GraphQLInt, int.class, Integer.class);
 		registerBuiltin(Scalars.GraphQLLong, long.class, Long.class);
+		registerBuiltin(Scalars.GraphQLFloat, float.class, Float.class, double.class, Double.class);
 
 		registerBuiltin(Scalars.GraphQLBigInteger, BigInteger.class);
 		registerBuiltin(Scalars.GraphQLBigDecimal, BigDecimal.class);
+
+		// Register some default type converters
+		typeResolvers.bindAny(Collection.class, new ListResolver());
 	}
 
 	/**
@@ -107,6 +131,18 @@ public class InternalGraphQLSchemaBuilder
 	public void addRootType(Class<?> type, Supplier<?> supplier)
 	{
 		this.rootTypes.put(type, supplier);
+	}
+
+	/**
+	 * Add a scalar binding.
+	 *
+	 * @param <JavaType>
+	 * @param type
+	 * @param scalar
+	 */
+	public <JavaType> void addScalar(Class<JavaType> type, GraphQLScalar<JavaType, ?> scalar)
+	{
+		this.typeResolvers.bindAny(type, new ScalarResolver(scalar));
 	}
 
 	/**
@@ -155,7 +191,6 @@ public class InternalGraphQLSchemaBuilder
 		GraphQLCodeRegistry.Builder codeRegistryBuilder = GraphQLCodeRegistry.newCodeRegistry();
 
 		ResolverContextImpl ctx = new ResolverContextImpl(
-			instanceFactory,
 			builder,
 			codeRegistryBuilder
 		);
@@ -187,7 +222,6 @@ public class InternalGraphQLSchemaBuilder
 	private class ResolverContextImpl
 		implements ResolverContext
 	{
-		private final InstanceFactory instanceFactory;
 		private final GraphQLSchema.Builder builder;
 
 		protected final GraphQLCodeRegistry.Builder codeRegistryBuilder;
@@ -195,13 +229,10 @@ public class InternalGraphQLSchemaBuilder
 		private Breadcrumb breadcrumb;
 
 		public ResolverContextImpl(
-			InstanceFactory instanceFactory,
 			GraphQLSchema.Builder builder,
 			GraphQLCodeRegistry.Builder codeRegistryBuilder
 		)
 		{
-			this.instanceFactory = instanceFactory;
-
 			this.builder = builder;
 			this.codeRegistryBuilder = codeRegistryBuilder;
 
@@ -212,6 +243,12 @@ public class InternalGraphQLSchemaBuilder
 		public InstanceFactory getInstanceFactory()
 		{
 			return instanceFactory;
+		}
+
+		@Override
+		public TypeConverter getTypeConverter()
+		{
+			return typeConverter;
 		}
 
 		@Override
@@ -447,15 +484,13 @@ public class InternalGraphQLSchemaBuilder
 		private final TypeRef type;
 
 		public OutputEncounterImpl(
-			InstanceFactory instanceFactory,
-
 			GraphQLSchema.Builder builder,
 			GraphQLCodeRegistry.Builder codeRegistryBuilder,
 
 			TypeRef type
 		)
 		{
-			super(instanceFactory, builder, codeRegistryBuilder);
+			super(builder, codeRegistryBuilder);
 
 			this.type = type;
 		}
@@ -483,15 +518,13 @@ public class InternalGraphQLSchemaBuilder
 		private final TypeRef type;
 
 		public InputEncounterImpl(
-			InstanceFactory instanceFactory,
-
 			GraphQLSchema.Builder builder,
 			GraphQLCodeRegistry.Builder codeRegistryBuilder,
 
 			TypeRef type
 		)
 		{
-			super(instanceFactory, builder, codeRegistryBuilder);
+			super(builder, codeRegistryBuilder);
 
 			this.type = type;
 		}

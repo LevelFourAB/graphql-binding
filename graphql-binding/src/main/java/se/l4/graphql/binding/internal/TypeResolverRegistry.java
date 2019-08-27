@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import se.l4.commons.types.matching.ClassMatchingHashMultimap;
 import se.l4.commons.types.matching.ClassMatchingMultimap;
+import se.l4.commons.types.matching.MatchedType;
 import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiInputResolver;
@@ -31,13 +32,26 @@ public class TypeResolverRegistry
 		this.inputTypes = new ClassMatchingHashMultimap<>();
 	}
 
+	public void bindAny(Class<?> type, Object resolver)
+	{
+		if(resolver instanceof GraphQLOutputResolver)
+		{
+			bindOutput(type, (GraphQLOutputResolver) resolver);
+		}
+
+		if(resolver instanceof GraphQLInputResolver)
+		{
+			bindInput(type, (GraphQLInputResolver) resolver);
+		}
+	}
+
 	/**
 	 * Bind an output resolver for the given type.
 	 *
 	 * @param type
 	 * @param resolver
 	 */
-	public <T> void bindOutput(Class<T> type, GraphQLOutputResolver resolver)
+	public void bindOutput(Class<?> type, GraphQLOutputResolver resolver)
 	{
 		outputTypes.put(type, resolver);
 	}
@@ -48,7 +62,7 @@ public class TypeResolverRegistry
 	 * @param type
 	 * @param resolver
 	 */
-	public <T> void bindInput(Class<T> type, GraphQLInputResolver resolver)
+	public void bindInput(Class<?> type, GraphQLInputResolver resolver)
 	{
 		inputTypes.put(type, resolver);
 	}
@@ -67,7 +81,11 @@ public class TypeResolverRegistry
 		List<GraphQLOutputResolver> resolvers = new ArrayList<>();
 
 		// Resolve ones that use types
-		resolvers.addAll(outputTypes.getAll((Class) type));
+		List<MatchedType<Object, GraphQLOutputResolver>> matching = outputTypes.getAll((Class) type);
+		for(MatchedType<Object, GraphQLOutputResolver> out : matching)
+		{
+			resolvers.add(out.getData());
+		}
 
 		if(type.isArray())
 		{
@@ -107,7 +125,11 @@ public class TypeResolverRegistry
 		List<GraphQLInputResolver> resolvers = new ArrayList<>();
 
 		// Resolve ones that use types
-		resolvers.addAll(outputTypes.getAll((Class) type));
+		List<MatchedType<Object, GraphQLInputResolver>> matching = inputTypes.getAll((Class) type);
+		for(MatchedType<Object, GraphQLInputResolver> in : matching)
+		{
+			resolvers.add(in.getData());
+		}
 
 		if(resolvers.isEmpty())
 		{

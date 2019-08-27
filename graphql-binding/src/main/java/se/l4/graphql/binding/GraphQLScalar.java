@@ -6,7 +6,7 @@ package se.l4.graphql.binding;
  * @param <PrimitiveType>
  * @param <Type>
  */
-public interface GraphQLScalar<GraphQLValue, Type>
+public interface GraphQLScalar<Type, GraphQLType>
 {
 	/**
 	 * Serialize the specified instance into a GraphQL type.
@@ -14,7 +14,7 @@ public interface GraphQLScalar<GraphQLValue, Type>
 	 * @param instance
 	 * @return
 	 */
-	GraphQLValue serialize(Type instance);
+	GraphQLType serialize(Type instance);
 
 	/**
 	 * Parse a value turning it into the type.
@@ -22,5 +22,5 @@ public interface GraphQLScalar<GraphQLValue, Type>
 	 * @param input
 	 * @return
 	 */
-	Type parseValue(GraphQLValue input);
+	Type parseValue(GraphQLType input);
 }

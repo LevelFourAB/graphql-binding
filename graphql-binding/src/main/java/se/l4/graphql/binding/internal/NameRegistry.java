@@ -115,19 +115,7 @@ public class NameRegistry
 			return name.get().value();
 		}
 
-		// TODO: Ability to turn off clean up of names?
-
-		String rawName = member.getName();
-		if(rawName.startsWith("is") && rawName.length() > 2)
-		{
-			return Character.toLowerCase(rawName.charAt(2)) + rawName.substring(3);
-		}
-		else if((rawName.startsWith("get") || rawName.startsWith("set")) && rawName.length() > 3)
-		{
-			return Character.toLowerCase(rawName.charAt(3)) + rawName.substring(4);
-		}
-
-		return rawName;
+		return member.getName();
 	}
 
 	public String getName(ParameterRef parameter)

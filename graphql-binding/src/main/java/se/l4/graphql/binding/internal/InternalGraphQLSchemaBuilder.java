@@ -25,6 +25,7 @@ import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
+import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
 import se.l4.graphql.binding.internal.resolvers.TypeResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
@@ -42,7 +43,7 @@ public class InternalGraphQLSchemaBuilder
 	private final TypeResolverRegistry typeResolvers;
 
 	private final Map<Class<?>, Supplier<?>> rootTypes;
-	private final List<Class<?>> outputTypes;
+	private final List<Class<?>> types;
 
 	private final Map<TypeRef, GraphQLOutputType> builtOutputTypes;
 	private final Map<TypeRef, GraphQLInputType> builtInputTypes;
@@ -57,7 +58,7 @@ public class InternalGraphQLSchemaBuilder
 		typeResolvers = new TypeResolverRegistry();
 
 		rootTypes = new HashMap<>();
-		outputTypes = new ArrayList<>();
+		types = new ArrayList<>();
 
 		builtInputTypes = new HashMap<>();
 		builtOutputTypes = new HashMap<>();
@@ -113,9 +114,9 @@ public class InternalGraphQLSchemaBuilder
 	 *
 	 * @param type
 	 */
-	public void addOutputType(Class<?> type)
+	public void addType(Class<?> type)
 	{
-		this.outputTypes.add(type);
+		this.types.add(type);
 	}
 
 	/**
@@ -159,10 +160,21 @@ public class InternalGraphQLSchemaBuilder
 			codeRegistryBuilder
 		);
 
-		for(Class<?> type : outputTypes)
+		for(Class<?> type : types)
 		{
-			GraphQLOutputType graphQLType = ctx.resolveOutput(Types.reference(type));
-			builder.additionalType(graphQLType);
+			TypeRef typeRef = Types.reference(type);
+
+			Optional<GraphQLOutputType> output = ctx.maybeResolveOutput(typeRef);
+			if(output.isPresent())
+			{
+				builder.additionalType(output.get());
+			}
+
+			Optional<GraphQLInputType> input = ctx.maybeResolveInput(typeRef);
+			if(input.isPresent())
+			{
+				builder.additionalType(input.get());
+			}
 		}
 
 		// Build the root type
@@ -318,45 +330,21 @@ public class InternalGraphQLSchemaBuilder
 				.orElse("");
 		}
 
-		@Override
-		public GraphQLInputType resolveInput(TypeRef type)
+		private void registerResolved(TypeRef type, GraphQLType graphQLType)
 		{
-			TypeRef withoutUsage = type.withoutUsage();
-
-			GraphQLInputType graphQLType;
-			if(builtInputTypes.containsKey(withoutUsage))
+			if(graphQLType instanceof GraphQLInputType)
 			{
-				graphQLType = builtInputTypes.get(withoutUsage);
-			}
-			else
-			{
-				graphQLType = typeResolvers.getInputResolver(type.getErasedType())
-					.flatMap(resolver -> resolver.resolveInput(new InputEncounterImpl(
-						instanceFactory,
-						builder,
-						codeRegistryBuilder,
-
-						withoutUsage
-					)))
-					.orElseThrow(() -> new GraphQLMappingException(
-						"Requested binding of `" + type.toTypeName()
-						+ "` but type is not resolvable to a GraphQL type. "
-						+ "Types need to be annotated or bound via resolvers"
-					));
-
-				builtInputTypes.put(withoutUsage, graphQLType);
+				builtInputTypes.put(type, (GraphQLInputType) graphQLType);
 			}
 
-			if(type.getUsage().hasAnnotation(GraphQLNonNull.class))
+			if(graphQLType instanceof GraphQLOutputType)
 			{
-				graphQLType = GraphQLNonNull.nonNull(graphQLType);
+				builtOutputTypes.put(type, (GraphQLOutputType) graphQLType);
 			}
-
-			return graphQLType;
 		}
 
 		@Override
-		public GraphQLOutputType resolveOutput(TypeRef type)
+		public Optional<GraphQLOutputType> maybeResolveOutput(TypeRef type)
 		{
 			TypeRef withoutUsage = type.withoutUsage();
 
@@ -367,29 +355,88 @@ public class InternalGraphQLSchemaBuilder
 			}
 			else
 			{
-				graphQLType = typeResolvers.getOutputResolver(type.getErasedType())
+				Optional<? extends GraphQLOutputType> resolved = typeResolvers.getOutputResolver(type.getErasedType())
 					.flatMap(resolver -> resolver.resolveOutput(new OutputEncounterImpl(
-						instanceFactory,
 						builder,
 						codeRegistryBuilder,
 
 						withoutUsage
-					)))
-					.orElseThrow(() -> new GraphQLMappingException(
-						"Requested binding of `" + type.toTypeName()
-						+ "` but type is not resolvable to a GraphQL type. "
-						+ "Types need to be annotated or bound via resolvers"
-					));
+					)));
 
-				builtOutputTypes.put(withoutUsage, graphQLType);
+				if(! resolved.isPresent())
+				{
+					return Optional.empty();
+				}
+
+				graphQLType = resolved.get();
+				registerResolved(withoutUsage, graphQLType);
 			}
 
 			if(type.getUsage().hasAnnotation(GraphQLNonNull.class))
 			{
-				graphQLType = GraphQLNonNull.nonNull(graphQLType);
+				graphQLType = graphql.schema.GraphQLNonNull.nonNull(graphQLType);
 			}
 
-			return graphQLType;
+			return Optional.of(graphQLType);
+		}
+
+		@Override
+		public GraphQLOutputType resolveOutput(TypeRef type)
+		{
+			return maybeResolveOutput(type)
+				.orElseThrow(() -> new GraphQLMappingException(
+					"Requested output binding of `" + type.toTypeName()
+					+ "` but type is not resolvable to a GraphQL type. "
+					+ "Types need to be annotated or bound via resolvers"
+				));
+		}
+
+		@Override
+		public Optional<GraphQLInputType> maybeResolveInput(TypeRef type)
+		{
+			TypeRef withoutUsage = type.withoutUsage();
+
+			GraphQLInputType graphQLType;
+			if(builtInputTypes.containsKey(withoutUsage))
+			{
+				graphQLType = builtInputTypes.get(withoutUsage);
+			}
+			else
+			{
+				Optional<? extends GraphQLInputType> resolved = typeResolvers.getInputResolver(type.getErasedType())
+					.flatMap(resolver -> resolver.resolveInput(new InputEncounterImpl(
+						builder,
+						codeRegistryBuilder,
+
+						withoutUsage
+					)));
+
+				if(! resolved.isPresent())
+				{
+					return Optional.empty();
+				}
+
+				graphQLType = resolved.get();
+				registerResolved(withoutUsage, graphQLType);
+			}
+
+			if(type.getUsage().hasAnnotation(GraphQLNonNull.class))
+			{
+				graphQLType = graphql.schema.GraphQLNonNull.nonNull(graphQLType);
+			}
+
+			return Optional.of(graphQLType);
+		}
+
+		@Override
+		public GraphQLInputType resolveInput(TypeRef type)
+		{
+			return maybeResolveInput(type)
+				.orElseThrow(() -> new GraphQLMappingException(
+					"Requested input binding of `" + type.toTypeName()
+					+ "` but type is not resolvable to a GraphQL type. "
+					+ "Types need to be annotated or bound via resolvers"
+				));
 		}
 	}
 

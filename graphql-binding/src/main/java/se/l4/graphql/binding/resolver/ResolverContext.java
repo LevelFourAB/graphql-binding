@@ -108,12 +108,24 @@ public interface ResolverContext
 	String getDescription(Annotated annotated);
 
 	/**
-	 * Convert a Java type into a GraphQL type.
+	 * Convert a Java type into a GraphQL type, throwing an exception if unable
+	 * to resolve.
 	 *
 	 * @param type
 	 * @return
 	 */
 	GraphQLOutputType resolveOutput(TypeRef type);
 
+	/**
+	 * Convert a Java type into a GraphQL type, allowing the type to be
+	 * non-existent.
+	 *
+	 * @param type
+	 * @return
+	 */
+	Optional<GraphQLOutputType> maybeResolveOutput(TypeRef type);
+
 	GraphQLInputType resolveInput(TypeRef type);
+
+	Optional<GraphQLInputType> maybeResolveInput(TypeRef type);
 }

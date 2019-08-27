@@ -17,10 +17,12 @@ import graphql.language.IntValue;
 import graphql.language.StringValue;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLModifiedType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLType;
 import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.Types;
@@ -109,9 +111,10 @@ public class InternalGraphQLSchemaBuilder
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void registerBuiltin(GraphQLScalarType graphQLType, Class<?>... types)
 	{
+		ResolvedGraphQLType<?> resolved = ResolvedGraphQLType.forType(graphQLType);
+
 		for(Class<?> t : types)
 		{
-			ResolvedGraphQLType<?> resolved = ResolvedGraphQLType.forType(graphQLType);
 			TypeRef type = Types.reference(t);
 
 			builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
@@ -375,12 +378,18 @@ public class InternalGraphQLSchemaBuilder
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private void registerResolved(TypeRef type, ResolvedGraphQLType<?> resolved)
 		{
-			if(resolved.getGraphQLType() instanceof GraphQLInputType)
+			GraphQLType gql = resolved.getGraphQLType();
+			if(gql instanceof GraphQLModifiedType)
+			{
+				gql = ((GraphQLModifiedType) gql).getWrappedType();
+			}
+
+			if(gql instanceof GraphQLInputType)
 			{
 				builtInputTypes.put(type, (ResolvedGraphQLType) resolved);
 			}
 
-			if(resolved.getGraphQLType() instanceof GraphQLOutputType)
+			if(gql instanceof GraphQLOutputType)
 			{
 				builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
 			}

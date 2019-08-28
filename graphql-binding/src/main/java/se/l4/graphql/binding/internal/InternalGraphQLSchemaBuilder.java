@@ -169,6 +169,19 @@ public class InternalGraphQLSchemaBuilder
 		this.types.add(type);
 	}
 
+	public void bind(Class<?> type, Object resolver)
+	{
+		if(! (resolver instanceof GraphQLInputResolver)
+			&& ! (resolver instanceof GraphQLOutputResolver))
+		{
+			throw new GraphQLMappingException(
+				"Could not bind type `" + type + "`, resolver does not implement GraphQLInputResolver or GraphQLOutputResolver"
+			);
+		}
+
+		this.typeResolvers.bindAny(type, resolver);
+	}
+
 	/**
 	 * Build the root query type by going through and resolving all of the root
 	 * types.

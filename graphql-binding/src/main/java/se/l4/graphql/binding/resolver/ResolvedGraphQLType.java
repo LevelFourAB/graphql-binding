@@ -91,8 +91,12 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 		return conversion;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<T> withConversion(DataFetchingConversion<?, ?> conversion)
 	{
-		return new ResolvedGraphQLType<>(type, conversion);
+		return new ResolvedGraphQLType<>(
+			type,
+			this.conversion == IDENTITY ? conversion : this.conversion.and((DataFetchingConversion) conversion)
+		);
 	}
 }

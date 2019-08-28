@@ -29,6 +29,12 @@ public class GraphQLBinder
 		return this;
 	}
 
+	public GraphQLBinder withType(Class<?> type, Object resolver)
+	{
+		builder.bind(type, resolver);
+		return this;
+	}
+
 	public GraphQLBinder withRoot(Object instance)
 	{
 		builder.addRootType(instance.getClass(), () -> instance);

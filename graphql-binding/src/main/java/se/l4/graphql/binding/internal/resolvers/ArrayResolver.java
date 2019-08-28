@@ -18,7 +18,7 @@ public class ArrayResolver
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResolvedGraphQLType<GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getComponentType()
 			.map(encounter::resolveOutput)

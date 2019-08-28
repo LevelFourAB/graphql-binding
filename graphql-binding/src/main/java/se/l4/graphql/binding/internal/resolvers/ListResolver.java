@@ -22,7 +22,7 @@ public class ListResolver
 {
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResolvedGraphQLType<GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getTypeParameter(0)
 			.map(encounter::resolveOutput)

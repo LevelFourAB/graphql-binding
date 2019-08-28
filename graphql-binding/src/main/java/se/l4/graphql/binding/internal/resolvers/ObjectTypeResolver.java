@@ -41,7 +41,7 @@ public class ObjectTypeResolver
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());
 
-		resolve(encounter, encounter.getType(), DEFAULT_FETCHING, builder);
+		resolve(encounter.getContext(), encounter.getType(), DEFAULT_FETCHING, builder);
 
 		return ResolvedGraphQLType.forType(builder.build());
 	}

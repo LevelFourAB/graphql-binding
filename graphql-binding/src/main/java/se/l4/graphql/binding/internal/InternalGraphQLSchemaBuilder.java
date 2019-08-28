@@ -428,9 +428,7 @@ public class InternalGraphQLSchemaBuilder
 				}
 
 				graphQLType = resolver.get().resolveOutput(new OutputEncounterImpl(
-					builder,
-					codeRegistryBuilder,
-
+					this,
 					withoutUsage
 				));
 
@@ -486,9 +484,7 @@ public class InternalGraphQLSchemaBuilder
 				}
 
 				graphQLType = resolver.get().resolveInput(new InputEncounterImpl(
-					builder,
-					codeRegistryBuilder,
-
+					this,
 					withoutUsage
 				));
 
@@ -527,21 +523,23 @@ public class InternalGraphQLSchemaBuilder
 	}
 
 	private class OutputEncounterImpl
-		extends ResolverContextImpl
 		implements GraphQLOutputEncounter
 	{
+		private final ResolverContextImpl context;
 		private final TypeRef type;
 
 		public OutputEncounterImpl(
-			GraphQLSchema.Builder builder,
-			GraphQLCodeRegistry.Builder codeRegistryBuilder,
-
+			ResolverContextImpl context,
 			TypeRef type
 		)
 		{
-			super(builder, codeRegistryBuilder);
-
+			this.context = context;
 			this.type = type;
+		}
+
+		public ResolverContext getContext()
+		{
+			return context;
 		}
 
 		@Override
@@ -554,28 +552,31 @@ public class InternalGraphQLSchemaBuilder
 		public GraphQLObjectBuilder newObjectType()
 		{
 			return new GraphQLObjectBuilderImpl(
-				this,
-				codeRegistryBuilder
+				context,
+				context.codeRegistryBuilder
 			);
 		}
 	}
 
 	private class InputEncounterImpl
-		extends ResolverContextImpl
 		implements GraphQLInputEncounter
 	{
+		private final ResolverContextImpl context;
 		private final TypeRef type;
 
 		public InputEncounterImpl(
-			GraphQLSchema.Builder builder,
-			GraphQLCodeRegistry.Builder codeRegistryBuilder,
-
+			ResolverContextImpl context,
 			TypeRef type
 		)
 		{
-			super(builder, codeRegistryBuilder);
-
+			this.context = context;
 			this.type = type;
+		}
+
+		@Override
+		public ResolverContext getContext()
+		{
+			return context;
 		}
 
 		@Override

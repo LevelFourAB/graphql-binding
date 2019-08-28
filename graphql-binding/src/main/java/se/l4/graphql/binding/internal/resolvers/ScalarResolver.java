@@ -39,13 +39,13 @@ public class ScalarResolver
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		return ResolvedGraphQLType.forType(resolve(encounter, encounter.getType()));
+		return ResolvedGraphQLType.forType(resolve(encounter.getContext(), encounter.getType()));
 	}
 
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		return ResolvedGraphQLType.forType(resolve(encounter, encounter.getType()));
+		return ResolvedGraphQLType.forType(resolve(encounter.getContext(), encounter.getType()));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

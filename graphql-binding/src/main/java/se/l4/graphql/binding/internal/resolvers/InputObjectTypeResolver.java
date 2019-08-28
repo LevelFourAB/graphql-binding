@@ -28,7 +28,7 @@ public class InputObjectTypeResolver
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		ResolverContext context = encounter;
+		ResolverContext context = encounter.getContext();
 		TypeRef type = encounter.getType();
 
 		GraphQLInputObjectType.Builder builder = GraphQLInputObjectType.newInputObject()

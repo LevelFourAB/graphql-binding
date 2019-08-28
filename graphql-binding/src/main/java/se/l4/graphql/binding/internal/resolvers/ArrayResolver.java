@@ -9,6 +9,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
 import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -20,9 +21,11 @@ public class ArrayResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
+		ResolverContext context = encounter.getContext();
+
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getComponentType()
-			.map(encounter::resolveOutput)
-			.orElseThrow(() -> encounter.newError(
+			.map(context::resolveOutput)
+			.orElseThrow(() -> context.newError(
 				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
 			));
 

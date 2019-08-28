@@ -5,6 +5,7 @@ import se.l4.commons.types.Types;
 import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -21,10 +22,12 @@ public class ConvertingTypeResolver<I, O>
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		ResolvedGraphQLType<? extends GraphQLOutputType> type = encounter.resolveOutput(
+		ResolverContext context = encounter.getContext();
+
+		ResolvedGraphQLType<? extends GraphQLOutputType> type = context.resolveOutput(
 			Types.reference(factory.getOutput())
 		);
 

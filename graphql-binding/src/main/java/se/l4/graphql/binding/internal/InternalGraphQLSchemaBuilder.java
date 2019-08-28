@@ -5,9 +5,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import graphql.Scalars;
@@ -23,6 +25,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
+import graphql.schema.GraphQLTypeReference;
 import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.Types;
@@ -202,7 +205,6 @@ public class InternalGraphQLSchemaBuilder
 		GraphQLCodeRegistry.Builder codeRegistryBuilder = GraphQLCodeRegistry.newCodeRegistry();
 
 		ResolverContextImpl ctx = new ResolverContextImpl(
-			builder,
 			codeRegistryBuilder
 		);
 
@@ -244,21 +246,29 @@ public class InternalGraphQLSchemaBuilder
 	private class ResolverContextImpl
 		implements ResolverContext
 	{
-		private final GraphQLSchema.Builder builder;
-
 		protected final GraphQLCodeRegistry.Builder codeRegistryBuilder;
+
+		private final Set<TypeRef> inputsBeingResolved;
+		private final Map<TypeRef, PendingDataFetchingConversion<?, ?>> pendingInputConversions;
+
+		private final Set<TypeRef> outputsBeingResolved;
+		private final Map<TypeRef, PendingDataFetchingConversion<?, ?>> pendingOutputConversions;
 
 		private Breadcrumb breadcrumb;
 
 		public ResolverContextImpl(
-			GraphQLSchema.Builder builder,
 			GraphQLCodeRegistry.Builder codeRegistryBuilder
 		)
 		{
-			this.builder = builder;
 			this.codeRegistryBuilder = codeRegistryBuilder;
 
 			breadcrumb = Breadcrumb.empty();
+
+			inputsBeingResolved = new HashSet<>();
+			pendingInputConversions = new HashMap<>();
+
+			outputsBeingResolved = new HashSet<>();
+			pendingOutputConversions = new HashMap<>();
 		}
 
 		@Override
@@ -421,20 +431,50 @@ public class InternalGraphQLSchemaBuilder
 			}
 			else
 			{
-				Optional<GraphQLOutputResolver> resolver = typeResolvers.getOutputResolver(type.getErasedType());
-				if(! resolver.isPresent())
+				if(outputsBeingResolved.contains(withoutUsage))
 				{
-					return ResolvedGraphQLType.none();
+					/*
+					 * This type is already being resolved, return a type
+					 * reference with a pending conversion.
+					 */
+
+					String name = getTypeName(withoutUsage);
+					PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions
+						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
+
+					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
+						.withConversion(pending);
 				}
 
-				graphQLType = resolver.get().resolveOutput(new OutputEncounterImpl(
-					this,
-					withoutUsage
-				));
+				try
+				{
+					outputsBeingResolved.add(withoutUsage);
+
+					Optional<GraphQLOutputResolver> resolver = typeResolvers.getOutputResolver(type.getErasedType());
+					if(! resolver.isPresent())
+					{
+						return ResolvedGraphQLType.none();
+					}
+
+					graphQLType = resolver.get().resolveOutput(new OutputEncounterImpl(
+						this,
+						withoutUsage
+					));
+				}
+				finally
+				{
+					outputsBeingResolved.remove(withoutUsage);
+				}
 
 				if(! graphQLType.isPresent())
 				{
 					return ResolvedGraphQLType.none();
+				}
+
+				PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions.get(withoutUsage);
+				if(pending != null)
+				{
+					pending.update(graphQLType.getConversion());
 				}
 
 				registerResolved(withoutUsage, graphQLType);
@@ -477,20 +517,50 @@ public class InternalGraphQLSchemaBuilder
 			}
 			else
 			{
-				Optional<GraphQLInputResolver> resolver = typeResolvers.getInputResolver(type.getErasedType());
-				if(! resolver.isPresent())
+				if(inputsBeingResolved.contains(withoutUsage))
 				{
-					return ResolvedGraphQLType.none();
+					/*
+					 * This type is already being resolved, return a type
+					 * reference with a pending conversion.
+					 */
+
+					String name = getTypeName(withoutUsage);
+					PendingDataFetchingConversion<?, ?> pending = pendingInputConversions
+						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
+
+					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
+						.withConversion(pending);
 				}
 
-				graphQLType = resolver.get().resolveInput(new InputEncounterImpl(
-					this,
-					withoutUsage
-				));
+				try
+				{
+					inputsBeingResolved.add(withoutUsage);
+
+					Optional<GraphQLInputResolver> resolver = typeResolvers.getInputResolver(type.getErasedType());
+					if(! resolver.isPresent())
+					{
+						return ResolvedGraphQLType.none();
+					}
+
+					graphQLType = resolver.get().resolveInput(new InputEncounterImpl(
+						this,
+						withoutUsage
+					));
+				}
+				finally
+				{
+					inputsBeingResolved.remove(withoutUsage);
+				}
 
 				if(! graphQLType.isPresent())
 				{
 					return ResolvedGraphQLType.none();
+				}
+
+				PendingDataFetchingConversion<?, ?> pending = pendingInputConversions.get(withoutUsage);
+				if(pending != null)
+				{
+					pending.update(graphQLType.getConversion());
 				}
 
 				registerResolved(withoutUsage, graphQLType);

@@ -11,7 +11,7 @@ import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiInputResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiOutputResolver;
-import se.l4.graphql.binding.internal.resolvers.TypeResolver;
+import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -21,7 +21,7 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 public class TypeResolverRegistry
 {
 	private static final GraphQLOutputResolver ARRAY_RESOLVER = new ArrayResolver();
-	private static final GraphQLOutputResolver TYPE_RESOLVER = new TypeResolver();
+	private static final GraphQLOutputResolver TYPE_RESOLVER = new ObjectTypeResolver();
 
 	private final ClassMatchingMultimap<Object, GraphQLOutputResolver> outputTypes;
 	private final ClassMatchingMultimap<Object, GraphQLInputResolver> inputTypes;

@@ -5,12 +5,14 @@ import java.util.List;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
@@ -23,7 +25,11 @@ import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
-public class TypeResolver
+/**
+ * Resolver for types annotated with {@link GraphQLType} that resolve to
+ * {@link GraphQLObjectType}.
+ */
+public class ObjectTypeResolver
 	implements GraphQLOutputResolver
 {
 	private static final DataFetchingSupplier<Object> DEFAULT_FETCHING =

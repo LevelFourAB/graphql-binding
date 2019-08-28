@@ -41,8 +41,8 @@ import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
+import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
-import se.l4.graphql.binding.internal.resolvers.TypeResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.ResolverContext;
@@ -185,7 +185,7 @@ public class InternalGraphQLSchemaBuilder
 		for(Map.Entry<Class<?>, Supplier<?>> e : rootTypes.entrySet())
 		{
 			Supplier<?> supplier = e.getValue();
-			TypeResolver.resolve(
+			ObjectTypeResolver.resolve(
 				ctx,
 				Types.reference(e.getKey()),
 				env -> supplier.get(),

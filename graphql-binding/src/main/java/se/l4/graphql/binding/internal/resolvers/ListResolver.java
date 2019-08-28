@@ -3,10 +3,11 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.conversion.ConversionFunction;
+import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
@@ -50,20 +51,20 @@ public class ListResolver
 	}
 
 	private static class ListConverter<I, O>
-		implements ConversionFunction<Collection<I>, Collection<O>>
+		implements DataFetchingConversion<Collection<I>, Collection<O>>
 	{
-		private final ConversionFunction<I, O> conversion;
+		private final DataFetchingConversion<I, O> conversion;
 
-		public ListConverter(ConversionFunction<I, O> conversion)
+		public ListConverter(DataFetchingConversion<I, O> conversion)
 		{
 			this.conversion = conversion;
 		}
 
 		@Override
-		public Collection<O> convert(Collection<I> object)
+		public Collection<O> convert(DataFetchingEnvironment env, Collection<I> object)
 		{
 			return object.stream()
-				.map(conversion::convert)
+				.map(item -> conversion.convert(env, item))
 				.collect(Collectors.toList());
 		}
 	}

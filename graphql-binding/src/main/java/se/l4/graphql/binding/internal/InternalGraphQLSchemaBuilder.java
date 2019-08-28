@@ -37,6 +37,9 @@ import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
+import se.l4.graphql.binding.internal.factory.Factory;
+import se.l4.graphql.binding.internal.factory.FactoryResolver;
+import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.internal.resolvers.TypeResolver;
@@ -203,6 +206,17 @@ public class InternalGraphQLSchemaBuilder
 			codeRegistryBuilder
 		);
 
+		// Resolve all of the extra bindings - for when types use @GraphQLSource
+		for(Class<?> type : types)
+		{
+			List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, Types.reference(type));
+			for(Factory<Object, ?> factory : factories)
+			{
+				typeResolvers.bindOutput(factory.getInput(), new ConvertingTypeResolver<>(factory));
+			}
+		}
+
+		// Resolve all of the known types
 		for(Class<?> type : types)
 		{
 			TypeRef typeRef = Types.reference(type);

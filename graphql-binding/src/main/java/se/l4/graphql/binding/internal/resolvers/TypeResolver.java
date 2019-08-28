@@ -6,12 +6,12 @@ import java.util.List;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.conversion.ConversionFunction;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
@@ -107,7 +107,7 @@ public class TypeResolver
 
 				// Resolve the supplier to use for the parameter
 				String name = context.getParameterName(parameter);
-				arguments.add(new ArgumentResolver(name, (ConversionFunction) argumentType.getConversion()));
+				arguments.add(new ArgumentResolver(name, (DataFetchingConversion) argumentType.getConversion()));
 
 
 				// Register the argument
@@ -131,9 +131,9 @@ public class TypeResolver
 		implements DataFetchingSupplier<Object>
 	{
 		private final String name;
-		private final ConversionFunction<Object, Object> conversion;
+		private final DataFetchingConversion<Object, Object> conversion;
 
-		public ArgumentResolver(String name, ConversionFunction<Object, Object> conversion)
+		public ArgumentResolver(String name, DataFetchingConversion<Object, Object> conversion)
 		{
 			this.name = name;
 			this.conversion = conversion;
@@ -148,7 +148,7 @@ public class TypeResolver
 				return null;
 			}
 
-			return conversion.convert(value);
+			return conversion.convert(env, value);
 		}
 	}
 }

@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.conversion.ConversionFunction;
+import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
@@ -31,20 +32,20 @@ public class ArrayResolver
 	}
 
 	private static class ArrayConverter<I, O>
-		implements ConversionFunction<I[], Collection<O>>
+		implements DataFetchingConversion<I[], Collection<O>>
 	{
-		private final ConversionFunction<I, O> conversion;
+		private final DataFetchingConversion<I, O> conversion;
 
-		public ArrayConverter(ConversionFunction<I, O> conversion)
+		public ArrayConverter(DataFetchingConversion<I, O> conversion)
 		{
 			this.conversion = conversion;
 		}
 
 		@Override
-		public Collection<O> convert(I[] object)
+		public Collection<O> convert(DataFetchingEnvironment env, I[] object)
 		{
 			return Arrays.stream(object)
-				.map(conversion::convert)
+				.map(item -> conversion.convert(env, item))
 				.collect(Collectors.toList());
 		}
 	}

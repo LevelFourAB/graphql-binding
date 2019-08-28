@@ -3,7 +3,7 @@ package se.l4.graphql.binding.resolver;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLType;
-import se.l4.commons.types.conversion.ConversionFunction;
+import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
 /**
@@ -12,14 +12,14 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 public class ResolvedGraphQLType<T extends GraphQLType>
 {
 	private static final ResolvedGraphQLType<?> NONE = new ResolvedGraphQLType<>(null, null);
-	private static final ConversionFunction<?, ?> IDENTITY = i -> i;
+	private static final DataFetchingConversion<?, ?> IDENTITY = (env, i) -> i;
 
 	private final T type;
-	private final ConversionFunction<?, ?> conversion;
+	private final DataFetchingConversion<?, ?> conversion;
 
 	private ResolvedGraphQLType(
 		T type,
-		ConversionFunction<?, ?> conversion
+		DataFetchingConversion<?, ?> conversion
 	)
 	{
 		this.type = type;
@@ -82,7 +82,7 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 	 *
 	 * @return
 	 */
-	public ConversionFunction<?, ?> getConversion()
+	public DataFetchingConversion<?, ?> getConversion()
 	{
 		if(! isPresent())
 		{
@@ -92,7 +92,7 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 		return conversion;
 	}
 
-	public <I> ResolvedGraphQLType<T> withConversion(ConversionFunction<I, T> conversion)
+	public <I> ResolvedGraphQLType<T> withConversion(DataFetchingConversion<I, T> conversion)
 	{
 		return new ResolvedGraphQLType<>(type, conversion);
 	}

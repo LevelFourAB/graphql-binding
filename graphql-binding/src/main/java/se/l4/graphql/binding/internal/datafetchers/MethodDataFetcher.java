@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import se.l4.commons.types.conversion.ConversionFunction;
+import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 
 public class MethodDataFetcher<I, T>
@@ -14,13 +14,13 @@ public class MethodDataFetcher<I, T>
 	private final DataFetchingSupplier<Object> contextGetter;
 	private final Method method;
 	private final DataFetchingSupplier<?>[] parameters;
-	private final ConversionFunction<I, T> returnTypeConversion;
+	private final DataFetchingConversion<I, T> returnTypeConversion;
 
 	public MethodDataFetcher(
 		DataFetchingSupplier<Object> contextGetter,
 		Method method,
 		DataFetchingSupplier<?>[] parameters,
-		ConversionFunction<I, T> returnTypeConversion
+		DataFetchingConversion<I, T> returnTypeConversion
 	)
 	{
 		this.contextGetter = contextGetter;
@@ -43,6 +43,6 @@ public class MethodDataFetcher<I, T>
 				.toArray()
 		);
 
-		return returnTypeConversion.convert(result);
+		return returnTypeConversion.convert(environment, result);
 	}
 }

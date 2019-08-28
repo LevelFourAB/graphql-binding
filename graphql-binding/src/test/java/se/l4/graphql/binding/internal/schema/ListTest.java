@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
+import graphql.Scalars;
+import graphql.schema.GraphQLList;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
@@ -25,6 +27,26 @@ public class ListTest
 	{
 		binder.withRoot(new Root());
 	}
+
+	@Test
+	public void testSchema()
+	{
+		graphql.schema.GraphQLType type = schema.getQueryType().getFieldDefinition("outputString")
+			.getType();
+
+		assertThat("outputString returns list of strings", type, is(GraphQLList.list(Scalars.GraphQLString)));
+
+		type = schema.getQueryType().getFieldDefinition("outputStringNonNull")
+			.getType();
+
+		assertThat("outputStringNonNull returns non-null list of strings", type, is(graphql.schema.GraphQLNonNull.nonNull(GraphQLList.list(Scalars.GraphQLString))));
+
+		type = schema.getQueryType().getFieldDefinition("outputStringNonNullItems")
+			.getType();
+
+		assertThat("outputStringNonNullItems returns list of non-null strings", type, is(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
+	}
+
 
 	@Test
 	public void testOutputWithScalar()
@@ -59,6 +81,19 @@ public class ListTest
 	{
 		@GraphQLField
 		public List<String> outputString()
+		{
+			return ImmutableList.of("one", "two");
+		}
+
+		@GraphQLField
+		@GraphQLNonNull
+		public List<String> outputStringNonNull()
+		{
+			return ImmutableList.of("one", "two");
+		}
+
+		@GraphQLField
+		public List<@GraphQLNonNull String> outputStringNonNullItems()
 		{
 			return ImmutableList.of("one", "two");
 		}

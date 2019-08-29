@@ -10,7 +10,6 @@ import org.junit.Test;
 import se.l4.commons.types.Types;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLName;
-import se.l4.graphql.binding.internal.NameRegistry;
 
 public class NameRegistryTest
 {

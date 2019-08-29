@@ -91,7 +91,10 @@ public class NameRegistry
 		return typeReverseNames.containsKey(name);
 	}
 
-	public void reserveName(String name, Breadcrumb crumb)
+	public void reserveName(
+		String name,
+		Breadcrumb crumb,
+		TypeRef... refs)
 	{
 		if(hasName(name))
 		{
@@ -99,6 +102,11 @@ public class NameRegistry
 		}
 
 		typeReverseNames.put(name, crumb);
+
+		for(TypeRef ref : refs)
+		{
+			typeNames.put(ref.withoutUsage(), name);
+		}
 	}
 
 	/**

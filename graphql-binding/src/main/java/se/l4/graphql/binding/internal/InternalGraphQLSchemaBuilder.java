@@ -3,6 +3,7 @@ package se.l4.graphql.binding.internal;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,19 +133,25 @@ public class InternalGraphQLSchemaBuilder
 	 * Register a built in scalar and bind it to the specified types.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void registerBuiltin(GraphQLScalarType graphQLType, Class<?>... types)
+	private void registerBuiltin(GraphQLScalarType graphQLType, Class<?>... classes)
 	{
 		ResolvedGraphQLType<?> resolved = ResolvedGraphQLType.forType(graphQLType);
 
-		for(Class<?> t : types)
-		{
-			TypeRef type = Types.reference(t);
+		TypeRef[] types = Arrays.stream(classes)
+			.map(t -> Types.reference(t))
+			.toArray(TypeRef[]::new);
 
+		for(TypeRef type : types)
+		{
 			builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
 			builtInputTypes.put(type, (ResolvedGraphQLType) resolved);
 		}
 
-		names.reserveName(graphQLType.getName(), Breadcrumb.custom("by built-in scalar " + graphQLType.getName()));
+		names.reserveName(
+			graphQLType.getName(),
+			Breadcrumb.custom("by built-in scalar " + graphQLType.getName()),
+			types
+		);
 	}
 
 	public void setInstanceFactory(InstanceFactory instanceFactory)
@@ -258,11 +265,14 @@ public class InternalGraphQLSchemaBuilder
 		// Resolve all of the extra bindings - for when types use @GraphQLSource
 		for(Class<?> type : types)
 		{
-			List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, Types.reference(type));
-			for(Factory<Object, ?> factory : factories)
-			{
-				typeResolvers.bindOutput(factory.getInput(), new ConvertingTypeResolver<>(factory));
-			}
+			TypeRef typeRef = Types.reference(type);
+			ctx.breadcrumb(Breadcrumb.forType(typeRef), () -> {
+				List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, typeRef);
+				for(Factory<Object, ?> factory : factories)
+				{
+					typeResolvers.bindOutput(factory.getInput(), new ConvertingTypeResolver<>(factory));
+				}
+			});
 		}
 
 		// Resolve all of the known types
@@ -270,17 +280,19 @@ public class InternalGraphQLSchemaBuilder
 		{
 			TypeRef typeRef = Types.reference(type);
 
-			ResolvedGraphQLType<?> output = ctx.maybeResolveOutput(typeRef);
-			if(output.isPresent())
-			{
-				builder.additionalType(output.getGraphQLType());
-			}
+			ctx.breadcrumb(Breadcrumb.forType(typeRef), () -> {
+				ResolvedGraphQLType<?> output = ctx.maybeResolveOutput(typeRef);
+				if(output.isPresent())
+				{
+					builder.additionalType(output.getGraphQLType());
+				}
 
-			ResolvedGraphQLType<?> input = ctx.maybeResolveInput(typeRef);
-			if(input.isPresent())
-			{
-				builder.additionalType(input.getGraphQLType());
-			}
+				ResolvedGraphQLType<?> input = ctx.maybeResolveInput(typeRef);
+				if(input.isPresent())
+				{
+					builder.additionalType(input.getGraphQLType());
+				}
+			});
 		}
 
 		// Build the root type

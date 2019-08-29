@@ -8,7 +8,7 @@ import org.junit.Test;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
-import se.l4.graphql.binding.annotations.GraphQLType;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class InterfaceTypeTest
@@ -61,7 +61,7 @@ public class InterfaceTypeTest
 		String name();
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class Impl implements Interface
 	{
 		@Override

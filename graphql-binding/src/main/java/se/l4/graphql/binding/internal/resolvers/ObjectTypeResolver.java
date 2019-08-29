@@ -17,7 +17,7 @@ import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
-import se.l4.graphql.binding.annotations.GraphQLType;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
@@ -32,7 +32,7 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
 /**
- * Resolver for types annotated with {@link GraphQLType} that resolve to
+ * Resolver for types annotated with {@link GraphQLObject} that resolve to
  * {@link GraphQLObjectType}.
  */
 public class ObjectTypeResolver
@@ -45,7 +45,7 @@ public class ObjectTypeResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
-		if(! type.hasAnnotation(GraphQLType.class))
+		if(! type.hasAnnotation(GraphQLObject.class))
 		{
 			return ResolvedGraphQLType.none();
 		}

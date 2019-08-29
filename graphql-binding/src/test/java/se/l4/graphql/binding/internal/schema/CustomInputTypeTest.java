@@ -9,7 +9,7 @@ import graphql.Scalars;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
-import se.l4.graphql.binding.annotations.GraphQLInputType;
+import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.GraphQLTest;
@@ -90,7 +90,7 @@ public class CustomInputTypeTest
 		}
 	}
 
-	@GraphQLInputType
+	@GraphQLInputObject
 	public static class CustomType
 	{
 		@GraphQLField

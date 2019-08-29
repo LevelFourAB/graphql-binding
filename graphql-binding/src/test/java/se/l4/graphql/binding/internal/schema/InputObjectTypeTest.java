@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
-import se.l4.graphql.binding.annotations.GraphQLInputType;
+import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
@@ -79,7 +79,7 @@ public class InputObjectTypeTest
 		}
 	}
 
-	@GraphQLInputType
+	@GraphQLInputObject
 	public static class TestInput
 	{
 		@GraphQLField
@@ -89,7 +89,7 @@ public class InputObjectTypeTest
 		public SubTestInput sub;
 	}
 
-	@GraphQLInputType
+	@GraphQLInputObject
 	public static class SubTestInput
 	{
 		@GraphQLField

@@ -12,8 +12,8 @@ import org.junit.Test;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLSource;
-import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class TypeConversionTest
@@ -72,7 +72,7 @@ public class TypeConversionTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class ActualSubType
 	{
 		private final ConvertedType data;

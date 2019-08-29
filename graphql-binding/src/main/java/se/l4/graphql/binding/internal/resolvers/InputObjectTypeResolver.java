@@ -32,7 +32,7 @@ public class InputObjectTypeResolver
 	public ResolvedGraphQLType<? extends GraphQLInputObjectType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		TypeRef initialType = encounter.getType();
-		if(! initialType.hasAnnotation(se.l4.graphql.binding.annotations.GraphQLInputType.class))
+		if(! initialType.hasAnnotation(se.l4.graphql.binding.annotations.GraphQLInputObject.class))
 		{
 			return ResolvedGraphQLType.none();
 		}

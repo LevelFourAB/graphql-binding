@@ -15,7 +15,7 @@ import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
-import se.l4.graphql.binding.annotations.GraphQLType;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class ListTest
@@ -116,7 +116,7 @@ public class ListTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class Sub
 	{
 		@GraphQLField

@@ -16,11 +16,11 @@ import graphql.schema.GraphQLOutputType;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLField;
-import se.l4.graphql.binding.annotations.GraphQLInputType;
+import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLSource;
-import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class SelfReferencingTypeTest
@@ -153,7 +153,7 @@ public class SelfReferencingTypeTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class DirectRef
 	{
 		private final String name;
@@ -178,7 +178,7 @@ public class SelfReferencingTypeTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class IndirectRef
 	{
 		private final String name;
@@ -214,7 +214,7 @@ public class SelfReferencingTypeTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLObject
 	public class ConvertingDirectRef
 	{
 		private final NameHolder holder;
@@ -240,7 +240,7 @@ public class SelfReferencingTypeTest
 		}
 	}
 
-	@GraphQLInputType
+	@GraphQLInputObject
 	public static class DirectRefInput
 	{
 		@GraphQLField

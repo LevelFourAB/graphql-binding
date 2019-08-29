@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation used to mark a constructor or function as a factory. Used
- * together with {@link GraphQLType} to define automatic conversions from
+ * together with {@link GraphQLObject} to define automatic conversions from
  * other types.
  *
  * <p>
@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  *   public String id;
  * }
  *
- * {@code @}GraphQLType
+ * {@code @}GraphQLObject
  * class DataObjectQueryType {
  *   private final DataObject object;
  *

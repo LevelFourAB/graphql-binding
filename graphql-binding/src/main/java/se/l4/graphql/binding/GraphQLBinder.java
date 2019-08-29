@@ -3,8 +3,8 @@ package se.l4.graphql.binding;
 import graphql.schema.GraphQLSchema;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
-import se.l4.graphql.binding.annotations.GraphQLInputType;
-import se.l4.graphql.binding.annotations.GraphQLType;
+import se.l4.graphql.binding.annotations.GraphQLInputObject;
+import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 
@@ -68,12 +68,12 @@ public class GraphQLBinder
 	{
 		if(typeFinder != null)
 		{
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLType.class))
+			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLObject.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInputType.class))
+			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInputObject.class))
 			{
 				builder.addType(c);
 			}

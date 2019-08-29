@@ -7,13 +7,9 @@ import java.util.Optional;
 import se.l4.commons.types.matching.ClassMatchingHashMultimap;
 import se.l4.commons.types.matching.ClassMatchingMultimap;
 import se.l4.commons.types.matching.MatchedType;
-import se.l4.graphql.binding.annotations.GraphQLInputType;
-import se.l4.graphql.binding.annotations.GraphQLType;
-import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
-import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiInputResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiOutputResolver;
-import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
+import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -22,10 +18,6 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
  */
 public class TypeResolverRegistry
 {
-	private static final ArrayResolver ARRAY_RESOLVER = new ArrayResolver();
-	private static final ObjectTypeResolver TYPE_RESOLVER = new ObjectTypeResolver();
-	private static final InputObjectTypeResolver INPUT_TYPE_RESOLVER = new InputObjectTypeResolver();
-
 	private final ClassMatchingMultimap<Object, GraphQLOutputResolver> outputTypes;
 	private final ClassMatchingMultimap<Object, GraphQLInputResolver> inputTypes;
 
@@ -35,7 +27,7 @@ public class TypeResolverRegistry
 		this.inputTypes = new ClassMatchingHashMultimap<>();
 	}
 
-	public void bindAny(Class<?> type, Object resolver)
+	public void bindAny(Class<?> type, GraphQLResolver resolver)
 	{
 		if(resolver instanceof GraphQLOutputResolver)
 		{
@@ -90,16 +82,6 @@ public class TypeResolverRegistry
 			resolvers.add(out.getData());
 		}
 
-		if(type.isArray())
-		{
-			// Arrays have special treatment, always use the array resolver
-			resolvers.add(ARRAY_RESOLVER);
-		}
-		else if(type.isAnnotationPresent(GraphQLType.class))
-		{
-			resolvers.add(TYPE_RESOLVER);
-		}
-
 		if(resolvers.isEmpty())
 		{
 			return Optional.empty();
@@ -132,16 +114,6 @@ public class TypeResolverRegistry
 		for(MatchedType<Object, GraphQLInputResolver> in : matching)
 		{
 			resolvers.add(in.getData());
-		}
-
-		if(type.isArray())
-		{
-			// Arrays have special treatment, always use the array resolver
-			//resolvers.add(ARRAY_RESOLVER);
-		}
-		else if(type.isAnnotationPresent(GraphQLInputType.class))
-		{
-			resolvers.add(INPUT_TYPE_RESOLVER);
 		}
 
 		if(resolvers.isEmpty())

@@ -29,10 +29,15 @@ public class InputObjectTypeResolver
 {
 
 	@Override
-	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
+	public ResolvedGraphQLType<? extends GraphQLInputObjectType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		GraphQLResolverContext context = encounter.getContext();
 		TypeRef initialType = encounter.getType();
+		if(! initialType.findAnnotation(se.l4.graphql.binding.annotations.GraphQLInputType.class).isPresent())
+		{
+			return ResolvedGraphQLType.none();
+		}
+
+		GraphQLResolverContext context = encounter.getContext();
 
 		GraphQLInputObjectType.Builder builder = GraphQLInputObjectType.newInputObject()
 			.name(context.getTypeName(initialType))

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
@@ -21,13 +22,17 @@ public class ArrayResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
+		TypeRef type = encounter.getType();
+		if(! type.isArray())
+		{
+			return ResolvedGraphQLType.none();
+		}
+
 		GraphQLResolverContext context = encounter.getContext();
 
-		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getComponentType()
+		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = type.getComponentType()
 			.map(context::resolveOutput)
-			.orElseThrow(() -> context.newError(
-				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
-			));
+			.get();
 
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())

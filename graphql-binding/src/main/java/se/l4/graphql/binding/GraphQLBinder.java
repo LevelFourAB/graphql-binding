@@ -6,6 +6,7 @@ import se.l4.commons.types.TypeFinder;
 import se.l4.graphql.binding.annotations.GraphQLInputType;
 import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
+import se.l4.graphql.binding.resolver.GraphQLResolver;
 
 /**
  * Mapper for taking annotated classes and interfaces and turning them into
@@ -40,7 +41,7 @@ public class GraphQLBinder
 		return this;
 	}
 
-	public GraphQLBinder withType(Class<?> type, Object resolver)
+	public GraphQLBinder withType(Class<?> type, GraphQLResolver resolver)
 	{
 		builder.bind(type, resolver);
 		return this;

@@ -44,11 +44,14 @@ import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
+import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
+import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
@@ -111,6 +114,9 @@ public class InternalGraphQLSchemaBuilder
 
 		// Register some default type converters
 		typeResolvers.bindAny(Collection.class, new ListResolver());
+		typeResolvers.bindAny(Object.class, new ArrayResolver());
+		typeResolvers.bindAny(Object.class, new InputObjectTypeResolver());
+		typeResolvers.bindAny(Object.class, new ObjectTypeResolver());
 	}
 
 	/**
@@ -171,16 +177,8 @@ public class InternalGraphQLSchemaBuilder
 		this.types.add(type);
 	}
 
-	public void bind(Class<?> type, Object resolver)
+	public void bind(Class<?> type, GraphQLResolver resolver)
 	{
-		if(! (resolver instanceof GraphQLInputResolver)
-			&& ! (resolver instanceof GraphQLOutputResolver))
-		{
-			throw new GraphQLMappingException(
-				"Could not bind type `" + type + "`, resolver does not implement GraphQLInputResolver or GraphQLOutputResolver"
-			);
-		}
-
 		this.typeResolvers.bindAny(type, resolver);
 	}
 

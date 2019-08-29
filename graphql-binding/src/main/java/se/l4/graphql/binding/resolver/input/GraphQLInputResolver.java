@@ -1,6 +1,7 @@
 package se.l4.graphql.binding.resolver.input;
 
 import graphql.schema.GraphQLInputType;
+import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 
 /**
@@ -8,6 +9,7 @@ import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
  * Java type.
  */
 public interface GraphQLInputResolver
+	extends GraphQLResolver
 {
 	/**
 	 * Resolve the {@link GraphQLInputType} of the given type.

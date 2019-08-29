@@ -42,10 +42,16 @@ public class ObjectTypeResolver
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
+		TypeRef type = encounter.getType();
+		if(! type.findAnnotation(GraphQLType.class).isPresent())
+		{
+			return ResolvedGraphQLType.none();
+		}
+
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());
 
-		resolve(encounter.getContext(), encounter.getType(), DEFAULT_FETCHING, builder, GraphQLField.class);
+		resolve(encounter.getContext(), type, DEFAULT_FETCHING, builder, GraphQLField.class);
 
 		return ResolvedGraphQLType.forType(builder.build());
 	}

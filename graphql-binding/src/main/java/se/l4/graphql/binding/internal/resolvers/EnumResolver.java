@@ -4,8 +4,8 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.TypeRef;
+import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLName;
-import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
@@ -38,7 +38,7 @@ public class EnumResolver
 		TypeRef type
 	)
 	{
-		if(! type.hasAnnotation(GraphQLType.class))
+		if(! type.hasAnnotation(GraphQLEnum.class))
 		{
 			return ResolvedGraphQLType.none();
 		}

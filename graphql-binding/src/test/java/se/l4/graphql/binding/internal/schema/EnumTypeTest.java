@@ -6,9 +6,9 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
-import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class EnumTypeTest
@@ -71,7 +71,7 @@ public class EnumTypeTest
 		}
 	}
 
-	@GraphQLType
+	@GraphQLEnum
 	public enum TestEnum
 	{
 		VALUE,

@@ -1,6 +1,7 @@
 package se.l4.graphql.binding.internal;
 
 import graphql.schema.DataFetchingEnvironment;
+import se.l4.graphql.binding.resolver.DataFetchingConversion;
 
 public class PendingDataFetchingConversion<I, O>
 	implements DataFetchingConversion<I, O>

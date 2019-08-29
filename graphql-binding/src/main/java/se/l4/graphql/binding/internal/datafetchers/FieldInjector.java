@@ -5,7 +5,7 @@ import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
 import se.l4.graphql.binding.GraphQLMappingException;
-import se.l4.graphql.binding.internal.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingConversion;
 
 public class FieldInjector
 	implements ValueInjector

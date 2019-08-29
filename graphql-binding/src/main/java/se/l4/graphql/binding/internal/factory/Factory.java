@@ -1,6 +1,6 @@
 package se.l4.graphql.binding.internal.factory;
 
-import se.l4.graphql.binding.internal.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingConversion;
 
 /**
  * Factory that can create an object based on the current environment and a

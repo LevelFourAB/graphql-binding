@@ -2,11 +2,12 @@ package se.l4.graphql.binding.resolver;
 
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLType;
-import se.l4.graphql.binding.internal.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
 /**
- * Output handler as resolved by {@link GraphQLOutputResolver}.
+ * Output handler as resolved by a {@link GraphQLOutputResolver} or a
+ * {@link GraphQLInputResolver}.
  */
 public class ResolvedGraphQLType<T extends GraphQLType>
 {

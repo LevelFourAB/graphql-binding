@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
-import se.l4.graphql.binding.internal.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;

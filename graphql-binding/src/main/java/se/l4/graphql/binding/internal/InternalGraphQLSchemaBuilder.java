@@ -38,6 +38,8 @@ import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
+import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
@@ -205,7 +207,32 @@ public class InternalGraphQLSchemaBuilder
 				ctx,
 				Types.reference(e.getKey()),
 				env -> supplier.get(),
-				builder
+				builder,
+				GraphQLField.class
+			);
+		}
+
+		return builder.build();
+	}
+
+	private GraphQLObjectType buildMutation(ResolverContextImpl ctx)
+	{
+		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
+			ctx,
+			ctx.codeRegistryBuilder
+		);
+
+		builder.setName("Mutation");
+
+		for(Map.Entry<Class<?>, Supplier<?>> e : rootTypes.entrySet())
+		{
+			Supplier<?> supplier = e.getValue();
+			ObjectTypeResolver.resolve(
+				ctx,
+				Types.reference(e.getKey()),
+				env -> supplier.get(),
+				builder,
+				GraphQLMutation.class
 			);
 		}
 
@@ -251,6 +278,9 @@ public class InternalGraphQLSchemaBuilder
 
 		// Build the root type
 		builder.query(buildRootQuery(ctx));
+
+		// Build the mutation type
+		builder.mutation(buildMutation(ctx));
 
 		return builder.codeRegistry(codeRegistryBuilder.build())
 			.build();

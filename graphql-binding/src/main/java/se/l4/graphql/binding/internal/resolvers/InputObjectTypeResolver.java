@@ -1,8 +1,10 @@
 package se.l4.graphql.binding.internal.resolvers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -15,6 +17,7 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.internal.DataFetchingConversion;
 import se.l4.graphql.binding.internal.datafetchers.FieldInjector;
 import se.l4.graphql.binding.internal.datafetchers.ValueInjector;
+import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.ResolverContext;
@@ -29,52 +32,63 @@ public class InputObjectTypeResolver
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		ResolverContext context = encounter.getContext();
-		TypeRef type = encounter.getType();
+		TypeRef initialType = encounter.getType();
 
 		GraphQLInputObjectType.Builder builder = GraphQLInputObjectType.newInputObject()
-			.name(context.getTypeName(type))
-			.description(context.getDescription(type));
+			.name(context.getTypeName(initialType))
+			.description(context.getDescription(initialType));
 
 		List<ValueInjector> injectors = new ArrayList<>();
 
-		// Go through all the Java fields in the type and map them
-		for(FieldRef field : type.getDeclaredFields())
-		{
-			if(! field.findAnnotation(GraphQLField.class).isPresent())
+		Set<MemberKey> handled = new HashSet<>();
+
+		initialType.visitHierarchy(type -> {
+			// Go through all the Java fields in the type and map them
+			for(FieldRef field : type.getDeclaredFields())
 			{
-				continue;
-			}
+				// Check if this is already handled
+				if(! handled.add(MemberKey.create(field))) continue;
 
-			context.breadcrumb(Breadcrumb.forMember(field), () -> {
-				if(! field.isPublic())
+				if(! field.findAnnotation(GraphQLField.class).isPresent())
 				{
-					throw context.newError(
-						"Field must be public to be useable"
-					);
-				};
-
-				if(field.isFinal())
-				{
-					throw context.newError(
-						"Field can not be final"
-					);
+					continue;
 				}
 
-				ResolvedGraphQLType<? extends GraphQLInputType> fieldType = context.resolveInput(field.getType());
-				String name = context.getMemberName(field);
+				context.breadcrumb(Breadcrumb.forMember(field), () -> {
+					if(! field.isPublic())
+					{
+						throw context.newError(
+							"Field must be public to be useable"
+						);
+					};
 
-				injectors.add(new FieldInjector(field.getField(), name, fieldType.getConversion()));
+					if(field.isFinal())
+					{
+						throw context.newError(
+							"Field can not be final"
+						);
+					}
 
-				builder.field(
-					GraphQLInputObjectField.newInputObjectField()
-						.name(name)
-						.description(context.getDescription(type))
-						.type(fieldType.getGraphQLType())
-				);
-			});
-		}
+					ResolvedGraphQLType<? extends GraphQLInputType> fieldType = context.resolveInput(field.getType());
+					String name = context.getMemberName(field);
 
-		Supplier<Object> supplier = context.getInstanceFactory().supplier(type.getType());
+					injectors.add(new FieldInjector(field.getField(), name, fieldType.getConversion()));
+
+					builder.field(
+						GraphQLInputObjectField.newInputObjectField()
+							.name(name)
+							.description(context.getDescription(type))
+							.type(fieldType.getGraphQLType())
+					);
+				});
+			}
+
+			return true;
+		});
+
+		Supplier<Object> supplier = context.getInstanceFactory()
+			.supplier(initialType.getType());
+
 		InputObjectFactory factory = new InputObjectFactory(
 			(env, source) -> supplier.get(),
 			injectors.toArray(ValueInjector[]::new)

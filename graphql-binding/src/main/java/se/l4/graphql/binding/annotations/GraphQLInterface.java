@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to mark a class or interface that should become an interface
+ * Annotation used to mark a Java interface that should become an interface
  * within the GraphQL API.
  */
 @Documented

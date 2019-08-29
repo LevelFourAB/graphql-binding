@@ -8,6 +8,7 @@ import java.util.Set;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.FieldRef;
@@ -15,6 +16,7 @@ import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLType;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
@@ -67,6 +69,13 @@ public class ObjectTypeResolver
 		Set<MemberKey> handled = new HashSet<>();
 
 		initialType.visitHierarchy(type -> {
+			// Resolve if this type implements a certain interface
+			if(type.hasAnnotation(GraphQLInterface.class))
+			{
+				ResolvedGraphQLType<? extends GraphQLOutputType> resolved = context.resolveOutput(type);
+				builder.implement((GraphQLInterfaceType) resolved.getGraphQLType());
+			}
+
 			// Go through all the Java fields in the type and map them
 			for(FieldRef field : type.getDeclaredFields())
 			{

@@ -1,5 +1,6 @@
 package se.l4.graphql.binding.resolver;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import graphql.schema.GraphQLInputType;
@@ -137,4 +138,12 @@ public interface GraphQLResolverContext
 	ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(TypeRef type);
 
 	ResolvedGraphQLType<? extends GraphQLInputType> maybeResolveInput(TypeRef type);
+
+	/**
+	 * Find all of the types that extend the given type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	Set<TypeRef> findExtendingTypes(TypeRef type);
 }

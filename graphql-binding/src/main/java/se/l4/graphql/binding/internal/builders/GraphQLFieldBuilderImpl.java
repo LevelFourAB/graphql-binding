@@ -146,7 +146,7 @@ public class GraphQLFieldBuilderImpl<Parent>
 				throw context.newError("Field `%s` does not have a return type", name);
 			}
 
-			if(dataFetcher == null)
+			if(code != null && dataFetcher == null)
 			{
 				throw context.newError("Field `%s` does not have a data fetcher", name);
 			}
@@ -163,7 +163,10 @@ public class GraphQLFieldBuilderImpl<Parent>
 			}
 
 			consumer.accept(builder.build());
-			code.dataFetcher(FieldCoordinates.coordinates(parentName, name), dataFetcher);
+			if(code != null)
+			{
+				code.dataFetcher(FieldCoordinates.coordinates(parentName, name), dataFetcher);
+			}
 		});
 
 		return parent;

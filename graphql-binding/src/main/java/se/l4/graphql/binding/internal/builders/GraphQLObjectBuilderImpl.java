@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import graphql.schema.GraphQLCodeRegistry;
+import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
@@ -88,6 +89,13 @@ public class GraphQLObjectBuilderImpl
 				builder.field(field);
 			}
 		);
+	}
+
+	@Override
+	public GraphQLObjectBuilder implement(GraphQLInterfaceType type)
+	{
+		builder.withInterface(type);
+		return this;
 	}
 
 	@Override

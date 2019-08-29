@@ -41,6 +41,7 @@ import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.builders.GraphQLInterfaceBuilderImpl;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
@@ -48,6 +49,7 @@ import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.EnumResolver;
 import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
+import se.l4.graphql.binding.internal.resolvers.InterfaceResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
@@ -57,6 +59,7 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
+import se.l4.graphql.binding.resolver.query.GraphQLInterfaceBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
@@ -116,9 +119,13 @@ public class InternalGraphQLSchemaBuilder
 		// Register some default type converters
 		typeResolvers.bindAny(Object.class, new InputObjectTypeResolver());
 		typeResolvers.bindAny(Object.class, new ObjectTypeResolver());
+
+		typeResolvers.bindAny(Object.class, new InterfaceResolver());
+
+		typeResolvers.bindAny(Enum.class, new EnumResolver());
+
 		typeResolvers.bindAny(Collection.class, new ListResolver());
 		typeResolvers.bindAny(Object.class, new ArrayResolver());
-		typeResolvers.bindAny(Enum.class, new EnumResolver());
 	}
 
 	/**
@@ -633,6 +640,20 @@ public class InternalGraphQLSchemaBuilder
 				+ "Types need to be annotated or bound via resolvers"
 			);
 		}
+
+		@Override
+		public Set<TypeRef> findExtendingTypes(TypeRef type)
+		{
+			Set<TypeRef> result = new HashSet<>();
+			for(Class<?> c : types)
+			{
+				if(type.getErasedType().isAssignableFrom(c))
+				{
+					result.add(Types.reference(c));
+				}
+			}
+			return result;
+		}
 	}
 
 	private class OutputEncounterImpl
@@ -668,6 +689,12 @@ public class InternalGraphQLSchemaBuilder
 				context,
 				context.codeRegistryBuilder
 			);
+		}
+
+		@Override
+		public GraphQLInterfaceBuilder newInterfaceType()
+		{
+			return new GraphQLInterfaceBuilderImpl(context);
 		}
 	}
 

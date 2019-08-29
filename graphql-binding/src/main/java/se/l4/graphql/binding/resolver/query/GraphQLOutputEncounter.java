@@ -22,6 +22,15 @@ public interface GraphQLOutputEncounter
 
 	/**
 	 * Start building a new object type.
+	 *
+	 * @return
 	 */
 	GraphQLObjectBuilder newObjectType();
+
+	/**
+	 * Start building a new interface type.
+	 *
+	 * @return
+	 */
+	GraphQLInterfaceBuilder newInterfaceType();
 }

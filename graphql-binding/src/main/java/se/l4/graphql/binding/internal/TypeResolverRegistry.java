@@ -82,6 +82,15 @@ public class TypeResolverRegistry
 			resolvers.add(out.getData());
 		}
 
+		if(type.isInterface())
+		{
+			matching = outputTypes.getAll(Object.class);
+			for(MatchedType<Object, GraphQLOutputResolver> out : matching)
+			{
+				resolvers.add(out.getData());
+			}
+		}
+
 		if(resolvers.isEmpty())
 		{
 			return Optional.empty();

@@ -2,7 +2,7 @@ package se.l4.graphql.binding.resolver.query;
 
 import graphql.schema.GraphQLObjectType;
 import se.l4.commons.types.reflect.TypeRef;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 
 public interface GraphQLOutputMixin
 {
@@ -15,7 +15,7 @@ public interface GraphQLOutputMixin
 	 * @param graphqlBuilder
 	 */
 	void mixin(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		TypeRef type,
 		TypeRef otherType,
 		String graphqlName,

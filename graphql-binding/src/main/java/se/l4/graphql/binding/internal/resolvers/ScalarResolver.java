@@ -15,8 +15,8 @@ import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
@@ -49,7 +49,7 @@ public class ScalarResolver
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GraphQLScalarType resolve(ResolverContext ctx, TypeRef type)
+	private GraphQLScalarType resolve(GraphQLResolverContext ctx, TypeRef type)
 	{
 		return ctx.breadcrumb(Breadcrumb.forType(type), () -> {
 			TypeRef scalarType = Types.reference(scalar.getClass());

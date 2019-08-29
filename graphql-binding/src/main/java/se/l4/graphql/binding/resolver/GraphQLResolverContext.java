@@ -15,7 +15,7 @@ import se.l4.graphql.binding.GraphQLMappingException;
 /**
  * Context passed to bindings to perform mapping.
  */
-public interface ResolverContext
+public interface GraphQLResolverContext
 {
 	/**
 	 * Get the current location being resolved.

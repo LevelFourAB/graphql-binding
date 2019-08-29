@@ -12,14 +12,14 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLArgumentBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
 
 public class GraphQLFieldBuilderImpl<Parent>
 	implements GraphQLFieldBuilder<Parent>
 {
-	private final ResolverContext context;
+	private final GraphQLResolverContext context;
 	private final GraphQLCodeRegistry.Builder code;
 
 	private final Parent parent;
@@ -40,7 +40,7 @@ public class GraphQLFieldBuilderImpl<Parent>
 	private Breadcrumb breadcrumb;
 
 	public GraphQLFieldBuilderImpl(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		GraphQLCodeRegistry.Builder code,
 		Breadcrumb breadcrumb,
 		Parent parent,

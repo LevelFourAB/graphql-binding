@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.resolver.input;
 
 import se.l4.commons.types.reflect.TypeRef;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 
 public interface GraphQLInputEncounter
 {
@@ -11,7 +11,7 @@ public interface GraphQLInputEncounter
 	 *
 	 * @return
 	 */
-	ResolverContext getContext();
+	GraphQLResolverContext getContext();
 
 	/**
 	 * Get the type being resolved.

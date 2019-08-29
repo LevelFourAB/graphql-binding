@@ -19,8 +19,8 @@ import se.l4.graphql.binding.internal.datafetchers.ValueInjector;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 
@@ -31,7 +31,7 @@ public class InputObjectTypeResolver
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		ResolverContext context = encounter.getContext();
+		GraphQLResolverContext context = encounter.getContext();
 		TypeRef initialType = encounter.getType();
 
 		GraphQLInputObjectType.Builder builder = GraphQLInputObjectType.newInputObject()

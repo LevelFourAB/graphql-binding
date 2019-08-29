@@ -19,7 +19,7 @@ import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLSource;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.Breadcrumb;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 
 public class FactoryResolver
 {
@@ -29,7 +29,7 @@ public class FactoryResolver
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <I> List<Factory<I, ?>> resolveFactories(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		TypeRef ref
 	)
 	{
@@ -80,7 +80,7 @@ public class FactoryResolver
 	}
 
 	private static DataFetchingSupplier<?>[] getParameterSuppliers(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		ExecutableRef executable
 	)
 	{
@@ -116,7 +116,7 @@ public class FactoryResolver
 	}
 
 	public static Optional<DataFetchingSupplier<?>> resolveEnvironmentSupplier(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		ParameterRef ref
 	)
 	{

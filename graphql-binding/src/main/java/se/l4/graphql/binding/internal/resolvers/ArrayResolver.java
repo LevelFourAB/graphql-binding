@@ -8,8 +8,8 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -21,7 +21,7 @@ public class ArrayResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		ResolverContext context = encounter.getContext();
+		GraphQLResolverContext context = encounter.getContext();
 
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getComponentType()
 			.map(context::resolveOutput)

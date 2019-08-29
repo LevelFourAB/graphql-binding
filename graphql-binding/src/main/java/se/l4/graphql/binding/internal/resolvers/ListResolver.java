@@ -8,8 +8,8 @@ import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
@@ -25,7 +25,7 @@ public class ListResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		ResolverContext context = encounter.getContext();
+		GraphQLResolverContext context = encounter.getContext();
 
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getTypeParameter(0)
 			.map(context::resolveOutput)
@@ -42,7 +42,7 @@ public class ListResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		ResolverContext context = encounter.getContext();
+		GraphQLResolverContext context = encounter.getContext();
 
 		ResolvedGraphQLType<? extends GraphQLInputType> componentType = encounter.getType().getTypeParameter(0)
 			.map(context::resolveInput)

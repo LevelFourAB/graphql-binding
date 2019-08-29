@@ -49,8 +49,8 @@ import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
@@ -287,7 +287,7 @@ public class InternalGraphQLSchemaBuilder
 	}
 
 	private class ResolverContextImpl
-		implements ResolverContext
+		implements GraphQLResolverContext
 	{
 		protected final GraphQLCodeRegistry.Builder codeRegistryBuilder;
 
@@ -650,7 +650,7 @@ public class InternalGraphQLSchemaBuilder
 			this.type = type;
 		}
 
-		public ResolverContext getContext()
+		public GraphQLResolverContext getContext()
 		{
 			return context;
 		}
@@ -687,7 +687,7 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@Override
-		public ResolverContext getContext()
+		public GraphQLResolverContext getContext()
 		{
 			return context;
 		}

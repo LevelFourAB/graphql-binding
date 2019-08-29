@@ -6,13 +6,13 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLArgumentBuilder;
 
 public class GraphQLArgumentBuilderImpl<Parent>
 	implements GraphQLArgumentBuilder<Parent>
 {
-	private final ResolverContext context;
+	private final GraphQLResolverContext context;
 	private final Breadcrumb breadcrumb;
 	private final Parent parent;
 	private final Consumer<GraphQLArgument> consumer;
@@ -23,7 +23,7 @@ public class GraphQLArgumentBuilderImpl<Parent>
 	private GraphQLInputType type;
 
 	public GraphQLArgumentBuilderImpl(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		Breadcrumb breadcrumb,
 		Parent parent,
 		Consumer<GraphQLArgument> consumer

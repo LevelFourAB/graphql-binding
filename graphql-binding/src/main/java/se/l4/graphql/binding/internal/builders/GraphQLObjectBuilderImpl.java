@@ -7,14 +7,14 @@ import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLObjectType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
-import se.l4.graphql.binding.resolver.ResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
 
 public class GraphQLObjectBuilderImpl
 	implements GraphQLObjectBuilder
 {
-	private final ResolverContext context;
+	private final GraphQLResolverContext context;
 
 	private final GraphQLCodeRegistry.Builder code;
 	private final GraphQLObjectType.Builder builder;
@@ -26,7 +26,7 @@ public class GraphQLObjectBuilderImpl
 	private String name;
 
 	public GraphQLObjectBuilderImpl(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		GraphQLCodeRegistry.Builder code
 	)
 	{

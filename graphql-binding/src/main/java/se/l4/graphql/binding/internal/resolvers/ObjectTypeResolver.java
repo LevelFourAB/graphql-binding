@@ -22,8 +22,8 @@ import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.ResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
@@ -51,7 +51,7 @@ public class ObjectTypeResolver
 	}
 
 	public static void resolve(
-		ResolverContext context,
+		GraphQLResolverContext context,
 		TypeRef initialType,
 		DataFetchingSupplier<Object> contextGetter,
 		GraphQLObjectBuilder builder,

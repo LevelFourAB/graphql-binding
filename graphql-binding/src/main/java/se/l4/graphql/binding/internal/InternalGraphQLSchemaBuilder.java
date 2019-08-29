@@ -46,6 +46,7 @@ import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
+import se.l4.graphql.binding.internal.resolvers.EnumResolver;
 import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
@@ -113,10 +114,11 @@ public class InternalGraphQLSchemaBuilder
 		registerBuiltin(Scalars.GraphQLBigDecimal, BigDecimal.class);
 
 		// Register some default type converters
-		typeResolvers.bindAny(Collection.class, new ListResolver());
-		typeResolvers.bindAny(Object.class, new ArrayResolver());
 		typeResolvers.bindAny(Object.class, new InputObjectTypeResolver());
 		typeResolvers.bindAny(Object.class, new ObjectTypeResolver());
+		typeResolvers.bindAny(Collection.class, new ListResolver());
+		typeResolvers.bindAny(Object.class, new ArrayResolver());
+		typeResolvers.bindAny(Enum.class, new EnumResolver());
 	}
 
 	/**

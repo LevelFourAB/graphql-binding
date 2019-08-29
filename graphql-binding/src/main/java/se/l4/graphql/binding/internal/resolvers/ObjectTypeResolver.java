@@ -45,7 +45,7 @@ public class ObjectTypeResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
-		if(! type.findAnnotation(GraphQLType.class).isPresent())
+		if(! type.hasAnnotation(GraphQLType.class))
 		{
 			return ResolvedGraphQLType.none();
 		}

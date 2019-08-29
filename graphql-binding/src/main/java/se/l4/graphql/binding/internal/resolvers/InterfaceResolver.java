@@ -30,7 +30,7 @@ public class InterfaceResolver
 	{
 		TypeRef initialType = encounter.getType();
 
-		if(! initialType.findAnnotation(GraphQLInterface.class).isPresent())
+		if(! initialType.hasAnnotation(GraphQLInterface.class))
 		{
 			return ResolvedGraphQLType.none();
 		}

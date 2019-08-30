@@ -1,4 +1,4 @@
-package se.l4.graphql.binding.resolver.query;
+package se.l4.graphql.binding.resolver.output;
 
 import se.l4.commons.types.reflect.TypeRef;
 

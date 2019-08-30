@@ -14,8 +14,8 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Resolver for a list.

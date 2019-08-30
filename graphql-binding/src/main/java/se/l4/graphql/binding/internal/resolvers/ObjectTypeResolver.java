@@ -26,10 +26,10 @@ import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Resolver for types annotated with {@link GraphQLObject} that resolve to

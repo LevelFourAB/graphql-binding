@@ -15,10 +15,10 @@ import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLInterfaceBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 public class InterfaceResolver
 	implements GraphQLOutputResolver

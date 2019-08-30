@@ -13,8 +13,8 @@ import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
-import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLInterfaceBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
 
 public class GraphQLInterfaceBuilderImpl
 	implements GraphQLInterfaceBuilder

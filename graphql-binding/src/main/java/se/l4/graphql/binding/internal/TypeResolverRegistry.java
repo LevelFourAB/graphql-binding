@@ -9,7 +9,7 @@ import se.l4.graphql.binding.internal.resolvers.MultiInputResolver;
 import se.l4.graphql.binding.internal.resolvers.MultiOutputResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Registry for keeping track of and finding resolvers for both input and

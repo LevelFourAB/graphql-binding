@@ -60,11 +60,11 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
-import se.l4.graphql.binding.resolver.query.GraphQLInterfaceBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLObjectMixin;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Internal class that does the actual resolving of types.

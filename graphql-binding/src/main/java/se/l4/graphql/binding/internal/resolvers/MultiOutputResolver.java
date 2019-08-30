@@ -5,8 +5,8 @@ import java.util.List;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 public class MultiOutputResolver
 	implements GraphQLOutputResolver

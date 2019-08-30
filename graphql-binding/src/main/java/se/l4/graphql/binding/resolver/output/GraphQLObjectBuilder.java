@@ -1,12 +1,13 @@
-package se.l4.graphql.binding.resolver.query;
+package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLObjectType;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Builder for creating GraphQL object types.
  */
-public interface GraphQLInterfaceBuilder
+public interface GraphQLObjectBuilder
 {
 	/**
 	 * Set the {@link TypeRef} this object is based on. Will copy name and
@@ -15,7 +16,7 @@ public interface GraphQLInterfaceBuilder
 	 * @param type
 	 * @return
 	 */
-	GraphQLInterfaceBuilder over(TypeRef type);
+	GraphQLObjectBuilder over(TypeRef type);
 
 	/**
 	 * Set the name of the object.
@@ -23,30 +24,29 @@ public interface GraphQLInterfaceBuilder
 	 * @param name
 	 * @return
 	 */
-	GraphQLInterfaceBuilder setName(String name);
+	GraphQLObjectBuilder setName(String name);
 
 	/**
 	 * Set the description of the object.
 	 */
-	GraphQLInterfaceBuilder setDescription(String description);
+	GraphQLObjectBuilder setDescription(String description);
 
 	/**
 	 * Define a new field for this object.
 	 *
 	 * @return
 	 */
-	GraphQLFieldBuilder<GraphQLInterfaceBuilder> newField();
+	GraphQLFieldBuilder<GraphQLObjectBuilder> newField();
 
 	/**
-	 * Add an implementation of this interface.
+	 * Indicate that this type implements the given interface.
 	 *
-	 * @param type
 	 * @return
 	 */
-	GraphQLInterfaceBuilder addImplementation(TypeRef type);
+	GraphQLObjectBuilder implement(GraphQLInterfaceType type);
 
 	/**
 	 * Build the object type.
 	 */
-	GraphQLInterfaceType build();
+	GraphQLObjectType build();
 }

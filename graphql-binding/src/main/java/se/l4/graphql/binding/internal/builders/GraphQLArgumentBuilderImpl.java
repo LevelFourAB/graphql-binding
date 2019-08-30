@@ -7,7 +7,7 @@ import graphql.schema.GraphQLInputType;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
-import se.l4.graphql.binding.resolver.query.GraphQLArgumentBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLArgumentBuilder;
 
 public class GraphQLArgumentBuilderImpl<Parent>
 	implements GraphQLArgumentBuilder<Parent>

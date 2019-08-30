@@ -4,7 +4,6 @@ import graphql.schema.GraphQLInputType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 
 /**
  * Resolver responsible for creating a {@link GraphQLInputType} for a certain
@@ -17,7 +16,7 @@ public interface GraphQLInputResolver
 	 * Perform a check if this input resolver might support the given type.
 	 * This method is expected to perform a minimal check, such as for the
 	 * {@link TypeRef#getErasedType()} and annotations on the type. More
-	 * detailed checks should be done in {@link #resolveInput(GraphQLOutputEncounter)}.
+	 * detailed checks should be done in {@link #resolveInput(GraphQLInputEncounter)}.
 	 *
 	 * @return
 	 */

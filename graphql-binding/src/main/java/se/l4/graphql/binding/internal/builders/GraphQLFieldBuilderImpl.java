@@ -13,8 +13,8 @@ import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
-import se.l4.graphql.binding.resolver.query.GraphQLArgumentBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLArgumentBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 
 public class GraphQLFieldBuilderImpl<Parent>
 	implements GraphQLFieldBuilder<Parent>

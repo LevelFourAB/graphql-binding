@@ -3,7 +3,7 @@ package se.l4.graphql.binding.resolver;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Output handler as resolved by a {@link GraphQLOutputResolver} or a

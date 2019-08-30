@@ -19,9 +19,9 @@ import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
-import se.l4.graphql.binding.resolver.query.GraphQLObjectMixin;
-import se.l4.graphql.binding.resolver.query.GraphQLObjectMixinEncounter;
+import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectMixinEncounter;
 
 /**
  * Implementation of {@link GraphQLObjectMixin} that wraps a root object

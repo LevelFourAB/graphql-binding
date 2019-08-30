@@ -26,12 +26,26 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 		this.conversion = conversion;
 	}
 
+	/**
+	 * Get an instance that represents that no type was resolved.
+	 *
+	 * @return
+	 *   instance that always returns false from {@link #isPresent()}
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T extends GraphQLType> ResolvedGraphQLType<T> none()
 	{
 		return (ResolvedGraphQLType) NONE;
 	}
 
+	/**
+	 * Create a resolved result over the given type.
+	 *
+	 * @param type
+	 *   the GraphQL type
+	 * @return
+	 *   instance resolved to the specified type with no conversion
+	 */
 	public static <T extends GraphQLType> ResolvedGraphQLType<T> forType(T type)
 	{
 		return new ResolvedGraphQLType<>(type, IDENTITY);
@@ -62,6 +76,11 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 		return type;
 	}
 
+	/**
+	 * Get a version of this type that represents a non-null value.
+	 *
+	 * @return
+	 */
 	public ResolvedGraphQLType<GraphQLNonNull> nonNull()
 	{
 		if(! isPresent())
@@ -92,6 +111,12 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 		return conversion;
 	}
 
+	/**
+	 * Get a version of this type using the specified conversion to modify the
+	 * Java type.
+	 *
+	 * @param conversion
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<T> withConversion(DataFetchingConversion<?, ?> conversion)
 	{

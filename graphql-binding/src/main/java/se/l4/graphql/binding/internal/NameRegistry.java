@@ -94,7 +94,8 @@ public class NameRegistry
 	public void reserveName(
 		String name,
 		Breadcrumb crumb,
-		TypeRef... refs)
+		TypeRef... refs
+	)
 	{
 		if(hasName(name))
 		{
@@ -107,6 +108,13 @@ public class NameRegistry
 		{
 			typeNames.put(ref.withoutUsage(), name);
 		}
+	}
+
+	public void reserveNameAllowDuplicate(TypeRef type, String name)
+	{
+		if(typeNames.containsKey(type)) return;
+
+		typeNames.put(type.withoutUsage(), name);
 	}
 
 	/**

@@ -532,6 +532,9 @@ public class InternalGraphQLSchemaBuilder
 				 */
 				builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
 			}
+
+			// Register the name
+			names.reserveNameAllowDuplicate(type, gql.getName());
 		}
 
 		@Override

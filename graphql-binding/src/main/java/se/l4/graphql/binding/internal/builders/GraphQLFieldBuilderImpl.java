@@ -2,12 +2,10 @@ package se.l4.graphql.binding.internal.builders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import graphql.schema.DataFetcher;
-import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.MemberRef;
@@ -20,12 +18,10 @@ public class GraphQLFieldBuilderImpl<Parent>
 	implements GraphQLFieldBuilder<Parent>
 {
 	private final GraphQLResolverContext context;
-	private final GraphQLCodeRegistry.Builder code;
 
 	private final Parent parent;
-	private final String parentName;
 
-	private final Consumer<GraphQLFieldDefinition> consumer;
+	private final BiConsumer<GraphQLFieldDefinition, DataFetcher<?>> consumer;
 
 	private String name;
 	private String description;
@@ -41,20 +37,17 @@ public class GraphQLFieldBuilderImpl<Parent>
 
 	public GraphQLFieldBuilderImpl(
 		GraphQLResolverContext context,
-		GraphQLCodeRegistry.Builder code,
 		Breadcrumb breadcrumb,
+
 		Parent parent,
-		String parentName,
-		Consumer<GraphQLFieldDefinition> consumer
+		BiConsumer<GraphQLFieldDefinition, DataFetcher<?>> consumer
 	)
 	{
 		this.context = context;
-		this.code = code;
 
 		this.breadcrumb = breadcrumb;
 
 		this.parent = parent;
-		this.parentName = parentName;
 
 		this.consumer = consumer;
 
@@ -146,11 +139,6 @@ public class GraphQLFieldBuilderImpl<Parent>
 				throw context.newError("Field `%s` does not have a return type", name);
 			}
 
-			if(code != null && dataFetcher == null)
-			{
-				throw context.newError("Field `%s` does not have a data fetcher", name);
-			}
-
 			GraphQLFieldDefinition.Builder builder = GraphQLFieldDefinition.newFieldDefinition()
 				.name(name)
 				.description(description)
@@ -162,11 +150,7 @@ public class GraphQLFieldBuilderImpl<Parent>
 				builder.deprecate(deprecationReason);
 			}
 
-			consumer.accept(builder.build());
-			if(code != null)
-			{
-				code.dataFetcher(FieldCoordinates.coordinates(parentName, name), dataFetcher);
-			}
+			consumer.accept(builder.build(), dataFetcher);
 		});
 
 		return parent;

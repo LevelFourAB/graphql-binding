@@ -1,9 +1,11 @@
 package se.l4.graphql.binding.internal.builders;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
+import graphql.schema.DataFetcher;
+import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
@@ -25,7 +27,7 @@ public class GraphQLObjectBuilderImpl
 
 	private final GraphQLObjectType.Builder builder;
 
-	private final Set<String> fields;
+	private final Map<String, DataFetcher<?>> fields;
 
 	private TypeRef type;
 	private Breadcrumb breadcrumb;
@@ -43,7 +45,7 @@ public class GraphQLObjectBuilderImpl
 		this.code = code;
 
 		breadcrumb = Breadcrumb.empty();
-		this.fields = new HashSet<>();
+		this.fields = new HashMap<>();
 		builder = GraphQLObjectType.newObject();
 	}
 
@@ -52,10 +54,7 @@ public class GraphQLObjectBuilderImpl
 	{
 		this.type = type;
 		this.breadcrumb = Breadcrumb.forType(type);
-
-		this.name = context.getTypeName(type);
-		builder.name(name);
-		builder.description(context.getDescription(type));
+		this.setDescription(context.getDescription(type));
 		return this;
 	}
 
@@ -64,7 +63,6 @@ public class GraphQLObjectBuilderImpl
 	{
 		// TODO: Verify name uniqueness
 		this.name = name;
-		builder.name(name);
 		return this;
 	}
 
@@ -78,23 +76,22 @@ public class GraphQLObjectBuilderImpl
 	@Override
 	public GraphQLFieldBuilder<GraphQLObjectBuilder> newField()
 	{
-		if(name == null)
-		{
-			throw context.newError(breadcrumb, "Can not add fields before type has a name");
-		}
-
 		return new GraphQLFieldBuilderImpl<GraphQLObjectBuilder>(
 			context,
-			code,
 			breadcrumb,
 			this,
-			name,
-			field -> {
-				if(! fields.add(field.getName()))
+			(field, dataFetcher) -> {
+				if(fields.containsKey(field.getName()))
 				{
 					throw context.newError("Field name `%s` is not unique", field.getName());
 				}
 
+				if(dataFetcher == null)
+				{
+					throw context.newError("Field `%s` does not have a data fetcher", name);
+				}
+
+				fields.put(field.getName(), dataFetcher);
 				builder.field(field);
 			}
 		);
@@ -140,6 +137,28 @@ public class GraphQLObjectBuilderImpl
 					mixin.mixin(encounter);
 				}
 			}
+
+			if(this.name == null)
+			{
+				// Resolve the name if it does not exist
+				name = context.getTypeName(type);
+			}
+		}
+
+		// Verify that a name exists
+		if(name == null)
+		{
+			throw context.newError(breadcrumb, "No name provided for object");
+		}
+
+		// Set the name
+		builder.name(name);
+
+		// Setup all the data fetchers in the code registry
+		for(Map.Entry<String, DataFetcher<?>> e : fields.entrySet())
+		{
+			FieldCoordinates coordinates = FieldCoordinates.coordinates(this.name, e.getKey());
+			code.dataFetcher(coordinates, e.getValue());
 		}
 
 		return builder.build();

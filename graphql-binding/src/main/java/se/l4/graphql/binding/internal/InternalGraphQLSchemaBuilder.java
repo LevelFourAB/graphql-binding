@@ -55,6 +55,9 @@ import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.InterfaceResolver;
 import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
+import se.l4.graphql.binding.internal.resolvers.OptionalDoubleResolver;
+import se.l4.graphql.binding.internal.resolvers.OptionalIntResolver;
+import se.l4.graphql.binding.internal.resolvers.OptionalLongResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
@@ -135,7 +138,11 @@ public class InternalGraphQLSchemaBuilder
 
 		typeResolvers.add(new ListResolver());
 		typeResolvers.add(new ArrayResolver());
+
 		typeResolvers.add(new OptionalResolver());
+		typeResolvers.add(new OptionalIntResolver());
+		typeResolvers.add(new OptionalLongResolver());
+		typeResolvers.add(new OptionalDoubleResolver());
 	}
 
 	/**

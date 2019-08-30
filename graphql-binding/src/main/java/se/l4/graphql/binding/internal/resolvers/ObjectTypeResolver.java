@@ -81,13 +81,13 @@ public class ObjectTypeResolver
 			// Go through all the Java fields in the type and map them
 			for(FieldRef field : type.getDeclaredFields())
 			{
-				// Check if this is already handled
-				if(! handled.add(MemberKey.create(field))) continue;
-
 				if(! field.findAnnotation(annotation).isPresent())
 				{
 					continue;
 				}
+
+				// Check if this is already handled
+				if(! handled.add(MemberKey.create(field))) continue;
 
 				if(! field.isPublic())
 				{
@@ -113,13 +113,13 @@ public class ObjectTypeResolver
 			// Go through all the methods in the type and map them
 			for(MethodRef method : type.getDeclaredMethods())
 			{
-				// Check if this is already handled
-				if(! handled.add(MemberKey.create(method))) continue;
-
-				if(! method.findAnnotation(annotation).isPresent())
+				if(! method.hasAnnotation(annotation))
 				{
 					continue;
 				}
+
+				// Check if this is already handled
+				if(! handled.add(MemberKey.create(method))) continue;
 
 				if(! method.isPublic())
 				{

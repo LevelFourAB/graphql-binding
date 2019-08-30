@@ -53,13 +53,13 @@ public class InputObjectTypeResolver
 			// Go through all the Java fields in the type and map them
 			for(FieldRef field : type.getDeclaredFields())
 			{
-				// Check if this is already handled
-				if(! handled.add(MemberKey.create(field))) continue;
-
 				if(! field.findAnnotation(GraphQLField.class).isPresent())
 				{
 					continue;
 				}
+
+				// Check if this is already handled
+				if(! handled.add(MemberKey.create(field))) continue;
 
 				context.breadcrumb(Breadcrumb.forMember(field), () -> {
 					if(! field.isPublic())

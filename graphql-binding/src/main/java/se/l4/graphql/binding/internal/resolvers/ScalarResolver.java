@@ -13,6 +13,7 @@ import se.l4.commons.types.Types;
 import se.l4.commons.types.conversion.Conversion;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLScalar;
+import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -68,7 +69,7 @@ public class ScalarResolver
 			 * Java type of the scalar.
 			 */
 			String name;
-			Optional<GraphQLName> nameAnnotation = scalarType.findAnnotation(GraphQLName.class);
+			Optional<GraphQLName> nameAnnotation = scalarType.getAnnotation(GraphQLName.class);
 			if(nameAnnotation.isPresent())
 			{
 				name = nameAnnotation.get().value();
@@ -77,6 +78,17 @@ public class ScalarResolver
 			else
 			{
 				name = ctx.getTypeName(type);
+			}
+
+			String description;
+			Optional<GraphQLDescription> descriptionAnnotation = scalarType.getAnnotation(GraphQLDescription.class);
+			if(descriptionAnnotation.isPresent())
+			{
+				description = descriptionAnnotation.get().value();
+			}
+			else
+			{
+				description = ctx.getDescription(type);
 			}
 
 			// Resolve the interface and the GraphQL type and request a conversion to iit
@@ -90,7 +102,7 @@ public class ScalarResolver
 			// Create the GraphQL type representing the scalar
 			return GraphQLScalarType.newScalar()
 				.name(name)
-				.description(ctx.getDescription(scalarType))
+				.description(description)
 				.coercing(new CustomCoercing<>((GraphQLScalar) scalar, inputConversion))
 				.build();
 		});

@@ -488,7 +488,11 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		private void registerResolved(TypeRef type, ResolvedGraphQLType<?> resolved)
+		private void registerResolved(
+			TypeRef type,
+			ResolvedGraphQLType<?> resolved,
+			boolean isInput
+		)
 		{
 			GraphQLType gql = resolved.getGraphQLType();
 			if(gql instanceof GraphQLModifiedType)
@@ -496,13 +500,29 @@ public class InternalGraphQLSchemaBuilder
 				gql = ((GraphQLModifiedType) gql).getWrappedType();
 			}
 
-			if(gql instanceof GraphQLInputType)
+			if(gql instanceof GraphQLInputType
+				&& isInput || (! resolved.hasConversion() && ! resolved.hasDefaultValue())
+			)
 			{
+				/*
+				 * If the GraphQL type resolved is an input and we're either:
+				 *
+				 * 1) Resolving an input type
+				 * 2) The resolved type has no extras like a conversion and default value
+				 */
 				builtInputTypes.put(type, (ResolvedGraphQLType) resolved);
 			}
 
-			if(gql instanceof GraphQLOutputType)
+			if(gql instanceof GraphQLOutputType
+				&& ! isInput || (! resolved.hasConversion() && ! resolved.hasDefaultValue())
+			)
 			{
+				/*
+				 * If the GraphQL type resolved is an output and we're either:
+				 *
+				 * 1) Resolving an output type
+				 * 2) The resolved type has no extras like a conversion and default value
+				 */
 				builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
 			}
 		}
@@ -567,7 +587,7 @@ public class InternalGraphQLSchemaBuilder
 					pending.update(graphQLType.getConversion());
 				}
 
-				registerResolved(withoutUsage, graphQLType);
+				registerResolved(withoutUsage, graphQLType, false);
 			}
 
 			if(type.getUsage().hasAnnotation(GraphQLNonNull.class))
@@ -655,7 +675,7 @@ public class InternalGraphQLSchemaBuilder
 					pending.update(graphQLType.getConversion());
 				}
 
-				registerResolved(withoutUsage, graphQLType);
+				registerResolved(withoutUsage, graphQLType, true);
 			}
 
 			if(type.getUsage().hasAnnotation(GraphQLNonNull.class))

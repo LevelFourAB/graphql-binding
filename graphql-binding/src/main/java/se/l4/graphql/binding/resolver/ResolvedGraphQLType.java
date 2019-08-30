@@ -100,6 +100,16 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 	}
 
 	/**
+	 * Get if this type has a conversion.
+	 *
+	 * @return
+	 */
+	public boolean hasConversion()
+	{
+		return conversion != IDENTITY;
+	}
+
+	/**
 	 * Conversion that can convert from an object returned by the parent field
 	 * into an object that the fetchers defined by {@link #getGraphQLType()}
 	 * can act upon.
@@ -130,6 +140,16 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 			this.conversion == IDENTITY ? conversion : this.conversion.and((DataFetchingConversion) conversion),
 			defaultValue
 		);
+	}
+
+	/**
+	 * Get if a default value is present.
+	 *
+	 * @return
+	 */
+	public boolean hasDefaultValue()
+	{
+		return defaultValue != NO_DEFAULT;
 	}
 
 	/**

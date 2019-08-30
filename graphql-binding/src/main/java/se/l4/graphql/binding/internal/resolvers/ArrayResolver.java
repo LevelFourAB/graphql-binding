@@ -19,20 +19,27 @@ public class ArrayResolver
 {
 
 	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return type.isArray();
+	}
+
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
-		if(! type.isArray())
-		{
-			return ResolvedGraphQLType.none();
-		}
 
 		GraphQLResolverContext context = encounter.getContext();
 
 		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = type.getComponentType()
-			.map(context::resolveOutput)
+			.map(context::maybeResolveOutput)
 			.get();
+
+		if(! componentType.isPresent())
+		{
+			return ResolvedGraphQLType.none();
+		}
 
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())

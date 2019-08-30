@@ -3,6 +3,7 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.List;
 
 import graphql.schema.GraphQLOutputType;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
@@ -15,6 +16,12 @@ public class MultiOutputResolver
 	public MultiOutputResolver(List<GraphQLOutputResolver> resolvers)
 	{
 		this.resolvers = resolvers;
+	}
+
+	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return true;
 	}
 
 	@Override

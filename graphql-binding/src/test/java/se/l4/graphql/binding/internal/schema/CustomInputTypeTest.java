@@ -15,7 +15,7 @@ import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.GraphQLTest;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
-import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
+import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
 
 public class CustomInputTypeTest
 	extends GraphQLTest
@@ -26,7 +26,7 @@ public class CustomInputTypeTest
 	{
 		binder
 			.withRoot(new Root())
-			.withType(Maybe.class, new MaybeResolver());
+			.withResolver(new MaybeResolver());
 	}
 
 	@Test
@@ -108,8 +108,14 @@ public class CustomInputTypeTest
 	}
 
 	public class MaybeResolver
-		implements GraphQLInputResolver
+		implements TypedGraphQLInputResolver
 	{
+		@Override
+		public Class<?> getType()
+		{
+			return Maybe.class;
+		}
+
 		@Override
 		public ResolvedGraphQLType<? extends graphql.schema.GraphQLInputType> resolveInput(
 			GraphQLInputEncounter encounter

@@ -1,12 +1,14 @@
 package se.l4.graphql.binding.internal.resolvers;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
@@ -22,6 +24,12 @@ public class ListResolver
 	implements GraphQLOutputResolver, GraphQLInputResolver
 {
 	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return Collection.class.isAssignableFrom(type.getErasedType());
+	}
+
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
@@ -36,6 +44,12 @@ public class ListResolver
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())
 		).withConversion(new ListConverter(componentType.getConversion()));
+	}
+
+	@Override
+	public boolean supportsInput(TypeRef type)
+	{
+		return type.getErasedType().isAssignableFrom(List.class);
 	}
 
 	@Override

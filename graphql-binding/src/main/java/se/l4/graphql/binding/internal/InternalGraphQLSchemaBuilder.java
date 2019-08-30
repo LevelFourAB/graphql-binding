@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -118,15 +117,15 @@ public class InternalGraphQLSchemaBuilder
 		registerBuiltin(Scalars.GraphQLBigDecimal, BigDecimal.class);
 
 		// Register some default type converters
-		typeResolvers.bindAny(Object.class, new InputObjectTypeResolver());
-		typeResolvers.bindAny(Object.class, new ObjectTypeResolver());
+		typeResolvers.add(new InputObjectTypeResolver());
+		typeResolvers.add(new ObjectTypeResolver());
 
-		typeResolvers.bindAny(Object.class, new InterfaceResolver());
+		typeResolvers.add(new InterfaceResolver());
 
-		typeResolvers.bindAny(Enum.class, new EnumResolver());
+		typeResolvers.add(new EnumResolver());
 
-		typeResolvers.bindAny(Collection.class, new ListResolver());
-		typeResolvers.bindAny(Object.class, new ArrayResolver());
+		typeResolvers.add(new ListResolver());
+		typeResolvers.add(new ArrayResolver());
 	}
 
 	/**
@@ -180,7 +179,7 @@ public class InternalGraphQLSchemaBuilder
 	 */
 	public <JavaType> void addScalar(Class<JavaType> type, GraphQLScalar<JavaType, ?> scalar)
 	{
-		this.typeResolvers.bindAny(type, new ScalarResolver(scalar));
+		this.typeResolvers.add(new ScalarResolver(type, scalar));
 	}
 
 	/**
@@ -193,9 +192,9 @@ public class InternalGraphQLSchemaBuilder
 		this.types.add(type);
 	}
 
-	public void bind(Class<?> type, GraphQLResolver resolver)
+	public void addResolver(GraphQLResolver resolver)
 	{
-		this.typeResolvers.bindAny(type, resolver);
+		this.typeResolvers.add(resolver);
 	}
 
 	/**
@@ -270,7 +269,7 @@ public class InternalGraphQLSchemaBuilder
 				List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, typeRef);
 				for(Factory<Object, ?> factory : factories)
 				{
-					typeResolvers.bindOutput(factory.getInput(), new ConvertingTypeResolver<>(factory));
+					typeResolvers.add(new ConvertingTypeResolver<>(factory));
 				}
 			});
 		}
@@ -512,7 +511,7 @@ public class InternalGraphQLSchemaBuilder
 				{
 					outputsBeingResolved.add(withoutUsage);
 
-					Optional<GraphQLOutputResolver> resolver = typeResolvers.getOutputResolver(type.getErasedType());
+					Optional<GraphQLOutputResolver> resolver = typeResolvers.getOutputResolver(type);
 					if(! resolver.isPresent())
 					{
 						return ResolvedGraphQLType.none();
@@ -598,7 +597,7 @@ public class InternalGraphQLSchemaBuilder
 				{
 					inputsBeingResolved.add(withoutUsage);
 
-					Optional<GraphQLInputResolver> resolver = typeResolvers.getInputResolver(type.getErasedType());
+					Optional<GraphQLInputResolver> resolver = typeResolvers.getInputResolver(type);
 					if(! resolver.isPresent())
 					{
 						return ResolvedGraphQLType.none();

@@ -18,22 +18,30 @@ import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
-import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
+import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.query.TypedGraphQLOutputResolver;
 
 /**
  * Custom resolver that is registered whenever a scalar that uses
  * {@link GraphQLScalar} is added.
  */
 public class ScalarResolver
-	implements GraphQLOutputResolver, GraphQLInputResolver
+	implements TypedGraphQLOutputResolver, TypedGraphQLInputResolver
 {
+	private final Class<?> type;
 	private final GraphQLScalar<?, ?> scalar;
 
-	public ScalarResolver(GraphQLScalar<?, ?> scalar)
+	public ScalarResolver(Class<?> type, GraphQLScalar<?, ?> scalar)
 	{
+		this.type = type;
 		this.scalar = scalar;
+	}
+
+	@Override
+	public Class<?> getType()
+	{
+		return type;
 	}
 
 	@Override

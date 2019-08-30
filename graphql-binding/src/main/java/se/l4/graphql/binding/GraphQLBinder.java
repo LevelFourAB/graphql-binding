@@ -41,9 +41,9 @@ public class GraphQLBinder
 		return this;
 	}
 
-	public GraphQLBinder withType(Class<?> type, GraphQLResolver resolver)
+	public GraphQLBinder withResolver(GraphQLResolver resolver)
 	{
-		builder.bind(type, resolver);
+		builder.addResolver(resolver);
 		return this;
 	}
 

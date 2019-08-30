@@ -16,6 +16,17 @@ import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 public class EnumResolver
 	implements GraphQLOutputResolver, GraphQLInputResolver
 {
+	@Override
+	public boolean supportsInput(TypeRef type)
+	{
+		return type.hasAnnotation(GraphQLEnum.class);
+	}
+
+	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return supportsInput(type);
+	}
 
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(
@@ -38,11 +49,6 @@ public class EnumResolver
 		TypeRef type
 	)
 	{
-		if(! type.hasAnnotation(GraphQLEnum.class))
-		{
-			return ResolvedGraphQLType.none();
-		}
-
 		GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
 			.name(context.getTypeName(type))
 			.description(context.getDescription(type));

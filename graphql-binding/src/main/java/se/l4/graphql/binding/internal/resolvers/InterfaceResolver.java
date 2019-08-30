@@ -24,16 +24,17 @@ public class InterfaceResolver
 	implements GraphQLOutputResolver
 {
 	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return type.hasAnnotation(GraphQLInterface.class);
+	}
+
+	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(
 		GraphQLOutputEncounter encounter
 	)
 	{
 		TypeRef initialType = encounter.getType();
-
-		if(! initialType.hasAnnotation(GraphQLInterface.class))
-		{
-			return ResolvedGraphQLType.none();
-		}
 
 		GraphQLResolverContext context = encounter.getContext();
 

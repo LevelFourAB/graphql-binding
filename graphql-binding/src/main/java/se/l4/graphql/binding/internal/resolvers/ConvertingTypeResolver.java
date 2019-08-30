@@ -2,6 +2,7 @@ package se.l4.graphql.binding.internal.resolvers;
 
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -19,6 +20,12 @@ public class ConvertingTypeResolver<I, O>
 	)
 	{
 		this.factory = factory;
+	}
+
+	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return type.getErasedType() == factory.getInput();
 	}
 
 	@Override

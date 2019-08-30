@@ -42,13 +42,15 @@ public class ObjectTypeResolver
 		env -> env.getSource();
 
 	@Override
+	public boolean supportsOutput(TypeRef type)
+	{
+		return type.hasAnnotation(GraphQLObject.class);
+	}
+
+	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
-		if(! type.hasAnnotation(GraphQLObject.class))
-		{
-			return ResolvedGraphQLType.none();
-		}
 
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());

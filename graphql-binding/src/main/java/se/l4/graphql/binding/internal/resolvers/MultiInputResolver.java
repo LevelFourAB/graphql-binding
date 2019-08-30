@@ -3,6 +3,7 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.List;
 
 import graphql.schema.GraphQLInputType;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
@@ -15,6 +16,12 @@ public class MultiInputResolver
 	public MultiInputResolver(List<GraphQLInputResolver> resolvers)
 	{
 		this.resolvers = resolvers;
+	}
+
+	@Override
+	public boolean supportsInput(TypeRef type)
+	{
+		return true;
 	}
 
 	@Override

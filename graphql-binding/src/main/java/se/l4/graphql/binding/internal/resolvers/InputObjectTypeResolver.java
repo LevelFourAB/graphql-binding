@@ -14,6 +14,7 @@ import graphql.schema.GraphQLInputType;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.internal.datafetchers.FieldInjector;
 import se.l4.graphql.binding.internal.datafetchers.ValueInjector;
 import se.l4.graphql.binding.internal.factory.MemberKey;
@@ -27,15 +28,16 @@ import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 public class InputObjectTypeResolver
 	implements GraphQLInputResolver
 {
+	@Override
+	public boolean supportsInput(TypeRef type)
+	{
+		return type.hasAnnotation(GraphQLInputObject.class);
+	}
 
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLInputObjectType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		TypeRef initialType = encounter.getType();
-		if(! initialType.hasAnnotation(se.l4.graphql.binding.annotations.GraphQLInputObject.class))
-		{
-			return ResolvedGraphQLType.none();
-		}
 
 		GraphQLResolverContext context = encounter.getContext();
 

@@ -34,7 +34,7 @@ public class Breadcrumb
 			return this;
 		}
 
-		return new Breadcrumb(this.message + "\n  " + other.message);
+		return new Breadcrumb(other.message + "\n  " + this.message);
 	}
 
 	/**

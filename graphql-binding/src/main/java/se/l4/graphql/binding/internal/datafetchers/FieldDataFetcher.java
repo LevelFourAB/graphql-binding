@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 
 public class FieldDataFetcher<I, T>
 	implements DataFetcher<T>

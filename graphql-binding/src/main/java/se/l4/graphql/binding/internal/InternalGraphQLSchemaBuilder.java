@@ -55,6 +55,7 @@ import se.l4.graphql.binding.internal.resolvers.ListResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;

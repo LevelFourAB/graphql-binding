@@ -17,6 +17,7 @@ import se.l4.graphql.binding.internal.factory.ArgumentResolver;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;

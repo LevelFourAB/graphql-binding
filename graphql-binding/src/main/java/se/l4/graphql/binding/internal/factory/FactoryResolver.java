@@ -17,8 +17,8 @@ import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLSource;
-import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 
 public class FactoryResolver

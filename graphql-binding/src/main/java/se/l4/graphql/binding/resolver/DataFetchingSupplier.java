@@ -1,4 +1,4 @@
-package se.l4.graphql.binding.internal;
+package se.l4.graphql.binding.resolver;
 
 import graphql.schema.DataFetchingEnvironment;
 

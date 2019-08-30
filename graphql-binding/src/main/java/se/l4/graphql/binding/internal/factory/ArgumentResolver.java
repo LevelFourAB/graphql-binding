@@ -1,8 +1,8 @@
 package se.l4.graphql.binding.internal.factory;
 
 import graphql.schema.DataFetchingEnvironment;
-import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 
 /**
  * Resolver that extracts a GraphQL argument for use within a method call.

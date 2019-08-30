@@ -19,7 +19,7 @@ public class SpecificInputTest
 	{
 		try
 		{
-			new GraphQLBinder()
+			GraphQLBinder.newBinder()
 				.withRoot(new RootWithB())
 				.build();
 		}
@@ -36,7 +36,7 @@ public class SpecificInputTest
 	{
 		try
 		{
-			new GraphQLBinder()
+			GraphQLBinder.newBinder()
 				.withRoot(new RootWithList())
 				.build();
 		}

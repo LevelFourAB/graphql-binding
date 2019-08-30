@@ -18,18 +18,23 @@ public class GraphQLBinder
 
 	private TypeFinder typeFinder;
 
-	public GraphQLBinder()
+	private GraphQLBinder()
 	{
 		builder = new InternalGraphQLSchemaBuilder();
 	}
 
-	public GraphQLBinder withInstanceFactory(InstanceFactory factory)
+	public static GraphQLBinder newBinder()
+	{
+		return new GraphQLBinder();
+	}
+
+	public GraphQLBinder setInstanceFactory(InstanceFactory factory)
 	{
 		builder.setInstanceFactory(factory);
 		return this;
 	}
 
-	public GraphQLBinder withTypeFinder(TypeFinder finder)
+	public GraphQLBinder setTypeFinder(TypeFinder finder)
 	{
 		this.typeFinder = finder;
 		return this;

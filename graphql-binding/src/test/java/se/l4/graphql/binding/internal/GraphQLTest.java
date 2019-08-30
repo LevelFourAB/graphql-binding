@@ -22,7 +22,7 @@ public abstract class GraphQLTest
 	@Before
 	public void beforeTest()
 	{
-		GraphQLBinder binder = new GraphQLBinder();
+		GraphQLBinder binder = GraphQLBinder.newBinder();
 		setup(binder);
 		this.schema = binder.build();
 

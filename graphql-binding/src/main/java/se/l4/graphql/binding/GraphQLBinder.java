@@ -49,7 +49,7 @@ public class GraphQLBinder
 
 	public GraphQLBinder withRoot(Object instance)
 	{
-		builder.addRootType(instance.getClass(), () -> instance);
+		builder.addRootType(instance.getClass(), (env) -> instance);
 		return this;
 	}
 

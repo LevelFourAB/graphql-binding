@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
@@ -21,6 +20,7 @@ import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.DataFetchingSupplier;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
+import se.l4.graphql.binding.internal.factory.ArgumentResolver;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
@@ -167,28 +167,4 @@ public class ObjectTypeResolver
 		});
 	}
 
-	private static class ArgumentResolver
-		implements DataFetchingSupplier<Object>
-	{
-		private final String name;
-		private final DataFetchingConversion<Object, Object> conversion;
-
-		public ArgumentResolver(String name, DataFetchingConversion<Object, Object> conversion)
-		{
-			this.name = name;
-			this.conversion = conversion;
-		}
-
-		@Override
-		public Object get(DataFetchingEnvironment env)
-		{
-			Object value = env.getArgument(name);
-			if(value == null)
-			{
-				return null;
-			}
-
-			return conversion.convert(env, value);
-		}
-	}
 }

@@ -1,6 +1,7 @@
 package se.l4.graphql.binding.internal.builders;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import graphql.schema.GraphQLCodeRegistry;
@@ -11,28 +12,35 @@ import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.query.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
+import se.l4.graphql.binding.resolver.query.GraphQLObjectMixin;
+import se.l4.graphql.binding.resolver.query.GraphQLObjectMixinEncounter;
 
 public class GraphQLObjectBuilderImpl
 	implements GraphQLObjectBuilder
 {
 	private final GraphQLResolverContext context;
+	private final List<GraphQLObjectMixin> mixins;
 
 	private final GraphQLCodeRegistry.Builder code;
+
 	private final GraphQLObjectType.Builder builder;
 
 	private final Set<String> fields;
 
+	private TypeRef type;
 	private Breadcrumb breadcrumb;
 
 	private String name;
 
 	public GraphQLObjectBuilderImpl(
+		List<GraphQLObjectMixin> mixins,
 		GraphQLResolverContext context,
 		GraphQLCodeRegistry.Builder code
 	)
 	{
-		this.code = code;
+		this.mixins = mixins;
 		this.context = context;
+		this.code = code;
 
 		breadcrumb = Breadcrumb.empty();
 		this.fields = new HashSet<>();
@@ -42,6 +50,7 @@ public class GraphQLObjectBuilderImpl
 	@Override
 	public GraphQLObjectBuilder over(TypeRef type)
 	{
+		this.type = type;
 		this.breadcrumb = Breadcrumb.forType(type);
 
 		this.name = context.getTypeName(type);
@@ -101,6 +110,38 @@ public class GraphQLObjectBuilderImpl
 	@Override
 	public GraphQLObjectType build()
 	{
+		if(type != null)
+		{
+			GraphQLObjectMixinEncounter encounter = new GraphQLObjectMixinEncounter()
+			{
+
+				public GraphQLFieldBuilder<?> newField()
+				{
+					return GraphQLObjectBuilderImpl.this.newField();
+				}
+
+				@Override
+				public TypeRef getType()
+				{
+					return type;
+				}
+
+				@Override
+				public GraphQLResolverContext getContext()
+				{
+					return context;
+				}
+			};
+
+			for(GraphQLObjectMixin mixin : mixins)
+			{
+				if(mixin.supportsOutputMixin(type))
+				{
+					mixin.mixin(encounter);
+				}
+			}
+		}
+
 		return builder.build();
 	}
 }

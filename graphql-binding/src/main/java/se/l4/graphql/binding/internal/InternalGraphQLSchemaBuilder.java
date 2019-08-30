@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +62,7 @@ import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.query.GraphQLInterfaceBuilder;
 import se.l4.graphql.binding.resolver.query.GraphQLObjectBuilder;
+import se.l4.graphql.binding.resolver.query.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.query.GraphQLOutputResolver;
 
@@ -72,13 +74,14 @@ public class InternalGraphQLSchemaBuilder
 	private final NameRegistry names;
 	private final TypeResolverRegistry typeResolvers;
 
-	private final Map<Class<?>, Supplier<?>> rootTypes;
+	private final Map<Class<?>, DataFetchingSupplier<?>> rootTypes;
 	private final List<Class<?>> types;
 
 	private final Map<TypeRef, ResolvedGraphQLType<? extends GraphQLOutputType>> builtOutputTypes;
 	private final Map<TypeRef, ResolvedGraphQLType<? extends GraphQLInputType>> builtInputTypes;
 
 	private final TypeConverter typeConverter;
+	private final List<GraphQLObjectMixin> objectMixins;
 
 	private InstanceFactory instanceFactory;
 
@@ -94,6 +97,8 @@ public class InternalGraphQLSchemaBuilder
 
 		builtInputTypes = new HashMap<>();
 		builtOutputTypes = new HashMap<>();
+
+		objectMixins = new ArrayList<>();
 
 		typeConverter = new StandardTypeConverter();
 		typeConverter.addConversion(StringValue.class, String.class, value -> value.getValue());
@@ -165,9 +170,13 @@ public class InternalGraphQLSchemaBuilder
 	 * @param type
 	 * @param supplier
 	 */
-	public void addRootType(Class<?> type, Supplier<?> supplier)
+	public void addRootType(Class<?> type, DataFetchingSupplier<?> supplier)
 	{
 		this.rootTypes.put(type, supplier);
+		this.objectMixins.add(new RootObjectMixin(
+			Types.reference(type),
+			supplier
+		));
 	}
 
 	/**
@@ -204,22 +213,24 @@ public class InternalGraphQLSchemaBuilder
 	 * @param ctx
 	 * @return
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GraphQLObjectType buildRootQuery(ResolverContextImpl ctx)
 	{
 		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
+			Collections.emptyList(),
 			ctx,
 			ctx.codeRegistryBuilder
 		);
 
 		builder.setName("Query");
 
-		for(Map.Entry<Class<?>, Supplier<?>> e : rootTypes.entrySet())
+		for(Map.Entry<Class<?>, DataFetchingSupplier<?>> e : rootTypes.entrySet())
 		{
-			Supplier<?> supplier = e.getValue();
+			DataFetchingSupplier supplier = e.getValue();
 			ObjectTypeResolver.resolve(
 				ctx,
 				Types.reference(e.getKey()),
-				env -> supplier.get(),
+				supplier,
 				builder,
 				GraphQLField.class
 			);
@@ -228,22 +239,24 @@ public class InternalGraphQLSchemaBuilder
 		return builder.build();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GraphQLObjectType buildMutation(ResolverContextImpl ctx)
 	{
 		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
+			Collections.emptyList(),
 			ctx,
 			ctx.codeRegistryBuilder
 		);
 
 		builder.setName("Mutation");
 
-		for(Map.Entry<Class<?>, Supplier<?>> e : rootTypes.entrySet())
+		for(Map.Entry<Class<?>, DataFetchingSupplier<?>> e : rootTypes.entrySet())
 		{
-			Supplier<?> supplier = e.getValue();
+			DataFetchingSupplier supplier = e.getValue();
 			ObjectTypeResolver.resolve(
 				ctx,
 				Types.reference(e.getKey()),
-				env -> supplier.get(),
+				supplier,
 				builder,
 				GraphQLMutation.class
 			);
@@ -697,6 +710,7 @@ public class InternalGraphQLSchemaBuilder
 		public GraphQLObjectBuilder newObjectType()
 		{
 			return new GraphQLObjectBuilderImpl(
+				objectMixins,
 				context,
 				context.codeRegistryBuilder
 			);

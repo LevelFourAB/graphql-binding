@@ -82,6 +82,8 @@ public class ListResolver
 		@Override
 		public Collection<O> convert(DataFetchingEnvironment env, Collection<I> object)
 		{
+			if(object == null) return null;
+
 			return object.stream()
 				.map(item -> conversion.convert(env, item))
 				.collect(Collectors.toList());

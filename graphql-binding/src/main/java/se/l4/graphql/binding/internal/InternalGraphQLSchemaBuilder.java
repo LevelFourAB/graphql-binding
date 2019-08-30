@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.base.Defaults;
+
 import graphql.Scalars;
 import graphql.language.BooleanValue;
 import graphql.language.FloatValue;
@@ -148,8 +150,11 @@ public class InternalGraphQLSchemaBuilder
 
 		for(TypeRef type : types)
 		{
-			builtOutputTypes.put(type, (ResolvedGraphQLType) resolved);
-			builtInputTypes.put(type, (ResolvedGraphQLType) resolved);
+			Object defaultValue = Defaults.defaultValue(type.getErasedType());
+			ResolvedGraphQLType<?> withDefault = resolved.withDefaultValue(env -> defaultValue);
+
+			builtOutputTypes.put(type, (ResolvedGraphQLType) withDefault);
+			builtInputTypes.put(type, (ResolvedGraphQLType) withDefault);
 		}
 
 		names.reserveName(

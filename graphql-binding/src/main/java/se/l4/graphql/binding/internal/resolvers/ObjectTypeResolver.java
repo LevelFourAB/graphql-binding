@@ -51,6 +51,11 @@ public class ObjectTypeResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
+		if(! type.isFullyResolved())
+		{
+			// Types must be fully resolved to be usable
+			return ResolvedGraphQLType.none();
+		}
 
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());
@@ -89,25 +94,26 @@ public class ObjectTypeResolver
 				// Check if this is already handled
 				if(! handled.add(MemberKey.create(field))) continue;
 
-				if(! field.isPublic())
-				{
-					throw context.newError(
-						Breadcrumb.forMember(field),
-						"Field must be public to be useable"
-					);
-				}
+				context.breadcrumb(Breadcrumb.forMember(field), () -> {
+					if(! field.isPublic())
+					{
+						throw context.newError(
+							"Field must be public to be useable"
+						);
+					}
 
-				ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(field.getType());
+					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(field.getType());
 
-				builder.newField()
-					.over(field)
-					.setType(fieldType.getGraphQLType())
-					.withDataFetcher(new FieldDataFetcher<>(
-						contextGetter,
-						field.getField(),
-						fieldType.getConversion()
-					))
-					.done();
+					builder.newField()
+						.over(field)
+						.setType(fieldType.getGraphQLType())
+						.withDataFetcher(new FieldDataFetcher<>(
+							contextGetter,
+							field.getField(),
+							fieldType.getConversion()
+						))
+						.done();
+				});
 			}
 
 			// Go through all the methods in the type and map them
@@ -121,46 +127,50 @@ public class ObjectTypeResolver
 				// Check if this is already handled
 				if(! handled.add(MemberKey.create(method))) continue;
 
-				if(! method.isPublic())
-				{
-					throw context.newError(
-						Breadcrumb.forMember(method),
-						"Method must be public to be useable"
-					);
-				}
+				context.breadcrumb(Breadcrumb.forMember(method), () -> {
+					if(! method.isPublic())
+					{
+						throw context.newError(
+							"Method must be public to be useable"
+						);
+					}
 
-				ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(method.getReturnType());
+					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(method.getReturnType());
 
-				GraphQLFieldBuilder<?> fieldBuilder = builder.newField()
-					.over(method)
-					.setType(fieldType.getGraphQLType());
+					GraphQLFieldBuilder<?> fieldBuilder = builder.newField()
+						.over(method)
+						.setType(fieldType.getGraphQLType());
 
-				List<ParameterRef> parameters = method.getParameters();
-				List<DataFetchingSupplier<?>> arguments = new ArrayList<>();
+					List<ParameterRef> parameters = method.getParameters();
+					List<DataFetchingSupplier<?>> arguments = new ArrayList<>();
 
-				for(ParameterRef parameter : parameters)
-				{
-					ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
+					for(ParameterRef parameter : parameters)
+					{
+						ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
 
-					// Resolve the supplier to use for the parameter
-					String name = context.getParameterName(parameter);
-					arguments.add(new ArgumentResolver(name, (DataFetchingConversion) argumentType.getConversion()));
+						// Resolve the supplier to use for the parameter
+						String name = context.getParameterName(parameter);
+						arguments.add(new ArgumentResolver(
+							name,
+							(DataFetchingConversion) argumentType.getConversion(),
+							(DataFetchingSupplier) argumentType.getDefaultValue()
+						));
 
+						// Register the argument
+						fieldBuilder.newArgument()
+							.over(parameter)
+							.setType(argumentType.getGraphQLType())
+							.done();
+					}
 
-					// Register the argument
-					fieldBuilder.newArgument()
-						.over(parameter)
-						.setType(argumentType.getGraphQLType())
+					fieldBuilder.withDataFetcher(new MethodDataFetcher<>(
+						contextGetter,
+						method.getMethod(),
+						arguments.toArray(DataFetchingSupplier[]::new),
+						fieldType.getConversion()
+					))
 						.done();
-				}
-
-				fieldBuilder.withDataFetcher(new MethodDataFetcher<>(
-					contextGetter,
-					method.getMethod(),
-					arguments.toArray(DataFetchingSupplier[]::new),
-					fieldType.getConversion()
-				))
-					.done();
+				});
 			}
 
 			return true;

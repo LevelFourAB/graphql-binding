@@ -104,7 +104,11 @@ public class RootObjectMixin
 
 						// Resolve the supplier to use for the parameter
 						String name = context.getParameterName(parameter);
-						arguments.add(new ArgumentResolver(name, (DataFetchingConversion) argumentType.getConversion()));
+						arguments.add(new ArgumentResolver(
+							name,
+							(DataFetchingConversion) argumentType.getConversion(),
+							(DataFetchingSupplier) argumentType.getDefaultValue()
+						));
 
 						// Register the argument
 						fieldBuilder.newArgument()

@@ -59,6 +59,8 @@ public class ArrayResolver
 		@Override
 		public Collection<O> convert(DataFetchingEnvironment env, I[] object)
 		{
+			if(object == null) return null;
+
 			return Arrays.stream(object)
 				.map(item -> conversion.convert(env, item))
 				.collect(Collectors.toList());

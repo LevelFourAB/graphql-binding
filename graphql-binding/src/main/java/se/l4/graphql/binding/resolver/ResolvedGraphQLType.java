@@ -11,19 +11,23 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
  */
 public class ResolvedGraphQLType<T extends GraphQLType>
 {
-	private static final ResolvedGraphQLType<?> NONE = new ResolvedGraphQLType<>(null, null);
+	private static final ResolvedGraphQLType<?> NONE = new ResolvedGraphQLType<>(null, null, null);
 	private static final DataFetchingConversion<?, ?> IDENTITY = (env, i) -> i;
+	private static final DataFetchingSupplier<?> NO_DEFAULT = (env) -> null;
 
 	private final T type;
 	private final DataFetchingConversion<?, ?> conversion;
+	private final DataFetchingSupplier<?> defaultValue;
 
 	private ResolvedGraphQLType(
 		T type,
-		DataFetchingConversion<?, ?> conversion
+		DataFetchingConversion<?, ?> conversion,
+		DataFetchingSupplier<?> defaultValue
 	)
 	{
 		this.type = type;
 		this.conversion = conversion;
+		this.defaultValue = defaultValue;
 	}
 
 	/**
@@ -48,7 +52,7 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 	 */
 	public static <T extends GraphQLType> ResolvedGraphQLType<T> forType(T type)
 	{
-		return new ResolvedGraphQLType<>(type, IDENTITY);
+		return new ResolvedGraphQLType<>(type, IDENTITY, NO_DEFAULT);
 	}
 
 	/**
@@ -90,7 +94,8 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 
 		return new ResolvedGraphQLType<>(
 			GraphQLNonNull.nonNull(type),
-			conversion
+			conversion,
+			defaultValue
 		);
 	}
 
@@ -122,7 +127,38 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 	{
 		return new ResolvedGraphQLType<>(
 			type,
-			this.conversion == IDENTITY ? conversion : this.conversion.and((DataFetchingConversion) conversion)
+			this.conversion == IDENTITY ? conversion : this.conversion.and((DataFetchingConversion) conversion),
+			defaultValue
+		);
+	}
+
+	/**
+	 * Get supplier that returns the default value that should be used for
+	 * this type.
+	 *
+	 * @return
+	 */
+	public DataFetchingSupplier<?> getDefaultValue()
+	{
+		if(! isPresent())
+		{
+			throw new IllegalStateException();
+		}
+
+		return defaultValue;
+	}
+
+	/**
+	 * Get a version of this type using the specified default value.
+	 *
+	 * @param supplier
+	 */
+	public ResolvedGraphQLType<T> withDefaultValue(DataFetchingSupplier<?> supplier)
+	{
+		return new ResolvedGraphQLType<>(
+			type,
+			conversion,
+			supplier
 		);
 	}
 }

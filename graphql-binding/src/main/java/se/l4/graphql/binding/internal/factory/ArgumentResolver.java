@@ -1,5 +1,7 @@
 package se.l4.graphql.binding.internal.factory;
 
+import java.util.Map;
+
 import graphql.schema.DataFetchingEnvironment;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
@@ -12,22 +14,29 @@ public class ArgumentResolver
 {
 	private final String name;
 	private final DataFetchingConversion<Object, Object> conversion;
+	private final DataFetchingSupplier<Object> defaultValue;
 
-	public ArgumentResolver(String name, DataFetchingConversion<Object, Object> conversion)
+	public ArgumentResolver(
+		String name,
+		DataFetchingConversion<Object, Object> conversion,
+		DataFetchingSupplier<Object> defaultValue
+	)
 	{
 		this.name = name;
 		this.conversion = conversion;
+		this.defaultValue = defaultValue;
 	}
 
 	@Override
 	public Object get(DataFetchingEnvironment env)
 	{
-		Object value = env.getArgument(name);
-		if(value == null)
+		Map<String, Object> arguments = env.getArguments();
+		if(! arguments.containsKey(name))
 		{
-			return null;
+			return defaultValue.get(env);
 		}
 
+		Object value = env.getArgument(name);
 		return conversion.convert(env, value);
 	}
 }

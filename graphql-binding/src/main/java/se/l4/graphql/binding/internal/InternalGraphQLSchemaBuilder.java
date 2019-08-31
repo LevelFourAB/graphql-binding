@@ -513,7 +513,7 @@ public class InternalGraphQLSchemaBuilder
 		@Override
 		public String getDescription(Annotated annotated)
 		{
-			return annotated.findAnnotation(GraphQLDescription.class)
+			return annotated.getAnnotation(GraphQLDescription.class)
 				.map(GraphQLDescription::value)
 				.orElse("");
 		}

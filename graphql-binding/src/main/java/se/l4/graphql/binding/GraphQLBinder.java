@@ -3,7 +3,9 @@ package se.l4.graphql.binding;
 import graphql.schema.GraphQLSchema;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
+import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
+import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLRoot;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
@@ -80,6 +82,16 @@ public class GraphQLBinder
 			}
 
 			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInputObject.class))
+			{
+				builder.addType(c);
+			}
+
+			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLEnum.class))
+			{
+				builder.addType(c);
+			}
+
+			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInterface.class))
 			{
 				builder.addType(c);
 			}

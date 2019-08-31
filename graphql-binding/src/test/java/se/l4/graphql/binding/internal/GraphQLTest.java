@@ -10,6 +10,7 @@ import graphql.ExceptionWhileDataFetching;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.GraphQLContext;
 import graphql.GraphQLError;
 import graphql.schema.GraphQLSchema;
 import se.l4.graphql.binding.GraphQLBinder;
@@ -34,7 +35,12 @@ public abstract class GraphQLTest
 
 	protected Result execute(String query)
 	{
-		ExecutionResult result = ql.execute(query);
+		ExecutionResult result = ql.execute(ExecutionInput.newExecutionInput(query)
+			.context(GraphQLContext.newContext()
+				.of("test", "TestEnv")
+			)
+			.build()
+		);
 
 		return new Result(result);
 	}
@@ -43,6 +49,9 @@ public abstract class GraphQLTest
 	{
 		ExecutionResult result = ql.execute(ExecutionInput.newExecutionInput(query)
 			.variables(variables)
+			.context(GraphQLContext.newContext()
+				.of("test", "TestEnv")
+			)
 			.build()
 		);
 

@@ -19,10 +19,13 @@ import se.l4.commons.types.reflect.ExecutableRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
+import se.l4.graphql.binding.ContextValue;
 import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.graphql.binding.annotations.GraphQLContext;
 import se.l4.graphql.binding.annotations.GraphQLEnvironment;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLSource;
+import se.l4.graphql.binding.internal.ContextValueImpl;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -203,6 +206,33 @@ public class FactoryResolver
 			else
 			{
 				throw context.newError("@GraphQLEnvironment was used with unsupported type `" + type.toTypeName() + "`");
+			}
+		}
+
+		Optional<GraphQLContext> contextAnnotation = context.findMetaAnnotation(annotated, GraphQLContext.class);
+		if(contextAnnotation.isPresent())
+		{
+			String name = contextAnnotation.get().value();
+			if(type.getErasedType() == Optional.class)
+			{
+				return Optional.of(env -> {
+					graphql.GraphQLContext ctx = env.getContext();
+					return Optional.ofNullable(ctx.get(name));
+				});
+			}
+			else if(type.getErasedType() == ContextValue.class)
+			{
+				return Optional.of(env -> {
+					graphql.GraphQLContext ctx = env.getContext();
+					return new ContextValueImpl<>(ctx, name);
+				});
+			}
+			else
+			{
+				return Optional.of(env -> {
+					graphql.GraphQLContext ctx = env.getContext();
+					return ctx.get(name);
+				});
 			}
 		}
 

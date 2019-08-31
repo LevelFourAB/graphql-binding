@@ -1,5 +1,6 @@
 package se.l4.graphql.binding.internal;
 
+import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -373,6 +374,8 @@ public class InternalGraphQLSchemaBuilder
 		private final Set<TypeRef> outputsBeingResolved;
 		private final Map<TypeRef, PendingDataFetchingConversion<?, ?>> pendingOutputConversions;
 
+		private final Map<Class<?>, Map<Class<?>, Annotation>> annotationCache;
+
 		private Breadcrumb breadcrumb;
 
 		public ResolverContextImpl(
@@ -388,6 +391,8 @@ public class InternalGraphQLSchemaBuilder
 
 			outputsBeingResolved = new HashSet<>();
 			pendingOutputConversions = new HashMap<>();
+
+			annotationCache = new HashMap<>();
 		}
 
 		@Override
@@ -749,6 +754,53 @@ public class InternalGraphQLSchemaBuilder
 				}
 			}
 			return result;
+		}
+
+		@Override
+		public <T extends Annotation> Optional<T> findMetaAnnotation(Annotated annotated, Class<T> annotation)
+		{
+			return findMetaAnnotation(annotated.getAnnotations(), annotation);
+		}
+
+		@SuppressWarnings({ "unchecked" })
+		private <T extends Annotation> Optional<T> findMetaAnnotation(Annotation[] annotations, Class<T> annotation)
+		{
+			for(Annotation a : annotations)
+			{
+				if(a.annotationType() == annotation)
+				{
+					// This is the annotation we're looking for
+					return Optional.of((T) a);
+				}
+
+				// Skip looking on Java annotations - solves recursion for @Documented
+				if(a.annotationType().getName().startsWith("java.")) continue;
+
+				Map<Class<?>, Annotation> cached = annotationCache.computeIfAbsent(
+					a.annotationType(),
+					k -> new HashMap<>()
+				);
+
+				if(cached.containsKey(annotation))
+				{
+					// The annotation has been looked for and the result cached
+					return Optional.ofNullable((T) cached.get(annotation));
+				}
+
+				// Look one step deeper for the annotation
+				Optional<T> result = findMetaAnnotation(
+					a.annotationType().getAnnotations(),
+					annotation
+				);
+				cached.put(annotation, result.orElse(null));
+
+				if(result.isPresent())
+				{
+					return result;
+				}
+			}
+
+			return Optional.empty();
 		}
 	}
 

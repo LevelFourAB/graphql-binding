@@ -1,5 +1,7 @@
 package se.l4.graphql.binding.resolver;
 
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -146,4 +148,16 @@ public interface GraphQLResolverContext
 	 * @return
 	 */
 	Set<TypeRef> findExtendingTypes(TypeRef type);
+
+	/**
+	 * Find a meta annotation on the given annotated item. Meta annotations
+	 * are either directly present on the annotated item, or they are present
+	 * on an annotation type that then is present on the annotated item.
+	 *
+	 * @param <T>
+	 * @param annotated
+	 * @param annotation
+	 * @return
+	 */
+	<T extends Annotation> Optional<T> findMetaAnnotation(Annotated annotated, Class<T> annotation);
 }

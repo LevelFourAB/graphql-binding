@@ -9,13 +9,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import graphql.cachecontrol.CacheControl;
+import graphql.execution.directives.QueryDirectives;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingFieldSelectionSet;
+import se.l4.commons.types.reflect.Annotated;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.ExecutableRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.graphql.binding.annotations.GraphQLEnvironment;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLSource;
 import se.l4.graphql.binding.resolver.Breadcrumb;
@@ -144,7 +149,7 @@ public class FactoryResolver
 		int i = 0;
 		for(ParameterRef parameter : parameters)
 		{
-			Optional<DataFetchingSupplier<?>> supplier = resolveEnvironmentSupplier(context, parameter);
+			Optional<DataFetchingSupplier<?>> supplier = resolveEnvironmentSupplier(context, parameter, parameter.getType());
 			if(supplier.isPresent())
 			{
 				suppliers[i] = supplier.get();
@@ -172,9 +177,35 @@ public class FactoryResolver
 
 	public static Optional<DataFetchingSupplier<?>> resolveEnvironmentSupplier(
 		GraphQLResolverContext context,
-		ParameterRef ref
+		Annotated annotated,
+		TypeRef type
 	)
 	{
+		if(annotated.hasAnnotation(GraphQLEnvironment.class))
+		{
+			Class<?> erasedType = type.getErasedType();
+			if(erasedType == DataFetchingEnvironment.class)
+			{
+				return Optional.of(env -> env);
+			}
+			else if(erasedType == QueryDirectives.class)
+			{
+				return Optional.of(env -> env.getQueryDirectives());
+			}
+			else if(erasedType == DataFetchingFieldSelectionSet.class)
+			{
+				return Optional.of(env -> env.getSelectionSet());
+			}
+			else if(erasedType == CacheControl.class)
+			{
+				return Optional.of(env -> env.getCacheControl());
+			}
+			else
+			{
+				throw context.newError("@GraphQLEnvironment was used with unsupported type `" + type.toTypeName() + "`");
+			}
+		}
+
 		return Optional.empty();
 	}
 

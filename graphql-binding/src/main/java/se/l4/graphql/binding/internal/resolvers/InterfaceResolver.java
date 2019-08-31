@@ -2,6 +2,7 @@ package se.l4.graphql.binding.internal.resolvers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import graphql.schema.GraphQLInputType;
@@ -11,8 +12,10 @@ import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
+import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
@@ -73,6 +76,15 @@ public class InterfaceResolver
 
 				for(ParameterRef parameter : parameters)
 				{
+					Optional<DataFetchingSupplier<?>> supplier = FactoryResolver.resolveEnvironmentSupplier(
+						context,
+						parameter,
+						parameter.getType()
+					);
+
+					// If an environment supplier can be resolved this isn't an input argument
+					if(supplier.isPresent()) continue;
+
 					ResolvedGraphQLType<? extends GraphQLInputType> argumentType = context.resolveInput(parameter.getType());
 
 					// Register the argument

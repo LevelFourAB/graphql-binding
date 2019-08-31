@@ -11,11 +11,13 @@ import java.lang.annotation.Target;
  * in to another type. The first argument of the method should be annotated
  * with {@link GraphQLSource} and point to the type.
  *
+ * <p>
  * <pre>
  * {@code @}GraphQLMixinField
  * public List<Order> getOrders({@code @}GraphQLSource Customer customer) {
  *   ...
  * }
+ * </pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })

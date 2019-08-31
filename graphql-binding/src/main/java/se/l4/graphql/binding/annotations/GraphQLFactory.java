@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
  * This allows a GraphQL type to be automatically created from another type,
  * like this:
  *
+ * <p>
  * <pre>
  * class DataObject {
  *   public String id;
@@ -36,9 +37,11 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
+ * <p>
  * Factories can also be static methods, which works for {@link GraphQLObject}
  * and {@link GraphQLEnum}:
  *
+ * <p>
  * <pre>
  * class DataObjectQueryType {
  *   private final String id;
@@ -47,13 +50,13 @@ import java.lang.annotation.Target;
  *     this.id = id;
  *   }
  *
- *   @GraphQLField
+ *   {@code @}GraphQLField
  *   public String id() {
  *     return object.id;
  *   }
  *
- *   @GraphQLFactory
- *   public static DataObjectQueryType create(@GraphQLSource DataObject object) {
+ *   {@code @}GraphQLFactory
+ *   public static DataObjectQueryType create({@code @}GraphQLSource DataObject object) {
  *     return new DataObjectQueryType(object.id);
  *   }
  * }

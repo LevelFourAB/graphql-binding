@@ -10,11 +10,14 @@ import java.lang.annotation.Target;
  * Annotation that is used to specify a source when creating a GraphQL type
  * either via a constructor or a static factory method.
  *
+ * <p>
  * <pre>
- * public CustomType(@GraphQLSource SourceType source) {
+ * {@code @}GraphQLFactory
+ * public CustomType({@code @}GraphQLSource SourceType source) {
  * }
  *
- * public static CustomType create(@GraphQLSource SourceType source) {
+ * {@code @}GraphQLFactory
+ * public static CustomType create({@code @}GraphQLSource SourceType source) {
  *   ...
  * }
  * </pre>

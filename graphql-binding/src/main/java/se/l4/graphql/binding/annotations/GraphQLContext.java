@@ -12,26 +12,30 @@ import java.lang.annotation.Target;
  * the current execution. The use of this annotation assumes that the global
  * context has been set up to be an instance of {@link graphql.GraphQLContext}.
  *
+ * <p>
  * <pre>
- * @GraphQLField
- * public String list(@GraphQLContext("Auth") AuthData auth) {
+ * {@code @}GraphQLField
+ * public String list({@code @}GraphQLContext("Auth") AuthData auth) {
  * }
  * </pre>
  *
+ * <p>
  * This annotation can be placed on another annotation to allow that annotation
  * to be used instead when injecting a parameter or a field:
  *
+ * <p>
  * <pre>
- * @GraphQLContext("Auth")
- * @Retention(RetentionPolicy.RUNTIME)
- * @Target({ ElementType.PARAMETER, ElementType.FIELD })
- * public @interface AuthContext {
+ * {@code @}GraphQLContext("Auth")
+ * {@code @}Retention(RetentionPolicy.RUNTIME)
+ * {@code @}Target({ ElementType.PARAMETER, ElementType.FIELD })
+ * public {@code @}interface AuthContext {
  * }
  * </pre>
  *
+ * <p>
  * <pre>
- * @GraphQLField
- * public String list(@AuthContext AuthData auth) {
+ * {@code @}GraphQLField
+ * public String list({@code @}AuthContext AuthData auth) {
  * }
  * </pre>
  */

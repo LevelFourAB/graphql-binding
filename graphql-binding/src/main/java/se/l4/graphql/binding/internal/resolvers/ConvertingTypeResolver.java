@@ -39,7 +39,7 @@ public class ConvertingTypeResolver<I, O>
 		);
 
 		// Get the type but apply a conversion to our type
-		return type.withConversion((DataFetchingConversion) factory);
+		return type.withOutputConversion((DataFetchingConversion) factory);
 	}
 
 }

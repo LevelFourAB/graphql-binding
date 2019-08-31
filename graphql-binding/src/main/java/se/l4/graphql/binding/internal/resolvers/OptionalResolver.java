@@ -30,7 +30,7 @@ public class OptionalResolver
 	{
 		TypeRef value = encounter.getType().getTypeParameter(0).get();
 		return encounter.getContext().resolveOutput(value)
-			.withConversion((env, s) -> ((Optional) s).orElse(null));
+			.withOutputConversion((env, s) -> ((Optional) s).orElse(null));
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class OptionalResolver
 	{
 		TypeRef value = encounter.getType().getTypeParameter(0).get();
 		return encounter.getContext().resolveInput(value)
-			.withConversion((env, s) -> Optional.ofNullable(s))
+			.withInputConversion((env, s) -> Optional.ofNullable(s))
 			.withDefaultValue(env -> Optional.empty());
 	}
 }

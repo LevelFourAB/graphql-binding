@@ -28,7 +28,7 @@ public class OptionalLongResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLLong)
-			.withConversion((env, s) -> {
+			.withOutputConversion((env, s) -> {
 				OptionalLong argument = (OptionalLong) s;
 				return argument.isPresent() ? argument.getAsLong() : null;
 			});
@@ -38,7 +38,7 @@ public class OptionalLongResolver
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLLong)
-			.withConversion((env, s) -> s == null ? OptionalLong.empty() : OptionalLong.of((Long) s))
+			.withInputConversion((env, s) -> s == null ? OptionalLong.empty() : OptionalLong.of((Long) s))
 			.withDefaultValue(env -> OptionalLong.empty());
 	}
 }

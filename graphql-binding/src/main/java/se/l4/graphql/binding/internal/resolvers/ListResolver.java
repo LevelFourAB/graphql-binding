@@ -43,7 +43,7 @@ public class ListResolver
 
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())
-		).withConversion(new ListConverter(componentType.getConversion()));
+		).withOutputConversion(new ListConverter(componentType.getConversion()));
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ListResolver
 
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())
-		).withConversion(new ListConverter(componentType.getConversion()));
+		).withInputConversion(new ListConverter(componentType.getConversion()));
 	}
 
 	private static class ListConverter<I, O>

@@ -102,7 +102,7 @@ public class InputObjectTypeResolver
 		);
 
 		return ResolvedGraphQLType.forType(builder.build())
-			.withConversion(factory);
+			.withInputConversion(factory);
 	}
 
 	private static class InputObjectFactory

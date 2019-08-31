@@ -133,11 +133,21 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 	 * @param conversion
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResolvedGraphQLType<T> withConversion(DataFetchingConversion<?, ?> conversion)
+	public ResolvedGraphQLType<T> withInputConversion(DataFetchingConversion<?, ?> conversion)
 	{
 		return new ResolvedGraphQLType<>(
 			type,
 			this.conversion == IDENTITY ? conversion : this.conversion.and((DataFetchingConversion) conversion),
+			defaultValue
+		);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResolvedGraphQLType<T> withOutputConversion(DataFetchingConversion<?, ?> conversion)
+	{
+		return new ResolvedGraphQLType<>(
+			type,
+			this.conversion == IDENTITY ? conversion : conversion.and((DataFetchingConversion) this.conversion),
 			defaultValue
 		);
 	}

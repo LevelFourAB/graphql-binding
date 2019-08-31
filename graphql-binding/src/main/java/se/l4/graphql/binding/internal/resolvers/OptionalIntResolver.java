@@ -28,7 +28,7 @@ public class OptionalIntResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLInt)
-			.withConversion((env, s) -> {
+			.withOutputConversion((env, s) -> {
 				OptionalInt argument = (OptionalInt) s;
 				return argument.isPresent() ? argument.getAsInt() : null;
 			});
@@ -38,7 +38,7 @@ public class OptionalIntResolver
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLInt)
-			.withConversion((env, s) -> s == null ? OptionalInt.empty() : OptionalInt.of((Integer) s))
+			.withInputConversion((env, s) -> s == null ? OptionalInt.empty() : OptionalInt.of((Integer) s))
 			.withDefaultValue(env -> OptionalInt.empty());
 	}
 }

@@ -123,7 +123,7 @@ public class CustomInputTypeTest
 		{
 			TypeRef value = encounter.getType().getTypeParameter(0).get();
 			return encounter.getContext().resolveInput(value)
-				.withConversion((env, s) -> new Maybe<>(s));
+				.withInputConversion((env, s) -> new Maybe<>(s));
 		}
 	}
 }

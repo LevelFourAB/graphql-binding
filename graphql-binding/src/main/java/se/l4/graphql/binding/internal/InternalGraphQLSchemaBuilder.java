@@ -561,7 +561,7 @@ public class InternalGraphQLSchemaBuilder
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 
 					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
-						.withConversion(pending);
+						.withOutputConversion(pending);
 				}
 
 				try
@@ -649,7 +649,7 @@ public class InternalGraphQLSchemaBuilder
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 
 					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
-						.withConversion(pending);
+						.withInputConversion(pending);
 				}
 
 				try

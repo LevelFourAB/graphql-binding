@@ -28,7 +28,7 @@ public class OptionalDoubleResolver
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLFloat)
-			.withConversion((env, s) -> {
+			.withOutputConversion((env, s) -> {
 				OptionalDouble argument = (OptionalDouble) s;
 				return argument.isPresent() ? argument.getAsDouble() : null;
 			});
@@ -38,7 +38,7 @@ public class OptionalDoubleResolver
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
 		return ResolvedGraphQLType.forType(Scalars.GraphQLFloat)
-			.withConversion((env, s) -> s == null ? OptionalDouble.empty() : OptionalDouble.of(((Number) s).doubleValue()))
+			.withInputConversion((env, s) -> s == null ? OptionalDouble.empty() : OptionalDouble.of(((Number) s).doubleValue()))
 			.withDefaultValue(env -> OptionalDouble.empty());
 	}
 }

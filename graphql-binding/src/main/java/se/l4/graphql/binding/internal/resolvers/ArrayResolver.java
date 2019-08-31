@@ -43,7 +43,7 @@ public class ArrayResolver
 
 		return ResolvedGraphQLType.forType(
 			GraphQLList.list(componentType.getGraphQLType())
-		).withConversion(new ArrayConverter(componentType.getConversion()));
+		).withOutputConversion(new ArrayConverter(componentType.getConversion()));
 	}
 
 	private static class ArrayConverter<I, O>

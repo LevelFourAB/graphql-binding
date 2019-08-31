@@ -8,7 +8,20 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation used to mark a Java interface that should become an interface
- * within the GraphQL API.
+ * within the GraphQL API. GraphQL interfaces must contain one or more fields.
+ *
+ * <pre>
+ * @GraphQLInterface
+ * public interface Vehicle {
+ *   @GraphQLField
+ *   String id();
+ * }
+ *
+ * @GraphQLObject
+ * public class Spaceship implements Vehicle {
+ *   ...
+ * }
+ * </pre>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

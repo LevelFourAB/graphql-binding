@@ -42,6 +42,7 @@ import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLField;
+import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLInterfaceBuilderImpl;
@@ -297,6 +298,19 @@ public class InternalGraphQLSchemaBuilder
 			codeRegistryBuilder
 		);
 
+		/*
+		 * Find all the interfaces and unions we are interested in keeping
+		 * track of conversions for.
+		 */
+		InterfaceAndUnionConversion interfacesAndUnions = new InterfaceAndUnionConversion();
+		for(Class<?> type : types)
+		{
+			if(type.isAnnotationPresent(GraphQLInterface.class))
+			{
+				interfacesAndUnions.trackUnionOrInterface(type);
+			}
+		}
+
 		// Resolve all of the extra bindings - for when types use @GraphQLSource
 		for(Class<?> type : types)
 		{
@@ -305,9 +319,19 @@ public class InternalGraphQLSchemaBuilder
 				List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, typeRef);
 				for(Factory<Object, ?> factory : factories)
 				{
+					// Register an extra resolver for the type
 					typeResolvers.add(new ConvertingTypeResolver<>(factory));
+
+					// Track this factory - for automatic interface and union conversion
+					interfacesAndUnions.addFactory(factory);
 				}
 			});
+		}
+
+		// Bind the interface and union resolvers
+		for(GraphQLOutputResolver resolver : interfacesAndUnions.createResolvers())
+		{
+			typeResolvers.add(resolver);
 		}
 
 		// Resolve all of the known types

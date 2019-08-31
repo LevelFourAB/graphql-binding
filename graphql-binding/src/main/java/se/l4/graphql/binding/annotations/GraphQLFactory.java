@@ -36,6 +36,28 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
+ * Factories can also be static methods, which works for {@link GraphQLObject}
+ * and {@link GraphQLEnum}:
+ *
+ * <pre>
+ * class DataObjectQueryType {
+ *   private final String id;
+ *
+ *   public DataObjectQueryType(String id) {
+ *     this.id = id;
+ *   }
+ *
+ *   @GraphQLField
+ *   public String id() {
+ *     return object.id;
+ *   }
+ *
+ *   @GraphQLFactory
+ *   public static DataObjectQueryType create(@GraphQLSource DataObject object) {
+ *     return new DataObjectQueryType(object.id);
+ *   }
+ * }
+ * </pre>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

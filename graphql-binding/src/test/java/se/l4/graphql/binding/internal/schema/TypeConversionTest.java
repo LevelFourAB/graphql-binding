@@ -25,7 +25,8 @@ public class TypeConversionTest
 	{
 		binder
 			.withRoot(new Root())
-			.withType(ActualSubType.class);
+			.withType(GraphQLOverTypeA.class)
+			.withType(GraphQLOverTypeB.class);
 	}
 
 	@Test
@@ -47,38 +48,63 @@ public class TypeConversionTest
 		assertThat(result.pick("list", "1", "id"), is("v1"));
 	}
 
+	@Test
+	public void testViaMethod()
+	{
+		Result result = execute("{ viaMethod { id } }");
+		result.assertNoErrors();
+
+		assertThat(result.pick("viaMethod", "id"), is("test"));
+	}
+
 	public class Root
 	{
 		@GraphQLField
-		public ConvertedType get()
+		public TypeA get()
 		{
-			return new ConvertedType("test");
+			return new TypeA("test");
 		}
 
 		@GraphQLField
-		public List<ConvertedType> list()
+		public List<TypeA> list()
 		{
-			return ImmutableList.of(new ConvertedType("v0"), new ConvertedType("v1"));
+			return ImmutableList.of(new TypeA("v0"), new TypeA("v1"));
+		}
+
+		@GraphQLField
+		public TypeB viaMethod()
+		{
+			return new TypeB("test");
 		}
 	}
 
-	private class ConvertedType
+	private class TypeA
 	{
 		private final String id;
 
-		public ConvertedType(String id)
+		public TypeA(String id)
+		{
+			this.id = id;
+		}
+	}
+
+	private class TypeB
+	{
+		private final String id;
+
+		public TypeB(String id)
 		{
 			this.id = id;
 		}
 	}
 
 	@GraphQLObject
-	public class ActualSubType
+	public class GraphQLOverTypeA
 	{
-		private final ConvertedType data;
+		private final TypeA data;
 
 		@GraphQLFactory
-		public ActualSubType(@GraphQLSource ConvertedType data)
+		public GraphQLOverTypeA(@GraphQLSource TypeA data)
 		{
 			this.data = data;
 		}
@@ -87,6 +113,29 @@ public class TypeConversionTest
 		public String id()
 		{
 			return data.id;
+		}
+	}
+
+	@GraphQLObject
+	public static class GraphQLOverTypeB
+	{
+		private final String id;
+
+		public GraphQLOverTypeB(String id)
+		{
+			this.id = id;
+		}
+
+		@GraphQLField
+		public String id()
+		{
+			return id;
+		}
+
+		@GraphQLFactory
+		public static GraphQLOverTypeB create(@GraphQLSource TypeB data)
+		{
+			return new GraphQLOverTypeB(data.id);
 		}
 	}
 }

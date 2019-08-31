@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import graphql.schema.DataFetchingEnvironment;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.ExecutableRef;
+import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
@@ -27,14 +28,26 @@ public class FactoryResolver
 	{
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <I> List<Factory<I, ?>> resolveFactories(
+	public static List<Factory<?, ?>> resolveFactories(
 		GraphQLResolverContext context,
 		TypeRef ref
 	)
 	{
-		List<Factory<I, ?>> result = new ArrayList<>();
+		List<Factory<?, ?>> result = new ArrayList<>();
 
+		generateConstructorFactories(context, ref, result);
+		generateMethodFactories(context, ref, result);
+
+		return result;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void generateConstructorFactories(
+		GraphQLResolverContext context,
+		TypeRef ref,
+		List<Factory<?, ?>> result
+	)
+	{
 		for(ConstructorRef constructor : ref.getConstructors())
 		{
 			if(! constructor.findAnnotation(GraphQLFactory.class).isPresent())
@@ -62,8 +75,50 @@ public class FactoryResolver
 				constructor.getConstructor()
 			));
 		}
+	}
 
-		return result;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void generateMethodFactories(
+		GraphQLResolverContext context,
+		TypeRef ref,
+		List<Factory<?, ?>> result
+	)
+	{
+		for(MethodRef method : ref.getMethods())
+		{
+			if(! method.findAnnotation(GraphQLFactory.class).isPresent())
+			{
+				// Not marked with @GraphQLFactory, skip this constructor
+				continue;
+			}
+
+			if(! method.isStatic())
+			{
+				throw context.newError(
+					Breadcrumb.forMember(method),
+					"Factory methods must be static"
+				);
+			}
+
+			Optional<TypeRef> sourceType = findCreatableType(method);
+			if(! sourceType.isPresent())
+			{
+				throw context.newError(
+					Breadcrumb.forMember(method),
+					"A parameter with @GraphQLSource is required to be able " +
+					"to automatically construct type"
+				);
+			}
+
+			DataFetchingSupplier<?>[] suppliers = getParameterSuppliers(context, method);
+			result.add(new MethodFactory(
+				sourceType.get().getErasedType(),
+				method.getReturnType().getErasedType(),
+
+				suppliers,
+				method.getMethod()
+			));
+		}
 	}
 
 	private static Optional<TypeRef> findCreatableType(ExecutableRef executable)

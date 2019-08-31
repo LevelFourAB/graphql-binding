@@ -316,8 +316,8 @@ public class InternalGraphQLSchemaBuilder
 		{
 			TypeRef typeRef = Types.reference(type);
 			ctx.breadcrumb(Breadcrumb.forType(typeRef), () -> {
-				List<Factory<Object, ?>> factories = FactoryResolver.resolveFactories(ctx, typeRef);
-				for(Factory<Object, ?> factory : factories)
+				List<Factory<?, ?>> factories = FactoryResolver.resolveFactories(ctx, typeRef);
+				for(Factory<?, ?> factory : factories)
 				{
 					// Register an extra resolver for the type
 					typeResolvers.add(new ConvertingTypeResolver<>(factory));

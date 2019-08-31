@@ -38,7 +38,7 @@ public class InterfaceAndUnionConversion
 		types.put(type, new HashSet<>());
 	}
 
-	public void addFactory(Factory<Object, ?> factory)
+	public void addFactory(Factory<?, ?> factory)
 	{
 		List<MatchedType<Object, Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput());
 		for(MatchedType<Object, Set<Factory<?, ?>>> m : mappingTo)

@@ -88,9 +88,12 @@ public class InterfaceAndUnionConversion
 			}
 
 			// Register a resolver for every interface
-			for(Class<?> interfaceType : sharedInterfaces)
+			if(sharedInterfaces != null)
 			{
-				result.add(new Resolver(interfaceType, type.getType(), type.getData()));
+				for(Class<?> interfaceType : sharedInterfaces)
+				{
+					result.add(new Resolver(interfaceType, type.getType(), type.getData()));
+				}
 			}
 		}
 

@@ -1,9 +1,14 @@
 package se.l4.graphql.binding.internal.resolvers;
 
+import java.util.Optional;
+
 import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLEnumValueDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
+import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.TypeRef;
+import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -56,13 +61,23 @@ public class EnumResolver
 		Class<? extends Enum> enumType = (Class<? extends Enum>) type.getErasedType();
 		for(Enum<?> constant : enumType.getEnumConstants())
 		{
-			String name = type.getField(constant.name())
+			Optional<FieldRef> field = type.getField(constant.name());
+
+			String name = field
 				.flatMap(t -> t.getAnnotation(GraphQLName.class))
 				.map(a -> a.value())
 				.orElse(constant.name());
 
-			builder.value(
-				name, constant
+			String description = field
+				.flatMap(t -> t.getAnnotation(GraphQLDescription.class))
+				.map(a -> a.value())
+				.orElse(null);
+
+			builder.value(GraphQLEnumValueDefinition.newEnumValueDefinition()
+				.name(name)
+				.value(constant)
+				.description(description)
+				.build()
 			);
 		}
 

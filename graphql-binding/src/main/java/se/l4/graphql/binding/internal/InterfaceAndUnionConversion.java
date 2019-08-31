@@ -116,7 +116,7 @@ public class InterfaceAndUnionConversion
 			this.interfaceType = interfaceType;
 			this.graphQLType = graphQLType;
 
-			this.factories = factories.toArray(Factory[]::new);
+			this.factories = factories.toArray(new Factory[factories.size()]);
 		}
 
 		@Override

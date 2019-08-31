@@ -121,7 +121,7 @@ public class RootObjectMixin
 				fieldBuilder.withDataFetcher(new MethodDataFetcher(
 					supplier,
 					method.getMethod(),
-					arguments.toArray(DataFetchingSupplier[]::new),
+					arguments.toArray(new DataFetchingSupplier[arguments.size()]),
 					fieldType.getConversion()
 				))
 					.done();

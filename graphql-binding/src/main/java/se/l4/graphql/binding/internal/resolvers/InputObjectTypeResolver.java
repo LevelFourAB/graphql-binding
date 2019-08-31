@@ -98,7 +98,7 @@ public class InputObjectTypeResolver
 
 		InputObjectFactory factory = new InputObjectFactory(
 			(env, source) -> supplier.get(),
-			injectors.toArray(ValueInjector[]::new)
+			injectors.toArray(new ValueInjector[injectors.size()])
 		);
 
 		return ResolvedGraphQLType.forType(builder.build())

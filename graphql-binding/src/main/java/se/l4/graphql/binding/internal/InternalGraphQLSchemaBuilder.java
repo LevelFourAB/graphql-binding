@@ -441,15 +441,15 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@Override
-		public GraphQLMappingException newError(String message, Object... args)
+		public GraphQLMappingException newError(String message)
 		{
-			return new GraphQLMappingException(String.format(message, args) + "\n  " + breadcrumb.getLocation());
+			return new GraphQLMappingException(message + "\n  " + breadcrumb.getLocation());
 		}
 
 		@Override
-		public GraphQLMappingException newError(Breadcrumb crumb, String message, Object... args)
+		public GraphQLMappingException newError(Breadcrumb crumb, String message)
 		{
-			return new GraphQLMappingException(String.format(message, args) + "\n  " + breadcrumb.then(crumb).getLocation());
+			return new GraphQLMappingException(message + "\n  " + breadcrumb.then(crumb).getLocation());
 		}
 
 		@Override

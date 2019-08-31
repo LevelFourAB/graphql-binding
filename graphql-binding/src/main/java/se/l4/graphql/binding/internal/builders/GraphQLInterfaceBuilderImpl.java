@@ -80,7 +80,7 @@ public class GraphQLInterfaceBuilderImpl
 			(field, fetcher) -> {
 				if(! fields.add(field.getName()))
 				{
-					throw context.newError("Field name `%s` is not unique", field.getName());
+					throw context.newError("Field name `" + field.getName() + "` is not unique");
 				}
 
 				builder.field(field);

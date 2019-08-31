@@ -136,7 +136,7 @@ public class GraphQLFieldBuilderImpl<Parent>
 
 			if(type == null)
 			{
-				throw context.newError("Field `%s` does not have a return type", name);
+				throw context.newError("Field `" + name + "` does not have a return type");
 			}
 
 			GraphQLFieldDefinition.Builder builder = GraphQLFieldDefinition.newFieldDefinition()

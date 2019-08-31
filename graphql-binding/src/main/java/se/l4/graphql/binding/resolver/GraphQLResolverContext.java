@@ -48,7 +48,7 @@ public interface GraphQLResolverContext
 	 * @param args
 	 * @return
 	 */
-	GraphQLMappingException newError(String message, Object... args);
+	GraphQLMappingException newError(String message);
 
 	/**
 	 * Throw an error, resolving a new breadcrumb as the error location.
@@ -58,7 +58,7 @@ public interface GraphQLResolverContext
 	 * @param args
 	 * @return
 	 */
-	GraphQLMappingException newError(Breadcrumb crumb, String message, Object... args);
+	GraphQLMappingException newError(Breadcrumb crumb, String message);
 
 	/**
 	 * Get the instance factory used to create instances of types.

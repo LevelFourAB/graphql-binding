@@ -83,12 +83,12 @@ public class GraphQLObjectBuilderImpl
 			(field, dataFetcher) -> {
 				if(fields.containsKey(field.getName()))
 				{
-					throw context.newError("Field name `%s` is not unique", field.getName());
+					throw context.newError("Field name `" + field.getName() + "` is not unique");
 				}
 
 				if(dataFetcher == null)
 				{
-					throw context.newError("Field `%s` does not have a data fetcher", name);
+					throw context.newError("Field `" + field.getName() + "` does not have a data fetcher");
 				}
 
 				fields.put(field.getName(), dataFetcher);

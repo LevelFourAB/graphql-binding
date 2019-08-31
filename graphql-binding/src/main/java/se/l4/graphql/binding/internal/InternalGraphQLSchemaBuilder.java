@@ -17,10 +17,6 @@ import java.util.function.Supplier;
 import com.google.common.base.Defaults;
 
 import graphql.Scalars;
-import graphql.language.BooleanValue;
-import graphql.language.FloatValue;
-import graphql.language.IntValue;
-import graphql.language.StringValue;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLModifiedType;
@@ -110,10 +106,6 @@ public class InternalGraphQLSchemaBuilder
 		objectMixins = new ArrayList<>();
 
 		typeConverter = new StandardTypeConverter();
-		typeConverter.addConversion(StringValue.class, String.class, value -> value.getValue());
-		typeConverter.addConversion(BooleanValue.class, Boolean.class, value -> value.isValue());
-		typeConverter.addConversion(IntValue.class, BigInteger.class, value -> value.getValue());
-		typeConverter.addConversion(FloatValue.class, BigDecimal.class, value -> value.getValue());
 
 		// Register the built-in scalars
 		registerBuiltin(Scalars.GraphQLString, String.class);

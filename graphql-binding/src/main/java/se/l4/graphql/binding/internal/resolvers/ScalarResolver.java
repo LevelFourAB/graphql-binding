@@ -1,7 +1,24 @@
 package se.l4.graphql.binding.internal.resolvers;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import graphql.language.ArrayValue;
+import graphql.language.BooleanValue;
+import graphql.language.EnumValue;
+import graphql.language.FloatValue;
+import graphql.language.IntValue;
+import graphql.language.NullValue;
+import graphql.language.ObjectField;
+import graphql.language.ObjectValue;
+import graphql.language.StringValue;
+import graphql.language.Value;
+import graphql.language.VariableReference;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
@@ -164,15 +181,77 @@ public class ScalarResolver
 		public JavaType parseLiteral(Object input)
 			throws CoercingParseLiteralException
 		{
+			return parseLiteral(input, Collections.emptyMap());
+		}
+
+		@Override
+		public JavaType parseLiteral(Object input, Map<String, Object> variables)
+			throws CoercingParseLiteralException
+		{
 			try
 			{
-				GraphQLType converted = inputConversion.convert(input);
+				Object literalInput = convertLiteral(input, variables);
+				GraphQLType converted = inputConversion.convert(literalInput);
 				return scalar.parseValue(converted);
 			}
 			catch(Exception e)
 			{
 				throw new CoercingParseLiteralException("Could not parse scalar; " + e.getMessage(), e);
 			}
+		}
+
+		public Object convertLiteral(Object input, Map<String, Object> variables)
+			throws CoercingParseLiteralException
+		{
+			if(input instanceof NullValue)
+			{
+				return null;
+			}
+			else if(input instanceof FloatValue)
+			{
+				return ((FloatValue) input).getValue();
+			}
+			else if(input instanceof StringValue)
+			{
+				return ((StringValue) input).getValue();
+			}
+			else if (input instanceof IntValue)
+			{
+				return ((IntValue) input).getValue();
+			}
+			else if (input instanceof BooleanValue)
+			{
+				return ((BooleanValue) input).isValue();
+			}
+			else if (input instanceof EnumValue)
+			{
+				return ((EnumValue) input).getName();
+			}
+			else if(input instanceof VariableReference)
+			{
+				String varName = ((VariableReference) input).getName();
+				return variables.get(varName);
+			}
+			else if(input instanceof ArrayValue)
+			{
+				@SuppressWarnings("rawtypes")
+				List<Value> values = ((ArrayValue) input).getValues();
+				return values.stream()
+					.map(v -> convertLiteral(v, variables))
+					.collect(ImmutableList.toImmutableList());
+			}
+			else if(input instanceof ObjectValue)
+			{
+				List<ObjectField> values = ((ObjectValue) input).getObjectFields();
+				ImmutableMap.Builder<String, Object> parsedValues = ImmutableMap.builder();
+				values.forEach(field -> {
+					Object parsedValue = convertLiteral(field.getValue(), variables);
+					parsedValues.put(field.getName(), parsedValue);
+				});
+				return parsedValues.build();
+			}
+
+			throw new CoercingParseLiteralException();
 		}
 	}
 }

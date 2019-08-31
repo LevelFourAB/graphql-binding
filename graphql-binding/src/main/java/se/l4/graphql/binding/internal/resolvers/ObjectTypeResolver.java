@@ -182,7 +182,7 @@ public class ObjectTypeResolver
 					fieldBuilder.withDataFetcher(new MethodDataFetcher<>(
 						contextGetter,
 						method.getMethod(),
-						arguments.toArray(new DataFetchingSupplier[arguments.size()]),
+						arguments,
 						fieldType.getConversion()
 					))
 						.done();

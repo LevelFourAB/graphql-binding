@@ -2,6 +2,7 @@ package se.l4.graphql.binding.internal.datafetchers;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -19,13 +20,13 @@ public class MethodDataFetcher<I, T>
 	public MethodDataFetcher(
 		DataFetchingSupplier<Object> contextGetter,
 		Method method,
-		DataFetchingSupplier<?>[] parameters,
+		Collection<DataFetchingSupplier<?>> parameters,
 		DataFetchingConversion<I, T> returnTypeConversion
 	)
 	{
 		this.contextGetter = contextGetter;
 		this.method = method;
-		this.parameters = parameters;
+		this.parameters = parameters.toArray(new DataFetchingSupplier[parameters.size()]);
 		this.returnTypeConversion = returnTypeConversion;
 	}
 

@@ -847,7 +847,7 @@ public class InternalGraphQLSchemaBuilder
 		}
 	}
 
-	private class InputEncounterImpl
+	private static class InputEncounterImpl
 		implements GraphQLInputEncounter
 	{
 		private final ResolverContextImpl context;

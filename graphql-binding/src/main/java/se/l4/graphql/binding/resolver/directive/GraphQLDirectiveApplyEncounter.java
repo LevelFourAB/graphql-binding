@@ -1,5 +1,7 @@
 package se.l4.graphql.binding.resolver.directive;
 
+import java.util.Map;
+
 import graphql.schema.GraphQLDirective;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 
@@ -29,4 +31,19 @@ public interface GraphQLDirectiveApplyEncounter<A>
 	 * @return
 	 */
 	A getAnnotation();
+
+	/**
+	 * Set the arguments of the directive.
+	 *
+	 * @param arguments
+	 */
+	void setArguments(Map<String, Object> arguments);
+
+	/**
+	 * Set the value of the argument.
+	 *
+	 * @param id
+	 * @param value
+	 */
+	void setArgument(String id, Object value);
 }

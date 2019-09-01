@@ -9,19 +9,20 @@ import java.lang.annotation.RetentionPolicy;
 
 import org.junit.Test;
 
+import graphql.Scalars;
 import graphql.introspection.Introspection.DirectiveLocation;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLFieldDefinition;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.internal.GraphQLTest;
-import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveCreationEncounter;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldEncounter;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResolver;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
 
-public class FieldDirectiveTest
+public class FieldDirectiveWithArgumentTest
 	extends GraphQLTest
 {
 
@@ -42,6 +43,7 @@ public class FieldDirectiveTest
 		GraphQLFieldDefinition def = schema.getQueryType().getFieldDefinition("doThing");
 		GraphQLDirective fieldDirective = def.getDirective("Directive");
 		assertThat(fieldDirective, notNullValue());
+		assertThat(fieldDirective.getArgument("test").getValue(), is("1234"));
 	}
 
 	@Test
@@ -50,13 +52,13 @@ public class FieldDirectiveTest
 		Result result = execute("{ doThing }");
 		result.assertNoErrors();
 
-		assertThat(result.pick("doThing"), is("testsuffix"));
+		assertThat(result.pick("doThing"), is("test"));
 	}
 
 	public class Root
 	{
 		@GraphQLField
-		@TestDirective
+		@TestDirective("1234")
 		public String doThing()
 		{
 			return "test";
@@ -66,6 +68,7 @@ public class FieldDirectiveTest
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface TestDirective
 	{
+		String value();
 	}
 
 	public class TestDirectiveResolver
@@ -78,16 +81,19 @@ public class FieldDirectiveTest
 			return GraphQLDirective.newDirective()
 				.name("Directive")
 				.validLocation(DirectiveLocation.FIELD_DEFINITION)
+				.argument(GraphQLArgument.newArgument()
+					.name("test")
+					.type(Scalars.GraphQLString)
+					.build()
+				)
 				.build();
 		}
 
 		@Override
 		public void applyField(GraphQLDirectiveFieldEncounter<TestDirective> encounter)
 		{
-			DataFetchingSupplier<?> current = encounter.getSupplier();
-			encounter.setSupplier(env -> {
-				return current.get(env) + "suffix";
-			});
+			TestDirective d = encounter.getAnnotation();
+			encounter.setArgument("test", d.value());
 		}
 	}
 }

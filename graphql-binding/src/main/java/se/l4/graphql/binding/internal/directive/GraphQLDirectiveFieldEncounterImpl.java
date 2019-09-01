@@ -57,4 +57,11 @@ public class GraphQLDirectiveFieldEncounterImpl<A>
 	{
 		this.supplier = supplier;
 	}
+
+	public GraphQLFieldDefinition finalizeField()
+	{
+		return field.transform(builder -> builder.withDirective(
+			buildDirective()
+		));
+	}
 }

@@ -68,7 +68,6 @@ import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
-import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldEncounter;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResolver;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResult;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
@@ -867,7 +866,7 @@ public class InternalGraphQLSchemaBuilder
 					schemaBuilder.additionalDirective(directive);
 				}
 
-				GraphQLDirectiveFieldEncounter encounter = new GraphQLDirectiveFieldEncounterImpl(
+				GraphQLDirectiveFieldEncounterImpl encounter = new GraphQLDirectiveFieldEncounterImpl(
 					this,
 					directive,
 					a,
@@ -877,11 +876,14 @@ public class InternalGraphQLSchemaBuilder
 
 				fieldResolver.applyField(encounter);
 
-				field = encounter.getField();
+				field = encounter.finalizeField();
 				supplier = encounter.getSupplier();
 			}
 
-			return new GraphQLDirectiveFieldResult(field, supplier);
+			return new GraphQLDirectiveFieldResult(
+				field,
+				supplier
+			);
 		}
 	}
 

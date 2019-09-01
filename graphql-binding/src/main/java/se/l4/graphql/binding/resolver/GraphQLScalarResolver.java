@@ -1,4 +1,4 @@
-package se.l4.graphql.binding;
+package se.l4.graphql.binding.resolver;
 
 /**
  * Interface that can be used to implement a custom GraphQL scalar.
@@ -6,7 +6,7 @@ package se.l4.graphql.binding;
  * @param <PrimitiveType>
  * @param <Type>
  */
-public interface GraphQLScalar<Type, GraphQLType>
+public interface GraphQLScalarResolver<Type, GraphQLType>
 {
 	/**
 	 * Serialize the specified instance into a GraphQL type.

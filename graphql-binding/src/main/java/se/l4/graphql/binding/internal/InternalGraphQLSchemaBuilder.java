@@ -36,7 +36,6 @@ import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
-import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
@@ -58,10 +57,12 @@ import se.l4.graphql.binding.internal.resolvers.OptionalIntResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalLongResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
+import se.l4.graphql.binding.internal.resolvers.SpecificScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
@@ -125,6 +126,7 @@ public class InternalGraphQLSchemaBuilder
 		// Register some default type converters
 		typeResolvers.add(new InputObjectTypeResolver());
 		typeResolvers.add(new ObjectTypeResolver());
+		typeResolvers.add(new ScalarResolver());
 
 		typeResolvers.add(new InterfaceResolver());
 
@@ -191,13 +193,23 @@ public class InternalGraphQLSchemaBuilder
 	/**
 	 * Add a scalar binding.
 	 *
-	 * @param <JavaType>
-	 * @param type
 	 * @param scalar
 	 */
-	public <JavaType> void addScalar(Class<JavaType> type, GraphQLScalar<JavaType, ?> scalar)
+	public void addScalar(GraphQLScalarResolver<?, ?> scalar)
 	{
-		this.typeResolvers.add(new ScalarResolver(type, scalar));
+		// Resolve the interface and the GraphQL type and request a conversion to it
+		TypeRef scalarInterface = Types.reference(scalar.getClass())
+			.getInterface(GraphQLScalarResolver.class)
+			.get();
+
+		TypeRef javaType = scalarInterface.getTypeParameter(0).get();
+		TypeRef graphQLType = scalarInterface.getTypeParameter(1).get();
+
+		this.typeResolvers.add(new SpecificScalarResolver(
+			javaType,
+			graphQLType,
+			scalar
+		));
 	}
 
 	/**

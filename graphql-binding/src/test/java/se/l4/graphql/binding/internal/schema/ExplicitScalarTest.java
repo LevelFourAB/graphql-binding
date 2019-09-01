@@ -8,12 +8,12 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
-import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.internal.GraphQLTest;
+import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 
-public class RootWithCustomScalarTest
+public class ExplicitScalarTest
 	extends GraphQLTest
 {
 
@@ -22,7 +22,7 @@ public class RootWithCustomScalarTest
 	{
 		binder
 			.withRoot(new Root())
-			.withScalar(TestScalar.class, new GraphQLScalar<TestScalar, String>() {
+			.withScalar(new GraphQLScalarResolver<TestScalar, String>() {
 				@Override
 				public TestScalar parseValue(String input)
 				{

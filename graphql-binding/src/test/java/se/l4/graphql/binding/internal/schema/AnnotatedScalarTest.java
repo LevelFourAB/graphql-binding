@@ -8,20 +8,20 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
-import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
+import se.l4.graphql.binding.annotations.GraphQLScalar;
 import se.l4.graphql.binding.internal.GraphQLTest;
+import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 
-public class CustomScalarTest
+public class AnnotatedScalarTest
 	extends GraphQLTest
 {
 
 	@Override
 	protected void setup(GraphQLBinder binder)
 	{
-		binder.withRoot(new Root())
-			.withScalar(OpaqueID.class, new IDScalar());
+		binder.withRoot(new Root());
 	}
 
 	@Test
@@ -90,6 +90,7 @@ public class CustomScalarTest
 		}
 	}
 
+	@GraphQLScalar(IDScalar.class)
 	public static class OpaqueID
 	{
 		private final String value;
@@ -100,8 +101,8 @@ public class CustomScalarTest
 		}
 	}
 
-	private class IDScalar
-		implements GraphQLScalar<OpaqueID, String>
+	public static class IDScalar
+		implements GraphQLScalarResolver<OpaqueID, String>
 	{
 
 		@Override

@@ -1,5 +1,7 @@
 package se.l4.graphql.binding;
 
+import java.lang.annotation.Annotation;
+
 import graphql.schema.GraphQLSchema;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
@@ -10,6 +12,7 @@ import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLRoot;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
+import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 
 /**
  * Mapper for taking annotated classes and interfaces and turning them into
@@ -61,9 +64,11 @@ public class GraphQLBinder
 		return this;
 	}
 
-	public <T> GraphQLBinder withScalar(Class<T> scalar, GraphQLScalar<T, ?> binding)
+	public <T> GraphQLBinder withScalar(GraphQLScalarResolver<T, ?> binding)
 	{
-		builder.addScalar(scalar, binding);
+		builder.addScalar(binding);
+		return this;
+	}
 		return this;
 	}
 

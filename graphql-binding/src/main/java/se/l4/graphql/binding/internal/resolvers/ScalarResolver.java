@@ -29,56 +29,80 @@ import graphql.schema.GraphQLScalarType;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.conversion.Conversion;
 import se.l4.commons.types.reflect.TypeRef;
-import se.l4.graphql.binding.GraphQLScalar;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLName;
+import se.l4.graphql.binding.annotations.GraphQLScalar;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
+import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
-import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
+import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
-import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 
 /**
  * Custom resolver that is registered whenever a scalar that uses
- * {@link GraphQLScalar} is added.
+ * {@link GraphQLScalarConversion} is added.
  */
 public class ScalarResolver
-	implements TypedGraphQLOutputResolver, TypedGraphQLInputResolver
+	implements GraphQLOutputResolver, GraphQLInputResolver
 {
-	private final Class<?> type;
-	private final GraphQLScalar<?, ?> scalar;
-
-	public ScalarResolver(Class<?> type, GraphQLScalar<?, ?> scalar)
+	public ScalarResolver()
 	{
-		this.type = type;
-		this.scalar = scalar;
 	}
 
 	@Override
-	public Class<?> getType()
+	public boolean supportsOutput(TypeRef type)
 	{
-		return type;
+		return type.hasAnnotation(GraphQLScalar.class);
+	}
+
+	@Override
+	public boolean supportsInput(TypeRef type)
+	{
+		return supportsOutput(type);
 	}
 
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLOutputType> resolveOutput(GraphQLOutputEncounter encounter)
 	{
-		return ResolvedGraphQLType.forType(resolve(encounter.getContext(), encounter.getType()));
+		return resolve(encounter.getContext(), encounter.getType());
 	}
 
 	@Override
 	public ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(GraphQLInputEncounter encounter)
 	{
-		return ResolvedGraphQLType.forType(resolve(encounter.getContext(), encounter.getType()));
+		return resolve(encounter.getContext(), encounter.getType());
+	}
+
+	private ResolvedGraphQLType<GraphQLScalarType> resolve(GraphQLResolverContext context, TypeRef type)
+	{
+		GraphQLScalar annotation = type.getAnnotation(GraphQLScalar.class).get();
+
+		GraphQLScalarResolver<?, ?> scalar = context.getInstanceFactory().create(annotation.value());
+
+		// Resolve the interface and the GraphQL type and request a conversion to it
+		TypeRef scalarInterface = Types.reference(scalar.getClass())
+			.findInterface(GraphQLScalarResolver.class)
+			.get();
+
+		TypeRef javaType = scalarInterface.getTypeParameter(0).get();
+		TypeRef graphQLType = scalarInterface.getTypeParameter(1).get();
+
+		return resolve(context, javaType, graphQLType, scalar);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GraphQLScalarType resolve(GraphQLResolverContext ctx, TypeRef type)
+	public static ResolvedGraphQLType<GraphQLScalarType> resolve(
+		GraphQLResolverContext context,
+		TypeRef type,
+		TypeRef graphQLType,
+		GraphQLScalarResolver instance
+	)
 	{
-		return ctx.breadcrumb(Breadcrumb.forType(type), () -> {
-			TypeRef scalarType = Types.reference(scalar.getClass());
+		return ResolvedGraphQLType.forType(context.breadcrumb(Breadcrumb.forType(type), () -> {
+			TypeRef scalarType = Types.reference(instance.getClass());
 
 			/*
 			 * Resolve the name by first looking for an annotation of the
@@ -90,11 +114,11 @@ public class ScalarResolver
 			if(nameAnnotation.isPresent())
 			{
 				name = nameAnnotation.get().value();
-				ctx.requestTypeName(name);
+				context.requestTypeName(name);
 			}
 			else
 			{
-				name = ctx.getTypeName(type);
+				name = context.getTypeName(type);
 			}
 
 			String description;
@@ -105,29 +129,25 @@ public class ScalarResolver
 			}
 			else
 			{
-				description = ctx.getDescription(type);
+				description = context.getDescription(type);
 			}
 
-			// Resolve the interface and the GraphQL type and request a conversion to iit
-			TypeRef scalarInterface = scalarType.getInterface(GraphQLScalar.class).get();
-			TypeRef graphQLType = scalarInterface.getTypeParameter(1).get();
-
 			// Get a conversion that can convert from any object into the type requested
-			Conversion inputConversion = ctx.getTypeConverter()
+			Conversion inputConversion = context.getTypeConverter()
 				.getDynamicConversion(Object.class, graphQLType.getErasedType());
 
 			// Create the GraphQL type representing the scalar
 			return GraphQLScalarType.newScalar()
 				.name(name)
 				.description(description)
-				.coercing(new CustomCoercing<>((GraphQLScalar) scalar, inputConversion))
+				.coercing(new CustomCoercing<>((GraphQLScalarResolver) instance, inputConversion))
 				.build();
-		});
+		}));
 	}
 
 	/**
 	 * Implementation of {@link Coercing} that delegates work to an instance
-	 * of {@link GraphQLScalar}.
+	 * of {@link GraphQLScalarConversion}.
 	 *
 	 * @param <JavaType>
 	 * @param <GraphQLType>
@@ -135,11 +155,11 @@ public class ScalarResolver
 	public static class CustomCoercing<JavaType, GraphQLType>
 		implements Coercing<JavaType, GraphQLType>
 	{
-		private final GraphQLScalar<JavaType, GraphQLType> scalar;
+		private final GraphQLScalarResolver<JavaType, GraphQLType> scalar;
 		private final Conversion<Object, GraphQLType> inputConversion;
 
 		public CustomCoercing(
-			GraphQLScalar<JavaType, GraphQLType> scalar,
+			GraphQLScalarResolver<JavaType, GraphQLType> scalar,
 			Conversion<Object, GraphQLType> inputConversion
 		)
 		{

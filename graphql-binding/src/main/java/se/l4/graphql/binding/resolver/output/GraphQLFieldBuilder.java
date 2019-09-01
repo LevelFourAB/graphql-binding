@@ -1,8 +1,8 @@
 package se.l4.graphql.binding.resolver.output;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.MemberRef;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 
 /**
  * Builder for a field within a GraphQL object.
@@ -52,9 +52,9 @@ public interface GraphQLFieldBuilder<Parent>
 	GraphQLArgumentBuilder<GraphQLFieldBuilder<Parent>> newArgument();
 
 	/**
-	 * Set the data fetcher to use for the field.
+	 * Set the supplier to use for the field.
 	 */
-	GraphQLFieldBuilder<Parent> withDataFetcher(DataFetcher<?> fetcher);
+	GraphQLFieldBuilder<Parent> withSupplier(DataFetchingSupplier<?> supplier);
 
 	/**
 	 * Indicate that the field is done building and that it should be added

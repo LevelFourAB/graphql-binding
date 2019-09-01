@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.InstanceFactory;
@@ -14,6 +15,7 @@ import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResult;
 
 /**
  * Context passed to bindings to perform mapping.
@@ -160,4 +162,23 @@ public interface GraphQLResolverContext
 	 * @return
 	 */
 	<T extends Annotation> Optional<T> findMetaAnnotation(Annotated annotated, Class<T> annotation);
+
+	/**
+	 * Apply directives defined by the given annotations to the specified
+	 * field and supplier.
+	 *
+	 * @param annotations
+	 *   annotations used to resolve directives, may include annotations that
+	 *   are not directives
+	 * @param field
+	 *   the field to apply to
+	 * @param supplier
+	 *   the supplier for fetching the field values
+	 * @return
+	 */
+	GraphQLDirectiveFieldResult applyFieldDirectives(
+		Annotation[] annotations,
+		GraphQLFieldDefinition field,
+		DataFetchingSupplier<?> supplier
+	);
 }

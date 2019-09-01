@@ -1,16 +1,17 @@
 package se.l4.graphql.binding.internal.datafetchers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 
 public class MethodDataFetcher<I, T>
-	implements DataFetcher<T>
+	implements DataFetchingSupplier<T>
 {
 	private final DataFetchingSupplier<Object> contextGetter;
 	private final Method method;
@@ -33,17 +34,28 @@ public class MethodDataFetcher<I, T>
 	@Override
 	@SuppressWarnings("unchecked")
 	public T get(DataFetchingEnvironment environment)
-		throws Exception
 	{
 		Object context = contextGetter.get(environment);
 
-		I result = (I) method.invoke(
-			context,
-			Arrays.stream(parameters)
-				.map(p -> p.get(environment))
-				.toArray()
-		);
+		try
+		{
+			I result = (I) method.invoke(
+				context,
+				Arrays.stream(parameters)
+					.map(p -> p.get(environment))
+					.toArray()
+			);
 
-		return returnTypeConversion.convert(environment, result);
+			return returnTypeConversion.convert(environment, result);
+		}
+		catch(InvocationTargetException e)
+		{
+			throw new GraphQLMappingException(e.getCause().getMessage(), e.getCause());
+		}
+		catch(IllegalAccessException | IllegalArgumentException e)
+		{
+			throw new GraphQLMappingException(e.getMessage(), e);
+		}
+
 	}
 }

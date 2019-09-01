@@ -11,6 +11,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
@@ -27,7 +28,7 @@ public class GraphQLObjectBuilderImpl
 
 	private final GraphQLObjectType.Builder builder;
 
-	private final Map<String, DataFetcher<?>> fields;
+	private final Map<String, DataFetchingSupplier<?>> fields;
 
 	private TypeRef type;
 	private Breadcrumb breadcrumb;
@@ -80,18 +81,18 @@ public class GraphQLObjectBuilderImpl
 			context,
 			breadcrumb,
 			this,
-			(field, dataFetcher) -> {
+			(field, supplier) -> {
 				if(fields.containsKey(field.getName()))
 				{
 					throw context.newError("Field name `" + field.getName() + "` is not unique");
 				}
 
-				if(dataFetcher == null)
+				if(supplier == null)
 				{
 					throw context.newError("Field `" + field.getName() + "` does not have a data fetcher");
 				}
 
-				fields.put(field.getName(), dataFetcher);
+				fields.put(field.getName(), supplier);
 				builder.field(field);
 			}
 		);
@@ -155,10 +156,11 @@ public class GraphQLObjectBuilderImpl
 		builder.name(name);
 
 		// Setup all the data fetchers in the code registry
-		for(Map.Entry<String, DataFetcher<?>> e : fields.entrySet())
+		for(Map.Entry<String, DataFetchingSupplier<?>> e : fields.entrySet())
 		{
 			FieldCoordinates coordinates = FieldCoordinates.coordinates(this.name, e.getKey());
-			code.dataFetcher(coordinates, e.getValue());
+			DataFetchingSupplier<?> supplier = e.getValue();
+			code.dataFetcher(coordinates, (DataFetcher<?>) (env -> supplier.get(env)));
 		}
 
 		return builder.build();

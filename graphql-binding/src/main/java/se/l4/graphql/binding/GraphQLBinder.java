@@ -13,6 +13,7 @@ import se.l4.graphql.binding.annotations.GraphQLRoot;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
 
 /**
  * Mapper for taking annotated classes and interfaces and turning them into
@@ -69,6 +70,10 @@ public class GraphQLBinder
 		builder.addScalar(binding);
 		return this;
 	}
+
+	public GraphQLBinder withDirective(GraphQLDirectiveResolver<? extends Annotation> directive)
+	{
+		builder.addDirective(directive);
 		return this;
 	}
 

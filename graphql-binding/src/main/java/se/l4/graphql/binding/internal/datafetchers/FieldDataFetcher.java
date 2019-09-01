@@ -2,13 +2,13 @@ package se.l4.graphql.binding.internal.datafetchers;
 
 import java.lang.reflect.Field;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 
 public class FieldDataFetcher<I, T>
-	implements DataFetcher<T>
+	implements DataFetchingSupplier<T>
 {
 	private final DataFetchingSupplier<Object> contextGetter;
 	private final Field field;
@@ -28,9 +28,15 @@ public class FieldDataFetcher<I, T>
 	@Override
 	@SuppressWarnings("unchecked")
 	public T get(DataFetchingEnvironment environment)
-		throws Exception
 	{
-		Object context = contextGetter.get(environment);
-		return returnTypeConversion.convert(environment, (I) field.get(context));
+		try
+		{
+			Object context = contextGetter.get(environment);
+			return returnTypeConversion.convert(environment, (I) field.get(context));
+		}
+		catch(IllegalAccessException | IllegalArgumentException e)
+		{
+			throw new GraphQLMappingException(e.getMessage(), e);
+		}
 	}
 }

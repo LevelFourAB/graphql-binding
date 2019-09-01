@@ -118,7 +118,7 @@ public class RootObjectMixin
 					}
 				}
 
-				fieldBuilder.withDataFetcher(new MethodDataFetcher(
+				fieldBuilder.withSupplier(new MethodDataFetcher(
 					supplier,
 					method.getMethod(),
 					arguments,

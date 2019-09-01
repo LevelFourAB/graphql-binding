@@ -109,7 +109,7 @@ public class ObjectTypeResolver
 					builder.newField()
 						.over(field)
 						.setType(fieldType.getGraphQLType())
-						.withDataFetcher(new FieldDataFetcher<>(
+						.withSupplier(new FieldDataFetcher<>(
 							contextGetter,
 							field.getField(),
 							fieldType.getConversion()
@@ -179,7 +179,7 @@ public class ObjectTypeResolver
 							.done();
 					}
 
-					fieldBuilder.withDataFetcher(new MethodDataFetcher<>(
+					fieldBuilder.withSupplier(new MethodDataFetcher<>(
 						contextGetter,
 						method.getMethod(),
 						arguments,

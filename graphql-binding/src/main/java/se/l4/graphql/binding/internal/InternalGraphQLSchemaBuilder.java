@@ -18,6 +18,8 @@ import com.google.common.base.Defaults;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLCodeRegistry;
+import graphql.schema.GraphQLDirective;
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLModifiedType;
 import graphql.schema.GraphQLObjectType;
@@ -43,6 +45,8 @@ import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.internal.builders.GraphQLInterfaceBuilderImpl;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
+import se.l4.graphql.binding.internal.directive.GraphQLDirectiveCreationEncounterImpl;
+import se.l4.graphql.binding.internal.directive.GraphQLDirectiveFieldEncounterImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
@@ -64,6 +68,10 @@ import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldEncounter;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResolver;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResult;
+import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
@@ -85,9 +93,11 @@ public class InternalGraphQLSchemaBuilder
 
 	private final Map<TypeRef, ResolvedGraphQLType<? extends GraphQLOutputType>> builtOutputTypes;
 	private final Map<TypeRef, ResolvedGraphQLType<? extends GraphQLInputType>> builtInputTypes;
+	private final Map<Class<?>, GraphQLDirective> builtDirectives;
 
 	private final TypeConverter typeConverter;
 	private final List<GraphQLObjectMixin> objectMixins;
+	private final Map<Class<? extends Annotation>, GraphQLDirectiveResolver<? extends Annotation>> directives;
 
 	private InstanceFactory instanceFactory;
 
@@ -100,11 +110,12 @@ public class InternalGraphQLSchemaBuilder
 
 		rootTypes = new HashMap<>();
 		types = new ArrayList<>();
+		objectMixins = new ArrayList<>();
+		directives = new HashMap<>();
 
 		builtInputTypes = new HashMap<>();
 		builtOutputTypes = new HashMap<>();
-
-		objectMixins = new ArrayList<>();
+		builtDirectives =new HashMap<>();
 
 		typeConverter = new StandardTypeConverter();
 
@@ -228,6 +239,23 @@ public class InternalGraphQLSchemaBuilder
 	}
 
 	/**
+	 * Add a directive for use during resolution.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void addDirective(GraphQLDirectiveResolver<? extends Annotation> directive)
+	{
+		TypeRef directiveResolverType = Types.reference(directive.getClass())
+			.findInterface(GraphQLDirectiveResolver.class)
+			.get();
+
+		TypeRef annotation = directiveResolverType.getTypeParameter(0)
+			.filter(p -> p.isFullyResolved())
+			.orElseThrow(() -> new GraphQLMappingException("Could not find type of annotation"));
+
+		this.directives.put((Class) annotation.getErasedType(), directive);
+	}
+
+	/**
 	 * Build the root query type by going through and resolving all of the root
 	 * types.
 	 *
@@ -300,6 +328,7 @@ public class InternalGraphQLSchemaBuilder
 		GraphQLCodeRegistry.Builder codeRegistryBuilder = GraphQLCodeRegistry.newCodeRegistry();
 
 		ResolverContextImpl ctx = new ResolverContextImpl(
+			builder,
 			codeRegistryBuilder
 		);
 
@@ -370,7 +399,8 @@ public class InternalGraphQLSchemaBuilder
 	private class ResolverContextImpl
 		implements GraphQLResolverContext
 	{
-		protected final GraphQLCodeRegistry.Builder codeRegistryBuilder;
+		private final GraphQLSchema.Builder schemaBuilder;
+		private final GraphQLCodeRegistry.Builder codeRegistryBuilder;
 
 		private final Set<TypeRef> inputsBeingResolved;
 		private final Map<TypeRef, PendingDataFetchingConversion<?, ?>> pendingInputConversions;
@@ -383,9 +413,11 @@ public class InternalGraphQLSchemaBuilder
 		private Breadcrumb breadcrumb;
 
 		public ResolverContextImpl(
+			GraphQLSchema.Builder schemaBuilder,
 			GraphQLCodeRegistry.Builder codeRegistryBuilder
 		)
 		{
+			this.schemaBuilder = schemaBuilder;
 			this.codeRegistryBuilder = codeRegistryBuilder;
 
 			breadcrumb = Breadcrumb.empty();
@@ -805,6 +837,51 @@ public class InternalGraphQLSchemaBuilder
 			}
 
 			return Optional.empty();
+		}
+
+		@Override
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public GraphQLDirectiveFieldResult applyFieldDirectives(
+			Annotation[] annotations,
+			GraphQLFieldDefinition field,
+			DataFetchingSupplier<?> supplier
+		)
+		{
+			for(Annotation a : annotations)
+			{
+				GraphQLDirectiveResolver<?> resolver = directives.get(a.annotationType());
+				if(resolver == null) continue;
+
+				if(! (resolver instanceof GraphQLDirectiveFieldResolver))
+				{
+					throw newError("The annotation " + a.annotationType().getSimpleName() + " was used on a GraphQL field, but directive resolver does not support fields");
+				}
+
+				GraphQLDirectiveFieldResolver fieldResolver = (GraphQLDirectiveFieldResolver) resolver;
+
+				GraphQLDirective directive = builtDirectives.get(a.annotationType());
+				if(directive == null)
+				{
+					directive = resolver.createDirective(new GraphQLDirectiveCreationEncounterImpl(this));
+					builtDirectives.put(a.annotationType(), directive);
+					schemaBuilder.additionalDirective(directive);
+				}
+
+				GraphQLDirectiveFieldEncounter encounter = new GraphQLDirectiveFieldEncounterImpl(
+					this,
+					directive,
+					a,
+					field,
+					supplier
+				);
+
+				fieldResolver.applyField(encounter);
+
+				field = encounter.getField();
+				supplier = encounter.getSupplier();
+			}
+
+			return new GraphQLDirectiveFieldResult(field, supplier);
 		}
 	}
 

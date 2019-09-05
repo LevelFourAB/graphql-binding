@@ -76,8 +76,8 @@ public class FactoryResolver
 
 			DataFetchingSupplier<?>[] suppliers = getParameterSuppliers(context, constructor);
 			result.add(new ConstructorFactory(
-				sourceType.get().getErasedType(),
-				ref.getErasedType(),
+				sourceType.get(),
+				ref,
 
 				suppliers,
 				constructor.getConstructor()
@@ -120,8 +120,8 @@ public class FactoryResolver
 
 			DataFetchingSupplier<?>[] suppliers = getParameterSuppliers(context, method);
 			result.add(new MethodFactory(
-				sourceType.get().getErasedType(),
-				method.getReturnType().getErasedType(),
+				sourceType.get(),
+				method.getReturnType(),
 
 				suppliers,
 				method.getMethod()
@@ -239,17 +239,17 @@ public class FactoryResolver
 		return Optional.empty();
 	}
 
-	private static abstract class AbstractFactory<I, O>
-		implements Factory<I, O>
+	private static abstract class AbstractFactory
+		implements Factory<Object, Object>
 	{
-		private final Class<I> input;
-		private final Class<O> output;
+		private final TypeRef input;
+		private final TypeRef output;
 
 		private final DataFetchingSupplier<?>[] parameterSuppliers;
 
 		public AbstractFactory(
-			Class<I> input,
-			Class<O> output,
+			TypeRef input,
+			TypeRef output,
 			DataFetchingSupplier<?>[] parameterSuppliers
 		)
 		{
@@ -260,19 +260,19 @@ public class FactoryResolver
 		}
 
 		@Override
-		public Class<I> getInput()
+		public TypeRef getInput()
 		{
 			return input;
 		}
 
 		@Override
-		public Class<O> getOutput()
+		public TypeRef getOutput()
 		{
 			return output;
 		}
 
 		@Override
-		public O convert(DataFetchingEnvironment env, I source)
+		public Object convert(DataFetchingEnvironment env, Object source)
 		{
 			Object[] args = Arrays.stream(parameterSuppliers)
 				.map(supplier -> {
@@ -290,7 +290,7 @@ public class FactoryResolver
 			return create(args);
 		}
 
-		public abstract O create(Object[] args);
+		public abstract Object create(Object[] args);
 
 		@Override
 		public String toString()
@@ -301,16 +301,16 @@ public class FactoryResolver
 		}
 	}
 
-	private static class ConstructorFactory<I, O>
-		extends AbstractFactory<I, O>
+	private static class ConstructorFactory
+		extends AbstractFactory
 	{
-		private final Constructor<O> constructor;
+		private final Constructor<?> constructor;
 
 		public ConstructorFactory(
-			Class<I> input,
-			Class<O> output,
+			TypeRef input,
+			TypeRef output,
 			DataFetchingSupplier<?>[] parameterSuppliers,
-			Constructor<O> constructor
+			Constructor<?> constructor
 		)
 		{
 			super(input, output, parameterSuppliers);
@@ -319,7 +319,7 @@ public class FactoryResolver
 		}
 
 		@Override
-		public O create(Object[] args)
+		public Object create(Object[] args)
 		{
 			try
 			{
@@ -336,14 +336,14 @@ public class FactoryResolver
 		}
 	}
 
-	private static class MethodFactory<I, O>
-		extends AbstractFactory<I, O>
+	private static class MethodFactory
+		extends AbstractFactory
 	{
 		private final Method method;
 
 		public MethodFactory(
-			Class<I> input,
-			Class<O> output,
+			TypeRef input,
+			TypeRef output,
 			DataFetchingSupplier<?>[] parameterSuppliers,
 			Method method
 		)
@@ -354,12 +354,11 @@ public class FactoryResolver
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public O create(Object[] args)
+		public Object create(Object[] args)
 		{
 			try
 			{
-				return (O) method.invoke(null, args);
+				return (Object) method.invoke(null, args);
 			}
 			catch(IllegalAccessException | IllegalArgumentException e)
 			{

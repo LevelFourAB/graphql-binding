@@ -12,7 +12,6 @@ import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLRoot;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
-import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
 
 /**
@@ -62,12 +61,6 @@ public class GraphQLBinder
 	public GraphQLBinder withRoot(Object instance)
 	{
 		builder.addRootType(instance.getClass(), (env) -> instance);
-		return this;
-	}
-
-	public <T> GraphQLBinder withScalar(GraphQLScalarResolver<T, ?> binding)
-	{
-		builder.addScalar(binding);
 		return this;
 	}
 

@@ -1,5 +1,6 @@
 package se.l4.graphql.binding.internal.factory;
 
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 
 /**
@@ -17,12 +18,12 @@ public interface Factory<I, O>
 	 *
 	 * @return
 	 */
-	Class<I> getInput();
+	TypeRef getInput();
 
 	/**
 	 * Get the type of object this factory creates.
 	 *
 	 * @return
 	 */
-	Class<O> getOutput();
+	TypeRef getOutput();
 }

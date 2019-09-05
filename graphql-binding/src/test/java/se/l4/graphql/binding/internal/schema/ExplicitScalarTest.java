@@ -22,7 +22,7 @@ public class ExplicitScalarTest
 	{
 		binder
 			.withRoot(new Root())
-			.withScalar(new GraphQLScalarResolver<TestScalar, String>() {
+			.withResolver(new GraphQLScalarResolver<TestScalar, String>() {
 				@Override
 				public TestScalar parseValue(String input)
 				{

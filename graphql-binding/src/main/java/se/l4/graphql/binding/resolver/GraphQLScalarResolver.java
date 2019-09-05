@@ -7,6 +7,7 @@ package se.l4.graphql.binding.resolver;
  * @param <Type>
  */
 public interface GraphQLScalarResolver<Type, GraphQLType>
+	extends GraphQLResolver
 {
 	/**
 	 * Serialize the specified instance into a GraphQL type.

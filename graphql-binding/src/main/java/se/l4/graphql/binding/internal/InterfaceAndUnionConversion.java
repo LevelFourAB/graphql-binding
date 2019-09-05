@@ -11,6 +11,7 @@ import se.l4.commons.types.Types;
 import se.l4.commons.types.matching.ClassMatchingHashMap;
 import se.l4.commons.types.matching.ClassMatchingMap;
 import se.l4.commons.types.matching.MatchedType;
+import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
@@ -40,7 +41,7 @@ public class InterfaceAndUnionConversion
 
 	public void addFactory(Factory<?, ?> factory)
 	{
-		List<MatchedType<Object, Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput());
+		List<MatchedType<Object, Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput().getErasedType());
 		for(MatchedType<Object, Set<Factory<?, ?>>> m : mappingTo)
 		{
 			/*
@@ -68,10 +69,10 @@ public class InterfaceAndUnionConversion
 			for(Factory<?, ?> factory : type.getData())
 			{
 				Set<Class<?>> interfaces = new HashSet<>();
-				Types.visitHierarchy(factory.getInput(), t -> {
+				factory.getInput().visitHierarchy(t -> {
 					if(t.isInterface())
 					{
-						interfaces.add(t);
+						interfaces.add(t.getErasedType());
 					}
 
 					return true;
@@ -152,9 +153,10 @@ public class InterfaceAndUnionConversion
 		{
 			if(object == null) return null;
 
+			TypeRef objectType = Types.reference(object.getClass());
 			for(Factory factory : factories)
 			{
-				if(factory.getInput().isAssignableFrom(object.getClass()))
+				if(factory.getInput().isAssignableFrom(objectType))
 				{
 					return factory.convert(environment, object);
 				}

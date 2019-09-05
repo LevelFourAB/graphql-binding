@@ -1,9 +1,11 @@
 package se.l4.graphql.binding.internal.resolvers;
 
+import java.util.Optional;
+
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeInferrer;
 import se.l4.commons.types.reflect.TypeRef;
-import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
@@ -13,19 +15,39 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 public class ConvertingTypeResolver<I, O>
 	implements GraphQLOutputResolver
 {
-	private final Factory<I, O> factory;
+	private final TypeRef from;
+	private final TypeRef to;
+	private final DataFetchingConversion<I, O> conversion;
+
+	private final TypeInferrer[] parameterUsageInferrers;
+	private final TypeInferrer typeParameterInferrer;
 
 	public ConvertingTypeResolver(
-		Factory<I, O> factory
+		TypeRef from,
+		TypeRef to,
+		DataFetchingConversion<I, O> conversion
 	)
 	{
-		this.factory = factory;
+		this.from = from;
+		this.to = to;
+		this.conversion = conversion;
+
+		TypeRef type = Types.reference(conversion.getClass());
+
+		TypeInferrer[] parameterUsageInferrers = new TypeInferrer[type.getTypeParameterCount()];
+		for(int i=0, n=parameterUsageInferrers.length; i<n; i++)
+		{
+			parameterUsageInferrers[i] = type.getTypeParameterUsageInferrer(i, from);
+		}
+
+		this.parameterUsageInferrers = parameterUsageInferrers;
+		this.typeParameterInferrer = type.getTypeParameterInferrer(to);
 	}
 
 	@Override
 	public boolean supportsOutput(TypeRef type)
 	{
-		return type.getErasedType() == factory.getInput();
+		return from.isAssignableFrom(type);
 	}
 
 	@Override
@@ -34,12 +56,31 @@ public class ConvertingTypeResolver<I, O>
 	{
 		GraphQLResolverContext context = encounter.getContext();
 
-		ResolvedGraphQLType<? extends GraphQLOutputType> type = context.resolveOutput(
-			Types.reference(factory.getOutput())
-		);
+		TypeRef in = encounter.getType();
+
+		TypeRef[] refs = new TypeRef[parameterUsageInferrers.length];
+		for(int i=0, n=refs.length; i<n; i++)
+		{
+			Optional<TypeRef> inferred = parameterUsageInferrers[i].infer(in);
+			if(! inferred.isPresent())
+			{
+				return ResolvedGraphQLType.none();
+			}
+
+			refs[i] = inferred.get();
+		}
+
+		Optional<TypeRef> to = typeParameterInferrer.infer(refs);
+
+		if(! to.isPresent())
+		{
+			return ResolvedGraphQLType.none();
+		}
+
+		ResolvedGraphQLType<? extends GraphQLOutputType> type = context.resolveOutput(to.get());
 
 		// Get the type but apply a conversion to our type
-		return type.withOutputConversion((DataFetchingConversion) factory);
+		return type.withOutputConversion((DataFetchingConversion) conversion);
 	}
 
 }

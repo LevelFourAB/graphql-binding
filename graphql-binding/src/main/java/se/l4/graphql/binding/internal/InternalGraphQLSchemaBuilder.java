@@ -64,6 +64,7 @@ import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.internal.resolvers.SpecificScalarResolver;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
+import se.l4.graphql.binding.resolver.GraphQLConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
@@ -201,11 +202,51 @@ public class InternalGraphQLSchemaBuilder
 	}
 
 	/**
+	 * Add a type that should be made available.
+	 *
+	 * @param type
+	 */
+	public void addType(Class<?> type)
+	{
+		this.types.add(type);
+	}
+
+	public void addResolver(GraphQLResolver resolver)
+	{
+		this.typeResolvers.add(resolver);
+
+		if(resolver instanceof GraphQLConversion)
+		{
+			addConversionResolver((GraphQLConversion<?, ?>) resolver);
+		}
+
+		if(resolver instanceof GraphQLScalarResolver)
+		{
+			addScalar((GraphQLScalarResolver<?, ?>) resolver);
+		}
+	}
+
+	private void addConversionResolver(GraphQLConversion<?, ?> conversion)
+	{
+		TypeRef conversionType = Types.reference(conversion.getClass())
+			.findInterface(GraphQLConversion.class)
+			.get();
+
+		TypeRef from = conversionType.getTypeParameter(0)
+			.orElseThrow(() -> new GraphQLMappingException("Could not find type of annotation"));
+
+		TypeRef to = conversionType.getTypeParameter(1)
+			.orElseThrow(() -> new GraphQLMappingException("Could not find type of annotation"));
+
+		this.typeResolvers.add(new ConvertingTypeResolver<>(from, to, conversion));
+	}
+
+	/**
 	 * Add a scalar binding.
 	 *
 	 * @param scalar
 	 */
-	public void addScalar(GraphQLScalarResolver<?, ?> scalar)
+	private void addScalar(GraphQLScalarResolver<?, ?> scalar)
 	{
 		// Resolve the interface and the GraphQL type and request a conversion to it
 		TypeRef scalarInterface = Types.reference(scalar.getClass())
@@ -220,21 +261,6 @@ public class InternalGraphQLSchemaBuilder
 			graphQLType,
 			scalar
 		));
-	}
-
-	/**
-	 * Add a type that should be made available.
-	 *
-	 * @param type
-	 */
-	public void addType(Class<?> type)
-	{
-		this.types.add(type);
-	}
-
-	public void addResolver(GraphQLResolver resolver)
-	{
-		this.typeResolvers.add(resolver);
 	}
 
 	/**
@@ -353,7 +379,11 @@ public class InternalGraphQLSchemaBuilder
 				for(Factory<?, ?> factory : factories)
 				{
 					// Register an extra resolver for the type
-					typeResolvers.add(new ConvertingTypeResolver<>(factory));
+					typeResolvers.add(new ConvertingTypeResolver<>(
+						factory.getInput(),
+						factory.getOutput(),
+						factory
+					));
 
 					// Track this factory - for automatic interface and union conversion
 					interfacesAndUnions.addFactory(factory);

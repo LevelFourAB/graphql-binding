@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import graphql.schema.GraphQLSchema;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
+import se.l4.graphql.binding.annotations.GraphQLAutoRegister;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
@@ -102,6 +103,14 @@ public class GraphQLBinder
 			for(Object instance : typeFinder.getTypesAnnotatedWithAsInstances(GraphQLRoot.class))
 			{
 				builder.addRootType(instance.getClass(), env -> instance);
+			}
+
+			for(Object instance : typeFinder.getTypesAnnotatedWithAsInstances(GraphQLAutoRegister.class))
+			{
+				if(instance instanceof GraphQLResolver)
+				{
+					builder.addResolver((GraphQLResolver) instance);
+				}
 			}
 		}
 

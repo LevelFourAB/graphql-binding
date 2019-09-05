@@ -6,6 +6,7 @@ import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.reflect.TypeInferrer;
 import se.l4.commons.types.reflect.TypeRef;
+import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
@@ -32,7 +33,16 @@ public class ConvertingTypeResolver<I, O>
 		this.to = to;
 		this.conversion = conversion;
 
-		TypeRef type = Types.reference(conversion.getClass());
+		TypeRef type;
+		if(conversion instanceof Factory)
+		{
+			type = to;
+		}
+		else
+		{
+			type = Types.reference(conversion.getClass());
+		}
+
 
 		TypeInferrer[] parameterUsageInferrers = new TypeInferrer[type.getTypeParameterCount()];
 		for(int i=0, n=parameterUsageInferrers.length; i<n; i++)

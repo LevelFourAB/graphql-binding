@@ -71,7 +71,7 @@ public class NameRegistryTest
 			TypeGeneric.class,
 			TypeNoAnnotation.class
 		));
-		assertThat(name, is("TypeGeneric_TypeNoAnnotation"));
+		assertThat(name, is("TypeNoAnnotationTypeGeneric"));
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class NameRegistryTest
 			TypeGenericAnnotated.class,
 			TypeNoAnnotation.class
 		));
-		assertThat(name, is("Generic_TypeNoAnnotation"));
+		assertThat(name, is("TypeNoAnnotationGeneric"));
 	}
 
 	class TypeNoAnnotation {

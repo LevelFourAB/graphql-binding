@@ -86,7 +86,7 @@ public class GenericConversionTest
 	public void testFactoryConstructorStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("factoryConstructorString").getType();
-		assertThat(inferOutputType.getName(), is("GenericViaFactoryConstructor_String"));
+		assertThat(inferOutputType.getName(), is("StringGenericViaFactoryConstructor"));
 	}
 
 	@Test
@@ -102,7 +102,7 @@ public class GenericConversionTest
 	public void testFactoryConstructorWithSimpleStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("factoryConstructorWithSimpleInteger").getType();
-		assertThat(inferOutputType.getName(), is("GenericViaFactoryConstructor_Int"));
+		assertThat(inferOutputType.getName(), is("IntGenericViaFactoryConstructor"));
 	}
 
 	@Test

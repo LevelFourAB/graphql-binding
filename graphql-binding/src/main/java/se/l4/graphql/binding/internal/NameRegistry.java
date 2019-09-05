@@ -3,9 +3,12 @@ package se.l4.graphql.binding.internal;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -59,16 +62,16 @@ public class NameRegistry
 		String proposedName = nameAnnotation == null ? erasedType.getSimpleName() : nameAnnotation.value();
 
 		// Go through and add any type parameters to the name
-		StringBuilder nameBuilder = new StringBuilder()
-			.append(proposedName);
+		List<String> items = new LinkedList<>();
+		items.add(proposedName);
 
 		for(TypeRef typeParam : type.getTypeParameters())
 		{
 			String subName = getName(typeParam, path);
-			nameBuilder.append("_").append(subName);
+			items.add(0, subName);
 		}
 
-		name = nameBuilder.toString();
+		name = items.stream().collect(Collectors.joining());
 
 		// Check that the name is unique and register it
 		Breadcrumb existing = typeReverseNames.get(name);

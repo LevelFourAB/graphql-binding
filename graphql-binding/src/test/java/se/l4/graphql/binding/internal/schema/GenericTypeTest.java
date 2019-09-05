@@ -30,14 +30,14 @@ public class GenericTypeTest
 	@Test
 	public void testSchema()
 	{
-		GraphQLObjectType stringWrapper = schema.getObjectType("Wrapper_String");
+		GraphQLObjectType stringWrapper = schema.getObjectType("StringWrapper");
 		assertThat(stringWrapper, notNullValue());
 
 		GraphQLFieldDefinition field = stringWrapper.getFieldDefinition("item");
 		assertThat(field, notNullValue());
 		assertThat(field.getType(), is(Scalars.GraphQLString));
 
-		GraphQLObjectType stringHolderWrapper = schema.getObjectType("Wrapper_StringHolderQueryType");
+		GraphQLObjectType stringHolderWrapper = schema.getObjectType("StringHolderQueryTypeWrapper");
 		assertThat(stringHolderWrapper, notNullValue());
 	}
 

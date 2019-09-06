@@ -181,8 +181,22 @@ public interface GraphQLResolverContext
 	 */
 	ResolvedGraphQLType<? extends GraphQLOutputType> maybeResolveOutput(TypeRef type);
 
+	/**
+	 * Convert a Java type into a GraphQL input type, throwing an exception if
+	 * unable to resolve.
+	 *
+	 * @param type
+	 * @return
+	 */
 	ResolvedGraphQLType<? extends GraphQLInputType> resolveInput(TypeRef type);
 
+	/**
+	 * Convert a Java type into a GraphQL input type, allowing the type to be
+	 * non-existent.
+	 *
+	 * @param type
+	 * @return
+	 */
 	ResolvedGraphQLType<? extends GraphQLInputType> maybeResolveInput(TypeRef type);
 
 	/**

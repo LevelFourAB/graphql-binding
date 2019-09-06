@@ -191,4 +191,14 @@ public class ResolvedGraphQLType<T extends GraphQLType>
 			supplier
 		);
 	}
+
+	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName() + "{"
+			+ "type=" + type
+			+ ", conversion=" + conversion
+			+ ", defaultValue=" + defaultValue
+			+ "}";
+	}
 }

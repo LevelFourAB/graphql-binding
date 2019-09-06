@@ -55,7 +55,7 @@ public class EnumResolver
 	)
 	{
 		GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
-			.name(context.getTypeName(type))
+			.name(context.requestInputOutputTypeName(type))
 			.description(context.getDescription(type));
 
 		Class<? extends Enum> enumType = (Class<? extends Enum>) type.getErasedType();

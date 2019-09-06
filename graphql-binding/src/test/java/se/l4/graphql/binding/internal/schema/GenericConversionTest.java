@@ -102,7 +102,7 @@ public class GenericConversionTest
 	public void testFactoryConstructorWithSimpleStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("factoryConstructorWithSimpleInteger").getType();
-		assertThat(inferOutputType.getName(), is("IntGenericViaFactoryConstructor"));
+		assertThat(inferOutputType.getName(), is("IntListGenericViaFactoryConstructor"));
 	}
 
 	@Test

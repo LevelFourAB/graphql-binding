@@ -118,7 +118,7 @@ public class ScalarResolver
 			}
 			else
 			{
-				name = context.getTypeName(type);
+				name = context.requestInputOutputTypeName(type);
 			}
 
 			String description;

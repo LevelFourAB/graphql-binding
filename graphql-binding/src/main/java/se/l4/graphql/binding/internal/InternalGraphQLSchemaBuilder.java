@@ -62,6 +62,9 @@ import se.l4.graphql.binding.internal.resolvers.OptionalLongResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.internal.resolvers.SpecificScalarResolver;
+import se.l4.graphql.binding.naming.DefaultGraphQLNamingFunction;
+import se.l4.graphql.binding.naming.GraphQLNamingEncounter;
+import se.l4.graphql.binding.naming.GraphQLNamingFunction;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLConversion;
@@ -100,6 +103,7 @@ public class InternalGraphQLSchemaBuilder
 	private final Map<Class<? extends Annotation>, GraphQLDirectiveResolver<? extends Annotation>> directives;
 
 	private InstanceFactory instanceFactory;
+	private GraphQLNamingFunction defaultNaming;
 
 	public InternalGraphQLSchemaBuilder()
 	{
@@ -107,6 +111,7 @@ public class InternalGraphQLSchemaBuilder
 
 		names = new NameRegistry();
 		typeResolvers = new TypeResolverRegistry();
+		defaultNaming = new DefaultGraphQLNamingFunction();
 
 		rootTypes = new HashMap<>();
 		types = new ArrayList<>();
@@ -523,13 +528,65 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@Override
-		public String getTypeName(TypeRef type)
+		public String requestInputTypeName(TypeRef type)
 		{
+			return requestTypeName(type, true, false);
+		}
+
+		@Override
+		public String requestOutputTypeName(TypeRef type)
+		{
+			return requestTypeName(type, false, true);
+		}
+
+		@Override
+		public String requestInputOutputTypeName(TypeRef type)
+		{
+			return requestTypeName(type, true, true);
+		}
+
+		private String requestTypeName(TypeRef type, boolean input, boolean output)
+		{
+			Optional<String> current = names.getName(type);
+			if(current.isPresent())
+			{
+				return current.get();
+			}
+
 			try
 			{
-				return names.getName(type);
+				String name = defaultNaming.compute(new GraphQLNamingEncounter()
+				{
+					@Override
+					public GraphQLResolverContext getContext()
+					{
+						return ResolverContextImpl.this;
+					}
+
+					@Override
+					public TypeRef getType()
+					{
+						return type;
+					}
+
+					@Override
+					public boolean isInput()
+					{
+						return input;
+					}
+
+					@Override
+					public boolean isOutput()
+					{
+						return output;
+					}
+				});
+
+				names.reserveName(name, breadcrumb, type);
+
+				return name;
 			}
-			catch(GraphQLMappingException e)
+			catch(Exception e)
 			{
 				throw new GraphQLMappingException(e.getMessage() + "\n  " + breadcrumb.getLocation());
 			}
@@ -650,7 +707,7 @@ public class InternalGraphQLSchemaBuilder
 					 * reference with a pending conversion.
 					 */
 
-					String name = getTypeName(withoutUsage);
+					String name = requestOutputTypeName(withoutUsage);
 					PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 
@@ -738,7 +795,7 @@ public class InternalGraphQLSchemaBuilder
 					 * reference with a pending conversion.
 					 */
 
-					String name = getTypeName(withoutUsage);
+					String name = requestInputTypeName(withoutUsage);
 					PendingDataFetchingConversion<?, ?> pending = pendingInputConversions
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 

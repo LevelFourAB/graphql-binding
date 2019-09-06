@@ -42,7 +42,7 @@ public class InputObjectTypeResolver
 		GraphQLResolverContext context = encounter.getContext();
 
 		GraphQLInputObjectType.Builder builder = GraphQLInputObjectType.newInputObject()
-			.name(context.getTypeName(initialType))
+			.name(context.requestInputTypeName(initialType))
 			.description(context.getDescription(initialType));
 
 		List<ValueInjector> injectors = new ArrayList<>();

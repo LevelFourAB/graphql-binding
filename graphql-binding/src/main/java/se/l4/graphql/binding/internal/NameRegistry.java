@@ -1,14 +1,8 @@
 package se.l4.graphql.binding.internal;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -34,59 +28,9 @@ public class NameRegistry
 	 * @param type
 	 * @return
 	 */
-	public String getName(TypeRef type)
+	public Optional<String> getName(TypeRef type)
 	{
-		return getName(type, new HashSet<>());
-	}
-
-	protected String getName(TypeRef type, Set<Type> path)
-	{
-		Class<?> erasedType = type.getErasedType();
-
-		// Protect against potential type loops
-		if(path.contains(erasedType))
-		{
-			throw new GraphQLMappingException("Unable to resolve name, `"
-				+ type.toTypeName() + "` references itself"
-			);
-		}
-
-		path.add(erasedType);
-
-		// Get the registered type name if available
-		String name = typeNames.get(type.withoutUsage());
-		if(name != null) return name;
-
-		// Find a proposed name, either via annotation or using the simple type name
-		GraphQLName nameAnnotation = erasedType.getAnnotation(GraphQLName.class);
-		String proposedName = nameAnnotation == null ? erasedType.getSimpleName() : nameAnnotation.value();
-
-		// Go through and add any type parameters to the name
-		List<String> items = new LinkedList<>();
-		items.add(proposedName);
-
-		for(TypeRef typeParam : type.getTypeParameters())
-		{
-			String subName = getName(typeParam, path);
-			items.add(0, subName);
-		}
-
-		name = items.stream().collect(Collectors.joining());
-
-		// Check that the name is unique and register it
-		Breadcrumb existing = typeReverseNames.get(name);
-		if(existing != null)
-		{
-			throw new GraphQLMappingException("Name collision for `"
-				+ type.toTypeName() + "`, name resolved to `" + name
-				+ "` but name was previously resolved " + existing.getLocation()
-			);
-		}
-
-		typeReverseNames.put(name, Breadcrumb.forType(type));
-		typeNames.put(type.withoutUsage(), name);
-
-		return name;
+		return Optional.ofNullable(typeNames.get(type.withoutUsage()));
 	}
 
 	public boolean hasName(String name)

@@ -142,7 +142,7 @@ public class GraphQLObjectBuilderImpl
 			if(this.name == null)
 			{
 				// Resolve the name if it does not exist
-				name = context.getTypeName(type);
+				name = context.requestOutputTypeName(type);
 			}
 		}
 

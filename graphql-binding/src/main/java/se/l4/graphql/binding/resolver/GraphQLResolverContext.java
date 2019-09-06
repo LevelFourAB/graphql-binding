@@ -80,9 +80,28 @@ public interface GraphQLResolverContext
 	TypeConverter getTypeConverter();
 
 	/**
-	 * Get the name of the type.
+	 * Try to resolve the name of the specified output type.
+	 *
+	 * @param type
+	 * @return
 	 */
-	String getTypeName(TypeRef type);
+	String requestOutputTypeName(TypeRef type);
+
+	/**
+	 * Try to resolve the name of the specified input type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	String requestInputTypeName(TypeRef type);
+
+	/**
+	 * Try to resolve the name of the specified input and output type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	String requestInputOutputTypeName(TypeRef type);
 
 	/**
 	 * Get if the current type name is being used.

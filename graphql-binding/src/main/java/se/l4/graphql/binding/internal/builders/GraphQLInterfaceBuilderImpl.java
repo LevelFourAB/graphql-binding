@@ -48,7 +48,7 @@ public class GraphQLInterfaceBuilderImpl
 	{
 		this.breadcrumb = Breadcrumb.forType(type);
 
-		this.name = context.getTypeName(type);
+		this.name = context.requestOutputTypeName(type);
 		builder.name(name);
 		builder.description(context.getDescription(type));
 		return this;
@@ -91,7 +91,7 @@ public class GraphQLInterfaceBuilderImpl
 	@Override
 	public GraphQLInterfaceBuilder addImplementation(TypeRef type)
 	{
-		implementations.put(type.getErasedType(), context.getTypeName(type));
+		implementations.put(type.getErasedType(), context.requestOutputTypeName(type));
 		return this;
 	}
 

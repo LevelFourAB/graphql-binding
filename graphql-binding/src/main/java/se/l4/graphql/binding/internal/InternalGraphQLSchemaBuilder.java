@@ -40,7 +40,9 @@ import se.l4.commons.types.reflect.MemberRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
+import se.l4.graphql.binding.annotations.GraphQLContext;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
+import se.l4.graphql.binding.annotations.GraphQLEnvironment;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
@@ -51,6 +53,8 @@ import se.l4.graphql.binding.internal.directive.GraphQLDirectiveCreationEncounte
 import se.l4.graphql.binding.internal.directive.GraphQLDirectiveFieldEncounterImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.internal.factory.FactoryResolver;
+import se.l4.graphql.binding.internal.parameters.GraphQLContextParameterResolver;
+import se.l4.graphql.binding.internal.parameters.GraphQLEnvironmentParameterResolver;
 import se.l4.graphql.binding.internal.resolvers.ArrayResolver;
 import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.EnumResolver;
@@ -70,6 +74,8 @@ import se.l4.graphql.binding.naming.GraphQLNamingFunction;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLConversion;
+import se.l4.graphql.binding.resolver.GraphQLParameterEncounter;
+import se.l4.graphql.binding.resolver.GraphQLParameterResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
@@ -104,6 +110,8 @@ public class InternalGraphQLSchemaBuilder
 	private final List<GraphQLObjectMixin> objectMixins;
 	private final Map<Class<? extends Annotation>, GraphQLDirectiveResolver<? extends Annotation>> directives;
 
+	private final Map<Class<? extends Annotation>, GraphQLParameterResolver<?>> parameterResolvers;
+
 	private InstanceFactory instanceFactory;
 	private GraphQLNamingFunction defaultNaming;
 
@@ -114,6 +122,8 @@ public class InternalGraphQLSchemaBuilder
 		names = new NameRegistry();
 		typeResolvers = new TypeResolverRegistry();
 		defaultNaming = new DefaultGraphQLNamingFunction();
+
+		parameterResolvers = new HashMap<>();
 
 		rootTypes = new HashMap<>();
 		types = new ArrayList<>();
@@ -157,6 +167,10 @@ public class InternalGraphQLSchemaBuilder
 		typeResolvers.add(new OptionalIntResolver());
 		typeResolvers.add(new OptionalLongResolver());
 		typeResolvers.add(new OptionalDoubleResolver());
+
+		// Register default parameters
+		parameterResolvers.put(GraphQLEnvironment.class, new GraphQLEnvironmentParameterResolver());
+		parameterResolvers.put(GraphQLContext.class, new GraphQLContextParameterResolver());
 	}
 
 	/**
@@ -231,6 +245,11 @@ public class InternalGraphQLSchemaBuilder
 		{
 			addScalar((GraphQLScalarResolver<?, ?>) resolver);
 		}
+
+		if(resolver instanceof GraphQLParameterResolver)
+		{
+			addParameter((GraphQLParameterResolver<?>) resolver);
+		}
 	}
 
 	private void addConversionResolver(GraphQLConversion<?, ?> conversion)
@@ -285,6 +304,23 @@ public class InternalGraphQLSchemaBuilder
 			.orElseThrow(() -> new GraphQLMappingException("Could not find type of annotation"));
 
 		this.directives.put((Class) annotation.getErasedType(), directive);
+	}
+
+	/**
+	 * Add a parameter for use during resolution.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void addParameter(GraphQLParameterResolver<? extends Annotation> resolver)
+	{
+		TypeRef resolverType = Types.reference(resolver.getClass())
+			.findInterface(GraphQLParameterResolver.class)
+			.get();
+
+		TypeRef annotation = resolverType.getTypeParameter(0)
+			.filter(p -> p.isFullyResolved())
+			.orElseThrow(() -> new GraphQLMappingException("Could not find type of annotation"));
+
+		this.parameterResolvers.put((Class) annotation.getErasedType(), resolver);
 	}
 
 	/**
@@ -1054,6 +1090,47 @@ public class InternalGraphQLSchemaBuilder
 				field,
 				supplier
 			);
+		}
+
+		@Override
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public Optional<DataFetchingSupplier<?>> resolveSupplier(Annotation[] annotations, TypeRef type)
+		{
+			for(Map.Entry<Class<? extends Annotation>, GraphQLParameterResolver<?>> e : parameterResolvers.entrySet())
+			{
+				Optional<? extends Annotation> a = findMetaAnnotation(annotations, e.getKey());
+				if(! a.isPresent()) continue;
+
+				GraphQLParameterResolver resolver = e.getValue();
+				DataFetchingSupplier<?> supplier = resolver.resolveParameter(new GraphQLParameterEncounter<Annotation>() {
+					@Override
+					public Annotation getAnnotation()
+					{
+						return a.get();
+					}
+
+					@Override
+					public GraphQLResolverContext getContext()
+					{
+						return ResolverContextImpl.this;
+					}
+
+					@Override
+					public TypeRef getType()
+					{
+						return type;
+					}
+				});
+
+				if(supplier == null)
+				{
+					throw newError("Could not resolve how to handle " + a + " " + type.toTypeName());
+				}
+
+				return Optional.of(supplier);
+			}
+
+			return Optional.empty();
 		}
 	}
 

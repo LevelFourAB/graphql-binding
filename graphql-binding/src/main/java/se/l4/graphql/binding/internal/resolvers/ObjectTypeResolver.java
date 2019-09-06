@@ -21,7 +21,6 @@ import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.internal.datafetchers.FieldDataFetcher;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
 import se.l4.graphql.binding.internal.factory.ArgumentResolver;
-import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
@@ -149,11 +148,11 @@ public class ObjectTypeResolver
 
 					for(ParameterRef parameter : parameters)
 					{
-						Optional<DataFetchingSupplier<?>> supplier = FactoryResolver.resolveEnvironmentSupplier(
-							context,
-							parameter,
-							parameter.getType()
-						);
+						Optional<DataFetchingSupplier<?>> supplier =
+							context.resolveSupplier(
+								parameter.getAnnotations(),
+								parameter.getType()
+							);
 
 						if(supplier.isPresent())
 						{

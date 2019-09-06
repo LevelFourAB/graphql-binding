@@ -12,7 +12,6 @@ import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
-import se.l4.graphql.binding.internal.factory.FactoryResolver;
 import se.l4.graphql.binding.internal.factory.MemberKey;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
@@ -76,11 +75,11 @@ public class InterfaceResolver
 
 				for(ParameterRef parameter : parameters)
 				{
-					Optional<DataFetchingSupplier<?>> supplier = FactoryResolver.resolveEnvironmentSupplier(
-						context,
-						parameter,
-						parameter.getType()
-					);
+					Optional<DataFetchingSupplier<?>> supplier =
+						context.resolveSupplier(
+							parameter.getAnnotations(),
+							parameter.getType()
+						);
 
 					// If an environment supplier can be resolved this isn't an input argument
 					if(supplier.isPresent()) continue;

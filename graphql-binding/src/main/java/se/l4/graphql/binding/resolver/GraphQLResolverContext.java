@@ -237,4 +237,17 @@ public interface GraphQLResolverContext
 		GraphQLFieldDefinition field,
 		DataFetchingSupplier<?> supplier
 	);
+
+	/**
+	 * Resolve a supplier of a certain type by looking for
+	 * {@link GraphQLParameterResolver}s that match the annotations.
+	 *
+	 * @param annotations
+	 * @param type
+	 * @return
+	 */
+	Optional<DataFetchingSupplier<?>> resolveSupplier(
+		Annotation[] annotations,
+		TypeRef type
+	);
 }

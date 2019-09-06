@@ -41,4 +41,10 @@ public class OptionalResolver
 			.withInputConversion((env, s) -> Optional.ofNullable(s))
 			.withDefaultValue(env -> Optional.empty());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Optional";
+	}
 }

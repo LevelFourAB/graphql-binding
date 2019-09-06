@@ -41,4 +41,10 @@ public class OptionalIntResolver
 			.withInputConversion((env, s) -> s == null ? OptionalInt.empty() : OptionalInt.of((Integer) s))
 			.withDefaultValue(env -> OptionalInt.empty());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "OptionalInt scalar";
+	}
 }

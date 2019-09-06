@@ -41,4 +41,10 @@ public class OptionalDoubleResolver
 			.withInputConversion((env, s) -> s == null ? OptionalDouble.empty() : OptionalDouble.of(((Number) s).doubleValue()))
 			.withDefaultValue(env -> OptionalDouble.empty());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "OptionalDouble scalar";
+	}
 }

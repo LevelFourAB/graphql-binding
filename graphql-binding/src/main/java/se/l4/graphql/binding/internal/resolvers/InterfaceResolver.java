@@ -107,4 +107,11 @@ public class InterfaceResolver
 
 		return ResolvedGraphQLType.forType(builder.build());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "@" + GraphQLInterface.class.getSimpleName();
+	}
+
 }

@@ -69,6 +69,12 @@ public class ListResolver
 		).withInputConversion(new ListConverter(componentType.getConversion()));
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Collection";
+	}
+
 	private static class ListConverter<I, O>
 		implements DataFetchingConversion<Collection<I>, Collection<O>>
 	{

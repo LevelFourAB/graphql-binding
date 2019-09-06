@@ -145,6 +145,12 @@ public class ScalarResolver
 		}));
 	}
 
+	@Override
+	public String toString()
+	{
+		return "@" + GraphQLScalar.class.getName();
+	}
+
 	/**
 	 * Implementation of {@link Coercing} that delegates work to an instance
 	 * of {@link GraphQLScalarConversion}.

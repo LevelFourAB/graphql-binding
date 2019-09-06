@@ -49,6 +49,7 @@ public class EnumResolver
 		return resolve(encounter.getContext(), encounter.getType());
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ResolvedGraphQLType<GraphQLEnumType> resolve(
 		GraphQLResolverContext context,
 		TypeRef type
@@ -83,4 +84,11 @@ public class EnumResolver
 
 		return ResolvedGraphQLType.forType(builder.build());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "@" + GraphQLEnum.class.getSimpleName();
+	}
+
 }

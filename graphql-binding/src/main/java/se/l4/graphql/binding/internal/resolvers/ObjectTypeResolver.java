@@ -67,6 +67,7 @@ public class ObjectTypeResolver
 		return ResolvedGraphQLType.forType(builder.build());
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void resolve(
 		GraphQLResolverContext context,
 		TypeRef initialType,
@@ -193,4 +194,9 @@ public class ObjectTypeResolver
 		});
 	}
 
+	@Override
+	public String toString()
+	{
+		return "@" + GraphQLObject.class.getSimpleName();
+	}
 }

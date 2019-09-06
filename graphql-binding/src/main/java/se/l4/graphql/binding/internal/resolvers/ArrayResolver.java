@@ -46,6 +46,12 @@ public class ArrayResolver
 		).withOutputConversion(new ArrayConverter(componentType.getConversion()));
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Array";
+	}
+
 	private static class ArrayConverter<I, O>
 		implements DataFetchingConversion<I[], Collection<O>>
 	{

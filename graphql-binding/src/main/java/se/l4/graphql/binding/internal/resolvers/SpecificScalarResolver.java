@@ -59,4 +59,10 @@ public class SpecificScalarResolver
 			scalar
 		);
 	}
+
+	@Override
+	public String toString()
+	{
+		return "scalar " + scalar.getClass().getSimpleName();
+	}
 }

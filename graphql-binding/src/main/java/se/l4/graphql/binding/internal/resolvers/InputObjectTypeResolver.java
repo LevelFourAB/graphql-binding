@@ -105,6 +105,12 @@ public class InputObjectTypeResolver
 			.withInputConversion(factory);
 	}
 
+	@Override
+	public String toString()
+	{
+		return "@" + GraphQLInputObject.class.getSimpleName();
+	}
+
 	private static class InputObjectFactory
 		implements DataFetchingConversion<Object, Object>
 	{
@@ -121,6 +127,7 @@ public class InputObjectTypeResolver
 		}
 
 		@Override
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public Object convert(DataFetchingEnvironment environment, Object object)
 		{
 			Object instance = instanceFactory.convert(environment, object);

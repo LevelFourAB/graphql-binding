@@ -41,4 +41,10 @@ public class OptionalLongResolver
 			.withInputConversion((env, s) -> s == null ? OptionalLong.empty() : OptionalLong.of((Long) s))
 			.withDefaultValue(env -> OptionalLong.empty());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "OptionalLong scalar";
+	}
 }

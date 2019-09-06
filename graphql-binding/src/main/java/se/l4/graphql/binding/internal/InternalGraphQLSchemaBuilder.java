@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.base.Defaults;
@@ -21,6 +22,7 @@ import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLModifiedType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -528,6 +530,58 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@Override
+		public Optional<String> getInputTypeName(TypeRef type)
+		{
+			return getTypeName(type, inputsBeingResolved, this::maybeResolveInput);
+		}
+
+		@Override
+		public Optional<String> getOutputTypeName(TypeRef type)
+		{
+			return getTypeName(type, outputsBeingResolved, this::maybeResolveOutput);
+		}
+
+		private Optional<String> getTypeName(
+			TypeRef type,
+			Set<TypeRef> beingResolved,
+			Function<TypeRef, ResolvedGraphQLType<?>> resolver)
+		{
+			TypeRef withoutUsage = type.withoutUsage();
+
+			Optional<String> current = names.getName(withoutUsage);
+			if(current.isPresent())
+			{
+				return current;
+			}
+
+			if(beingResolved.contains(withoutUsage))
+			{
+				// Already attempting to resolve this, can't resolve it again
+				return Optional.empty();
+			}
+
+			ResolvedGraphQLType<?> gql = resolver.apply(type);
+			if(! gql.isPresent())
+			{
+				return Optional.empty();
+			}
+
+			GraphQLType gqlType = gql.getGraphQLType();
+			if(gqlType instanceof GraphQLList)
+			{
+				return Optional.of(((GraphQLList) gqlType).getWrappedType().getName() + "List");
+			}
+			else if(gqlType instanceof GraphQLModifiedType)
+			{
+				return Optional.of(((GraphQLModifiedType) gqlType).getWrappedType().getName());
+			}
+			else
+			{
+				return Optional.of(gqlType.getName());
+			}
+		}
+
+		@Override
 		public String requestInputTypeName(TypeRef type)
 		{
 			return requestTypeName(type, true, false);
@@ -693,7 +747,7 @@ public class InternalGraphQLSchemaBuilder
 		{
 			TypeRef withoutUsage = type.withoutUsage();
 
-			ResolvedGraphQLType<? extends GraphQLOutputType> graphQLType;
+			ResolvedGraphQLType<? extends GraphQLOutputType> graphQLType = ResolvedGraphQLType.none();
 			if(builtOutputTypes.containsKey(withoutUsage))
 			{
 				graphQLType = builtOutputTypes.get(withoutUsage);
@@ -707,7 +761,13 @@ public class InternalGraphQLSchemaBuilder
 					 * reference with a pending conversion.
 					 */
 
-					String name = requestOutputTypeName(withoutUsage);
+					String name = getOutputTypeName(withoutUsage)
+						.orElseThrow(() ->  newError(
+							"Could not resolve name for type " + type.toTypeName()
+							+ ", during recursive resolution. Try reserving a "
+							+ "name the name earlier in your resolver"
+						));
+
 					PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 
@@ -715,26 +775,40 @@ public class InternalGraphQLSchemaBuilder
 						.withOutputConversion(pending);
 				}
 
-				try
+				for(GraphQLOutputResolver resolver : typeResolvers.getOutputResolver(type))
 				{
-					outputsBeingResolved.add(withoutUsage);
-
-					graphQLType = breadcrumb(Breadcrumb.forType(type), () -> {
-						Optional<GraphQLOutputResolver> resolver = typeResolvers.getOutputResolver(type);
-						if(! resolver.isPresent())
+					try
+					{
+						if(! (resolver instanceof ConvertingTypeResolver))
 						{
-							return ResolvedGraphQLType.none();
+							/*
+							 * Only keep track of non-converting resolutions.
+							 *
+							 * This helps work around a case with recursive
+							 * resolutions failing because the type being
+							 * converted from does not have a name yet but its
+							 * actual type will have.
+							 */
+							outputsBeingResolved.add(withoutUsage);
 						}
 
-						return resolver.get().resolveOutput(new OutputEncounterImpl(
-							this,
-							withoutUsage
-						));
-					});
-				}
-				finally
-				{
-					outputsBeingResolved.remove(withoutUsage);
+						graphQLType = breadcrumb(Breadcrumb.forResolver(type, resolver), () -> {
+							return resolver.resolveOutput(new OutputEncounterImpl(
+								this,
+								withoutUsage
+							));
+						});
+
+						if(graphQLType.isPresent())
+						{
+							// Found a type, other resolvers will not run
+							break;
+						}
+					}
+					finally
+					{
+						outputsBeingResolved.remove(withoutUsage);
+					}
 				}
 
 				if(! graphQLType.isPresent())
@@ -781,7 +855,7 @@ public class InternalGraphQLSchemaBuilder
 		{
 			TypeRef withoutUsage = type.withoutUsage();
 
-			ResolvedGraphQLType<? extends GraphQLInputType> graphQLType;
+			ResolvedGraphQLType<? extends GraphQLInputType> graphQLType = ResolvedGraphQLType.none();
 			if(builtInputTypes.containsKey(withoutUsage))
 			{
 				graphQLType = builtInputTypes.get(withoutUsage);
@@ -795,7 +869,13 @@ public class InternalGraphQLSchemaBuilder
 					 * reference with a pending conversion.
 					 */
 
-					String name = requestInputTypeName(withoutUsage);
+					String name = getOutputTypeName(withoutUsage)
+						.orElseThrow(() ->  newError(
+							"Could not resolve name for type " + type.toTypeName()
+							+ ", during recursive resolution. Try reserving a "
+							+ "name the name earlier in your resolver"
+						));
+
 					PendingDataFetchingConversion<?, ?> pending = pendingInputConversions
 						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
 
@@ -803,26 +883,29 @@ public class InternalGraphQLSchemaBuilder
 						.withInputConversion(pending);
 				}
 
-				try
+				for(GraphQLInputResolver resolver : typeResolvers.getInputResolver(type))
 				{
-					inputsBeingResolved.add(withoutUsage);
+					try
+					{
+						inputsBeingResolved.add(withoutUsage);
 
-					graphQLType = breadcrumb(Breadcrumb.forType(type), () -> {
-						Optional<GraphQLInputResolver> resolver = typeResolvers.getInputResolver(type);
-						if(! resolver.isPresent())
+						graphQLType = breadcrumb(Breadcrumb.forType(type), () -> {
+							return resolver.resolveInput(new InputEncounterImpl(
+								this,
+								withoutUsage
+							));
+						});
+
+						if(graphQLType.isPresent())
 						{
-							return ResolvedGraphQLType.none();
+							// Found a type, other resolvers will not run
+							break;
 						}
-
-						return resolver.get().resolveInput(new InputEncounterImpl(
-							this,
-							withoutUsage
-						));
-					});
-				}
-				finally
-				{
-					inputsBeingResolved.remove(withoutUsage);
+					}
+					finally
+					{
+						inputsBeingResolved.remove(withoutUsage);
+					}
 				}
 
 				if(! graphQLType.isPresent())

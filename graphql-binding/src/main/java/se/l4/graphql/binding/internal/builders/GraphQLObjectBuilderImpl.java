@@ -55,6 +55,7 @@ public class GraphQLObjectBuilderImpl
 	{
 		this.type = type;
 		this.breadcrumb = Breadcrumb.forType(type);
+		name = context.requestOutputTypeName(type);
 		this.setDescription(context.getDescription(type));
 		return this;
 	}
@@ -64,6 +65,7 @@ public class GraphQLObjectBuilderImpl
 	{
 		// TODO: Verify name uniqueness
 		this.name = name;
+		context.requestTypeName(name);
 		return this;
 	}
 
@@ -137,12 +139,6 @@ public class GraphQLObjectBuilderImpl
 				{
 					mixin.mixin(encounter);
 				}
-			}
-
-			if(this.name == null)
-			{
-				// Resolve the name if it does not exist
-				name = context.requestOutputTypeName(type);
 			}
 		}
 

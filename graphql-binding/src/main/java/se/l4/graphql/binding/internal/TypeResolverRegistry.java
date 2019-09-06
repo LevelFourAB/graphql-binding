@@ -2,11 +2,8 @@ package se.l4.graphql.binding.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import se.l4.commons.types.reflect.TypeRef;
-import se.l4.graphql.binding.internal.resolvers.MultiInputResolver;
-import se.l4.graphql.binding.internal.resolvers.MultiOutputResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
@@ -48,7 +45,7 @@ public class TypeResolverRegistry
 	 * @return
 	 *   the found resolver
 	 */
-	public Optional<GraphQLOutputResolver> getOutputResolver(TypeRef type)
+	public List<GraphQLOutputResolver> getOutputResolver(TypeRef type)
 	{
 		List<GraphQLOutputResolver> resolvers = new ArrayList<>();
 
@@ -60,18 +57,7 @@ public class TypeResolverRegistry
 			}
 		}
 
-		if(resolvers.isEmpty())
-		{
-			return Optional.empty();
-		}
-		else if(resolvers.size() == 1)
-		{
-			return Optional.of(resolvers.get(0));
-		}
-		else
-		{
-			return Optional.of(new MultiOutputResolver(resolvers));
-		}
+		return resolvers;
 	}
 
 	/**
@@ -82,7 +68,7 @@ public class TypeResolverRegistry
 	 * @return
 	 *   the found resolver
 	 */
-	public Optional<GraphQLInputResolver> getInputResolver(TypeRef type)
+	public List<GraphQLInputResolver> getInputResolver(TypeRef type)
 	{
 		List<GraphQLInputResolver> resolvers = new ArrayList<>();
 
@@ -94,18 +80,7 @@ public class TypeResolverRegistry
 			}
 		}
 
-		if(resolvers.isEmpty())
-		{
-			return Optional.empty();
-		}
-		else if(resolvers.size() == 1)
-		{
-			return Optional.of(resolvers.get(0));
-		}
-		else
-		{
-			return Optional.of(new MultiInputResolver(resolvers));
-		}
+		return resolvers;
 	}
 
 }

@@ -49,6 +49,18 @@ public class Breadcrumb
 	}
 
 	/**
+	 * Create a breadcrumb for the given type.
+	 *
+	 * @param ref
+	 * @return
+	 */
+	public static Breadcrumb forResolver(TypeRef ref, GraphQLResolver resolver)
+	{
+		return new Breadcrumb("in `" + ref.toTypeName() + "` via " + resolver.toString());
+	}
+
+
+	/**
 	 * Create a breadcrumb for the given member.
 	 *
 	 * @param ref

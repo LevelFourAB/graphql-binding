@@ -80,7 +80,26 @@ public interface GraphQLResolverContext
 	TypeConverter getTypeConverter();
 
 	/**
-	 * Try to resolve the name of the specified output type.
+	 * Get the name of the specified output type. This resolve the output type
+	 * if possible and return the name.
+	 *
+	 * @param type
+	 * @return
+	 */
+	Optional<String> getOutputTypeName(TypeRef type);
+
+	/**
+	 * Get the name of the specified input type. This resolve the input type
+	 * if possible and return the name.
+	 *
+	 * @param type
+	 * @return
+	 */
+	Optional<String> getInputTypeName(TypeRef type);
+
+	/**
+	 * Request the name of the specified output type, this is intended to be
+	 * used by resolvers to find a suitable name for the types they build.
 	 *
 	 * @param type
 	 * @return
@@ -88,7 +107,9 @@ public interface GraphQLResolverContext
 	String requestOutputTypeName(TypeRef type);
 
 	/**
-	 * Try to resolve the name of the specified input type.
+	 * Try to resolve the name of the specified input type, this is intended
+	 * to be used by resolvers to find a suitable name for the types they
+	 * build.
 	 *
 	 * @param type
 	 * @return
@@ -96,7 +117,9 @@ public interface GraphQLResolverContext
 	String requestInputTypeName(TypeRef type);
 
 	/**
-	 * Try to resolve the name of the specified input and output type.
+	 * Try to resolve the name of the specified input and output type. This is
+	 * intended to be used by resolvers to find a suitable name for the types
+	 * hey build.
 	 *
 	 * @param type
 	 * @return

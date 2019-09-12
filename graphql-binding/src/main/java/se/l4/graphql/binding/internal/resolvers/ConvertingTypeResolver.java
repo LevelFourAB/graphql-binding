@@ -17,6 +17,7 @@ public class ConvertingTypeResolver<I, O>
 	implements GraphQLOutputResolver
 {
 	private final TypeRef from;
+	private final TypeRef to;
 	private final DataFetchingConversion<I, O> conversion;
 
 	private final TypeInferrer[] parameterUsageInferrers;
@@ -29,6 +30,7 @@ public class ConvertingTypeResolver<I, O>
 	)
 	{
 		this.from = from;
+		this.to = to;
 		this.conversion = conversion;
 
 		TypeRef type;
@@ -55,7 +57,7 @@ public class ConvertingTypeResolver<I, O>
 	@Override
 	public boolean supportsOutput(TypeRef type)
 	{
-		return from.isAssignableFrom(type);
+		return from.isAssignableFrom(type) && ! to.isAssignableFrom(type);
 	}
 
 	@Override

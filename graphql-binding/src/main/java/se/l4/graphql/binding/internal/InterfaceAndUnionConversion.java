@@ -8,9 +8,9 @@ import java.util.Set;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.Types;
-import se.l4.commons.types.matching.ClassMatchingHashMap;
-import se.l4.commons.types.matching.ClassMatchingMap;
-import se.l4.commons.types.matching.MatchedType;
+import se.l4.commons.types.matching.MatchedTypeRef;
+import se.l4.commons.types.matching.TypeMatchingHashMap;
+import se.l4.commons.types.matching.TypeMatchingMap;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.internal.factory.Factory;
@@ -19,7 +19,6 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
-import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
 
 /**
  * Helper for creating conversions between a Java interface and a GraphQL
@@ -27,22 +26,22 @@ import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
  */
 public class InterfaceAndUnionConversion
 {
-	private final ClassMatchingMap<Object, Set<Factory<?, ?>>> types;
+	private final TypeMatchingMap<Set<Factory<?, ?>>> types;
 
 	public InterfaceAndUnionConversion()
 	{
-		types = new ClassMatchingHashMap<>();
+		types = new TypeMatchingHashMap<>();
 	}
 
-	public void trackUnionOrInterface(Class<?> type)
+	public void trackUnionOrInterface(TypeRef type)
 	{
 		types.put(type, new HashSet<>());
 	}
 
 	public void addFactory(Factory<?, ?> factory)
 	{
-		List<MatchedType<Object, Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput().getErasedType());
-		for(MatchedType<Object, Set<Factory<?, ?>>> m : mappingTo)
+		List<MatchedTypeRef<Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput());
+		for(MatchedTypeRef<Set<Factory<?, ?>>> m : mappingTo)
 		{
 			/*
 			 * For every interface or union we are part of add the
@@ -62,17 +61,17 @@ public class InterfaceAndUnionConversion
 	{
 		List<GraphQLOutputResolver> result = new ArrayList<>();
 
-		for(MatchedType<Object, Set<Factory<?, ?>>> type : types.entries())
+		for(MatchedTypeRef<Set<Factory<?, ?>>> type : types.entries())
 		{
 			// Figure out what interfaces are shared between all the factories
-			Set<Class<?>> sharedInterfaces = null;
+			Set<TypeRef> sharedInterfaces = null;
 			for(Factory<?, ?> factory : type.getData())
 			{
-				Set<Class<?>> interfaces = new HashSet<>();
+				Set<TypeRef> interfaces = new HashSet<>();
 				factory.getInput().visitHierarchy(t -> {
 					if(t.isInterface())
 					{
-						interfaces.add(t.getErasedType());
+						interfaces.add(t.withoutUsage());
 					}
 
 					return true;
@@ -91,7 +90,7 @@ public class InterfaceAndUnionConversion
 			// Register a resolver for every interface
 			if(sharedInterfaces != null)
 			{
-				for(Class<?> interfaceType : sharedInterfaces)
+				for(TypeRef interfaceType : sharedInterfaces)
 				{
 					result.add(new Resolver(interfaceType, type.getType(), type.getData()));
 				}
@@ -102,15 +101,15 @@ public class InterfaceAndUnionConversion
 	}
 
 	private static class Resolver
-		implements TypedGraphQLOutputResolver
+		implements GraphQLOutputResolver
 	{
-		private final Class<?> interfaceType;
-		private final Class<?> graphQLType;
+		private final TypeRef interfaceType;
+		private final TypeRef graphQLType;
 		private final Factory<?, ?>[] factories;
 
 		public Resolver(
-			Class<?> interfaceType,
-			Class<?> graphQLType,
+			TypeRef interfaceType,
+			TypeRef graphQLType,
 			Set<Factory<?, ?>> factories
 		)
 		{
@@ -121,9 +120,9 @@ public class InterfaceAndUnionConversion
 		}
 
 		@Override
-		public Class<?> getType()
+		public boolean supportsOutput(TypeRef type)
 		{
-			return interfaceType;
+			return interfaceType.isAssignableFrom(type) && ! graphQLType.isAssignableFrom(type);
 		}
 
 		@Override
@@ -132,8 +131,14 @@ public class InterfaceAndUnionConversion
 		)
 		{
 			GraphQLResolverContext context = encounter.getContext();
-			return context.resolveOutput(Types.reference(graphQLType))
+			return context.resolveOutput(graphQLType)
 				.withOutputConversion(new FactoryConverter(factories));
+		}
+
+		@Override
+		public String toString()
+		{
+			return "Interface and Union type conversion";
 		}
 	}
 

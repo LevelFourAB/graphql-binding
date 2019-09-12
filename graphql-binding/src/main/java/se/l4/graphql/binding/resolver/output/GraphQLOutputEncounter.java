@@ -33,4 +33,11 @@ public interface GraphQLOutputEncounter
 	 * @return
 	 */
 	GraphQLInterfaceBuilder newInterfaceType();
+
+	/**
+	 * Start building a new union type.
+	 *
+	 * @return
+	 */
+	GraphQLUnionBuilder newUnionType();
 }

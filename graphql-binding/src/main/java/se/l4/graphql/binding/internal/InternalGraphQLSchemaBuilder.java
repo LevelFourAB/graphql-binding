@@ -47,8 +47,10 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.annotations.GraphQLUnion;
 import se.l4.graphql.binding.internal.builders.GraphQLInterfaceBuilderImpl;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
+import se.l4.graphql.binding.internal.builders.GraphQLUnionBuilderImpl;
 import se.l4.graphql.binding.internal.directive.GraphQLDirectiveCreationEncounterImpl;
 import se.l4.graphql.binding.internal.directive.GraphQLDirectiveFieldEncounterImpl;
 import se.l4.graphql.binding.internal.factory.Factory;
@@ -68,6 +70,7 @@ import se.l4.graphql.binding.internal.resolvers.OptionalLongResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalResolver;
 import se.l4.graphql.binding.internal.resolvers.ScalarResolver;
 import se.l4.graphql.binding.internal.resolvers.SpecificScalarResolver;
+import se.l4.graphql.binding.internal.resolvers.UnionResolver;
 import se.l4.graphql.binding.naming.DefaultGraphQLNamingFunction;
 import se.l4.graphql.binding.naming.GraphQLNamingEncounter;
 import se.l4.graphql.binding.naming.GraphQLNamingFunction;
@@ -90,6 +93,7 @@ import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.graphql.binding.resolver.output.GraphQLUnionBuilder;
 
 /**
  * Internal class that does the actual resolving of types.
@@ -157,6 +161,7 @@ public class InternalGraphQLSchemaBuilder
 		typeResolvers.add(new ScalarResolver());
 
 		typeResolvers.add(new InterfaceResolver());
+		typeResolvers.add(new UnionResolver());
 
 		typeResolvers.add(new EnumResolver());
 
@@ -407,9 +412,10 @@ public class InternalGraphQLSchemaBuilder
 		InterfaceAndUnionConversion interfacesAndUnions = new InterfaceAndUnionConversion();
 		for(Class<?> type : types)
 		{
-			if(type.isAnnotationPresent(GraphQLInterface.class))
+			if(type.isAnnotationPresent(GraphQLInterface.class)
+				|| type.isAnnotationPresent(GraphQLUnion.class))
 			{
-				interfacesAndUnions.trackUnionOrInterface(type);
+				interfacesAndUnions.trackUnionOrInterface(Types.reference(type));
 			}
 		}
 
@@ -989,7 +995,7 @@ public class InternalGraphQLSchemaBuilder
 			Set<TypeRef> result = new HashSet<>();
 			for(Class<?> c : types)
 			{
-				if(type.getErasedType().isAssignableFrom(c))
+				if(type.getErasedType().isAssignableFrom(c) && c != type.getErasedType())
 				{
 					result.add(Types.reference(c));
 				}
@@ -1174,6 +1180,12 @@ public class InternalGraphQLSchemaBuilder
 		public GraphQLInterfaceBuilder newInterfaceType()
 		{
 			return new GraphQLInterfaceBuilderImpl(context);
+		}
+
+		@Override
+		public GraphQLUnionBuilder newUnionType()
+		{
+			return new GraphQLUnionBuilderImpl(context);
 		}
 	}
 

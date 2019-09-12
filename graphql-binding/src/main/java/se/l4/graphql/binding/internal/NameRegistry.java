@@ -44,9 +44,10 @@ public class NameRegistry
 		TypeRef... refs
 	)
 	{
-		if(hasName(name))
+		Breadcrumb currentCrumb = typeReverseNames.get(name);
+		if(currentCrumb != null)
 		{
-			throw new GraphQLMappingException("Name `" + name + "` has already been reserved");
+			throw new GraphQLMappingException("Name `" + name + "` has already been reserved " + currentCrumb.getLocation());
 		}
 
 		typeReverseNames.put(name, crumb);

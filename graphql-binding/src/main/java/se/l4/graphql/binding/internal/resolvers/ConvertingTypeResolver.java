@@ -54,6 +54,16 @@ public class ConvertingTypeResolver<I, O>
 		this.typeParameterInferrer = type.getTypeParameterInferrer(to);
 	}
 
+	public TypeRef getFrom()
+	{
+		return from;
+	}
+
+	public TypeRef getTo()
+	{
+		return to;
+	}
+
 	@Override
 	public boolean supportsOutput(TypeRef type)
 	{

@@ -1,8 +1,7 @@
 package se.l4.graphql.binding.internal.resolvers;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputType;
@@ -20,13 +19,13 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 /**
  * Resolver for a list.
  */
-public class ListResolver
+public class IterableResolver
 	implements GraphQLOutputResolver, GraphQLInputResolver
 {
 	@Override
 	public boolean supportsOutput(TypeRef type)
 	{
-		return Collection.class.isAssignableFrom(type.getErasedType());
+		return Iterable.class.isAssignableFrom(type.getErasedType());
 	}
 
 	@Override
@@ -35,7 +34,9 @@ public class ListResolver
 	{
 		GraphQLResolverContext context = encounter.getContext();
 
-		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType().getTypeParameter(0)
+		ResolvedGraphQLType<? extends GraphQLOutputType> componentType = encounter.getType()
+			.findInterface(Iterable.class)
+			.get().getTypeParameter(0)
 			.map(context::resolveOutput)
 			.orElseThrow(() -> context.newError(
 				"Could not resolve a GraphQL type for `" + encounter.getType().toTypeName() + "`"
@@ -72,11 +73,11 @@ public class ListResolver
 	@Override
 	public String toString()
 	{
-		return "Collection";
+		return "Iterable";
 	}
 
 	private static class ListConverter<I, O>
-		implements DataFetchingConversion<Collection<I>, Collection<O>>
+		implements DataFetchingConversion<Iterable<I>, Iterable<O>>
 	{
 		private final DataFetchingConversion<I, O> conversion;
 
@@ -86,13 +87,16 @@ public class ListResolver
 		}
 
 		@Override
-		public Collection<O> convert(DataFetchingEnvironment env, Collection<I> object)
+		public Iterable<O> convert(DataFetchingEnvironment env, Iterable<I> object)
 		{
 			if(object == null) return null;
 
-			return object.stream()
-				.map(item -> conversion.convert(env, item))
-				.collect(Collectors.toList());
+			List<O> result = new ArrayList<>();
+			for(I item : object)
+			{
+				result.add(conversion.convert(env, item));
+			}
+			return result;
 		}
 	}
 }

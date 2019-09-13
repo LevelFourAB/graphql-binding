@@ -62,7 +62,7 @@ import se.l4.graphql.binding.internal.resolvers.ConvertingTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.EnumResolver;
 import se.l4.graphql.binding.internal.resolvers.InputObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.InterfaceResolver;
-import se.l4.graphql.binding.internal.resolvers.ListResolver;
+import se.l4.graphql.binding.internal.resolvers.IterableResolver;
 import se.l4.graphql.binding.internal.resolvers.ObjectTypeResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalDoubleResolver;
 import se.l4.graphql.binding.internal.resolvers.OptionalIntResolver;
@@ -154,24 +154,6 @@ public class InternalGraphQLSchemaBuilder
 
 		registerBuiltin(Scalars.GraphQLBigInteger, BigInteger.class);
 		registerBuiltin(Scalars.GraphQLBigDecimal, BigDecimal.class);
-
-		// Register some default type converters
-		typeResolvers.add(new InputObjectTypeResolver());
-		typeResolvers.add(new ObjectTypeResolver());
-		typeResolvers.add(new ScalarResolver());
-
-		typeResolvers.add(new InterfaceResolver());
-		typeResolvers.add(new UnionResolver());
-
-		typeResolvers.add(new EnumResolver());
-
-		typeResolvers.add(new ListResolver());
-		typeResolvers.add(new ArrayResolver());
-
-		typeResolvers.add(new OptionalResolver());
-		typeResolvers.add(new OptionalIntResolver());
-		typeResolvers.add(new OptionalLongResolver());
-		typeResolvers.add(new OptionalDoubleResolver());
 
 		// Register default parameters
 		parameterResolvers.put(GraphQLEnvironment.class, new GraphQLEnvironmentParameterResolver());
@@ -405,6 +387,16 @@ public class InternalGraphQLSchemaBuilder
 			codeRegistryBuilder
 		);
 
+		// Register the default resolvers that can work on any type using annotations
+		typeResolvers.add(new InputObjectTypeResolver());
+		typeResolvers.add(new ObjectTypeResolver());
+		typeResolvers.add(new ScalarResolver());
+
+		typeResolvers.add(new InterfaceResolver());
+		typeResolvers.add(new UnionResolver());
+
+		typeResolvers.add(new EnumResolver());
+
 		/*
 		 * Find all the interfaces and unions we are interested in keeping
 		 * track of conversions for.
@@ -463,6 +455,15 @@ public class InternalGraphQLSchemaBuilder
 				builder.additionalType(input.getGraphQLType());
 			}
 		}
+
+		// Register some default type converters that use types to work
+		typeResolvers.add(new IterableResolver());
+		typeResolvers.add(new ArrayResolver());
+
+		typeResolvers.add(new OptionalResolver());
+		typeResolvers.add(new OptionalIntResolver());
+		typeResolvers.add(new OptionalLongResolver());
+		typeResolvers.add(new OptionalDoubleResolver());
 
 		// Build the root type
 		builder.query(buildRootQuery(ctx));

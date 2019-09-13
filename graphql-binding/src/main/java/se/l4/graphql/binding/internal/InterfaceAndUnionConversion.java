@@ -1,9 +1,14 @@
 package se.l4.graphql.binding.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLOutputType;
@@ -13,7 +18,7 @@ import se.l4.commons.types.matching.TypeMatchingHashMap;
 import se.l4.commons.types.matching.TypeMatchingMap;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
-import se.l4.graphql.binding.internal.factory.Factory;
+import se.l4.graphql.binding.annotations.GraphQLConvertFrom;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
@@ -26,7 +31,7 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
  */
 public class InterfaceAndUnionConversion
 {
-	private final TypeMatchingMap<Set<Factory<?, ?>>> types;
+	private final TypeMatchingMap<Set<TrackedConversion>> types;
 
 	public InterfaceAndUnionConversion()
 	{
@@ -38,16 +43,16 @@ public class InterfaceAndUnionConversion
 		types.put(type, new HashSet<>());
 	}
 
-	public void addFactory(Factory<?, ?> factory)
+	public void add(TypeRef input, TypeRef output, DataFetchingConversion<?, ?> conversion)
 	{
-		List<MatchedTypeRef<Set<Factory<?, ?>>>> mappingTo = types.getAll(factory.getOutput());
-		for(MatchedTypeRef<Set<Factory<?, ?>>> m : mappingTo)
+		List<MatchedTypeRef<Set<TrackedConversion>>> mappingTo = types.getAll(output);
+		for(MatchedTypeRef<Set<TrackedConversion>> m : mappingTo)
 		{
 			/*
 			 * For every interface or union we are part of add the
 			 * type that can be converted into this GraphQL type.
 			 */
-			m.getData().add(factory);
+			m.getData().add(new TrackedConversion(input, output, conversion));
 		}
 	}
 
@@ -61,43 +66,103 @@ public class InterfaceAndUnionConversion
 	{
 		List<GraphQLOutputResolver> result = new ArrayList<>();
 
-		for(MatchedTypeRef<Set<Factory<?, ?>>> type : types.entries())
+		for(MatchedTypeRef<Set<TrackedConversion>> abstractType : types.entries())
 		{
-			// Figure out what interfaces are shared between all the factories
-			Set<TypeRef> sharedInterfaces = null;
-			for(Factory<?, ?> factory : type.getData())
+			// Build up a list of the types that can be converted into type
+			List<TypeRef> types = new ArrayList<>();
+
+			Optional<GraphQLConvertFrom> convertFrom = abstractType.getType()
+				.getAnnotation(GraphQLConvertFrom.class);
+
+			if(convertFrom.isPresent())
 			{
-				Set<TypeRef> interfaces = new HashSet<>();
-				factory.getInput().visitHierarchy(t -> {
-					if(t.isInterface())
-					{
-						interfaces.add(t.withoutUsage());
-					}
-
-					return true;
-				});
-
-				if(sharedInterfaces == null)
+				for(Class<?> c : convertFrom.get().value())
 				{
-					sharedInterfaces = interfaces;
+					types.add(Types.reference(c));
 				}
-				else
+			}
+
+			// Check which conversions fit what type
+			Multimap<TypeRef, TrackedConversion>  conversions = HashMultimap.create();
+
+			for(TrackedConversion conversion : abstractType.getData())
+			{
+				for(TypeRef type : types)
 				{
-					sharedInterfaces.retainAll(interfaces);
+					if(type.isAssignableFrom(conversion.input))
+					{
+						conversions.put(type, conversion);
+					}
 				}
 			}
 
 			// Register a resolver for every interface
-			if(sharedInterfaces != null)
+			for(TypeRef interfaceType : types)
 			{
-				for(TypeRef interfaceType : sharedInterfaces)
-				{
-					result.add(new Resolver(interfaceType, type.getType(), type.getData()));
-				}
+				result.add(new Resolver(
+					interfaceType,
+					abstractType.getType(),
+					conversions.get(interfaceType)
+				));
 			}
 		}
 
 		return result;
+	}
+
+	private static class TrackedConversion
+	{
+		private final TypeRef input;
+		private final TypeRef output;
+		private final DataFetchingConversion<?, ?> conversion;
+
+		public TrackedConversion(
+			TypeRef input,
+			TypeRef output,
+			DataFetchingConversion<?, ?> conversion
+		)
+		{
+			this.input = input.withoutUsage();
+			this.output = output.withoutUsage();
+			this.conversion = conversion;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((conversion == null) ? 0 : conversion.hashCode());
+			result = prime * result + ((input == null) ? 0 : input.hashCode());
+			result = prime * result + ((output == null) ? 0 : output.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TrackedConversion other = (TrackedConversion) obj;
+			if (conversion == null) {
+				if (other.conversion != null)
+					return false;
+			} else if (!conversion.equals(other.conversion))
+				return false;
+			if (input == null) {
+				if (other.input != null)
+					return false;
+			} else if (!input.equals(other.input))
+				return false;
+			if (output == null) {
+				if (other.output != null)
+					return false;
+			} else if (!output.equals(other.output))
+				return false;
+			return true;
+		}
 	}
 
 	private static class Resolver
@@ -105,18 +170,18 @@ public class InterfaceAndUnionConversion
 	{
 		private final TypeRef interfaceType;
 		private final TypeRef graphQLType;
-		private final Factory<?, ?>[] factories;
+		private final TrackedConversion[] conversions;
 
 		public Resolver(
 			TypeRef interfaceType,
 			TypeRef graphQLType,
-			Set<Factory<?, ?>> factories
+			Collection<TrackedConversion> conversions
 		)
 		{
 			this.interfaceType = interfaceType;
 			this.graphQLType = graphQLType;
 
-			this.factories = factories.toArray(new Factory[factories.size()]);
+			this.conversions = conversions.toArray(new TrackedConversion[conversions.size()]);
 		}
 
 		@Override
@@ -132,7 +197,7 @@ public class InterfaceAndUnionConversion
 		{
 			GraphQLResolverContext context = encounter.getContext();
 			return context.resolveOutput(graphQLType)
-				.withOutputConversion(new FactoryConverter(factories));
+				.withOutputConversion(new FactoryConverter(conversions));
 		}
 
 		@Override
@@ -146,11 +211,11 @@ public class InterfaceAndUnionConversion
 	private static class FactoryConverter
 		implements DataFetchingConversion<Object, Object>
 	{
-		private final Factory[] factories;
+		private final TrackedConversion[] conversions;
 
-		public FactoryConverter(Factory[] factories)
+		public FactoryConverter(TrackedConversion[] conversions)
 		{
-			this.factories = factories;
+			this.conversions = conversions;
 		}
 
 		@Override
@@ -159,11 +224,11 @@ public class InterfaceAndUnionConversion
 			if(object == null) return null;
 
 			TypeRef objectType = Types.reference(object.getClass());
-			for(Factory factory : factories)
+			for(TrackedConversion c : conversions)
 			{
-				if(factory.getInput().isAssignableFrom(objectType))
+				if(c.input.isAssignableFrom(objectType))
 				{
-					return factory.convert(environment, object);
+					return ((DataFetchingConversion) c.conversion).convert(environment, object);
 				}
 			}
 

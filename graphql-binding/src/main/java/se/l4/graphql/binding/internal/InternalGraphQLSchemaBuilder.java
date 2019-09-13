@@ -435,7 +435,7 @@ public class InternalGraphQLSchemaBuilder
 					));
 
 					// Track this factory - for automatic interface and union conversion
-					interfacesAndUnions.addFactory(factory);
+					interfacesAndUnions.add(factory.getInput(), factory.getOutput(), factory);
 				}
 			});
 		}

@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLConvertFrom;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
@@ -121,6 +122,7 @@ public class InterfaceConversionTest
 
 
 	@GraphQLInterface
+	@GraphQLConvertFrom(TestInterface.class)
 	public interface GraphQLOverTestInterface
 	{
 		@GraphQLField

@@ -438,6 +438,15 @@ public class InternalGraphQLSchemaBuilder
 			typeResolvers.add(resolver);
 		}
 
+		// Register some default type converters that use types to work
+		typeResolvers.add(new IterableResolver());
+		typeResolvers.add(new ArrayResolver());
+
+		typeResolvers.add(new OptionalResolver());
+		typeResolvers.add(new OptionalIntResolver());
+		typeResolvers.add(new OptionalLongResolver());
+		typeResolvers.add(new OptionalDoubleResolver());
+
 		// Resolve all of the known types
 		for(Class<?> type : types)
 		{
@@ -455,15 +464,6 @@ public class InternalGraphQLSchemaBuilder
 				builder.additionalType(input.getGraphQLType());
 			}
 		}
-
-		// Register some default type converters that use types to work
-		typeResolvers.add(new IterableResolver());
-		typeResolvers.add(new ArrayResolver());
-
-		typeResolvers.add(new OptionalResolver());
-		typeResolvers.add(new OptionalIntResolver());
-		typeResolvers.add(new OptionalLongResolver());
-		typeResolvers.add(new OptionalDoubleResolver());
 
 		// Build the root type
 		builder.query(buildRootQuery(ctx));

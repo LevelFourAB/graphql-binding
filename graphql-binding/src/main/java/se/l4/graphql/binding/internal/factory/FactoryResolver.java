@@ -207,6 +207,8 @@ public class FactoryResolver
 		@Override
 		public Object convert(DataFetchingEnvironment env, Object source)
 		{
+			if(source == null) return null;
+
 			Object[] args = Arrays.stream(parameterSuppliers)
 				.map(supplier -> {
 					if(supplier == null)

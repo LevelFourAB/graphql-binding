@@ -18,5 +18,7 @@ jobs:
       run: mvn compile --file pom.xml
     - name: Test
       run: mvn test --file pom.xml
+    - name: SonarCloud
+      run: mvn verify sonar:sonar -Dsonar.projectKey=LevelFourAB_graphql-binding -Dsonar.organization=levelfourab -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
     - name: Package
       run: mvn -Prelease -DskipTests package --file pom.xml

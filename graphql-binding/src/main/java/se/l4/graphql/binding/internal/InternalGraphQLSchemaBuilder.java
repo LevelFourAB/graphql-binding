@@ -1180,7 +1180,10 @@ public class InternalGraphQLSchemaBuilder
 		@Override
 		public GraphQLInterfaceBuilder newInterfaceType()
 		{
-			return new GraphQLInterfaceBuilderImpl(context);
+			return new GraphQLInterfaceBuilderImpl(
+				objectMixins,
+				context
+			);
 		}
 
 		@Override

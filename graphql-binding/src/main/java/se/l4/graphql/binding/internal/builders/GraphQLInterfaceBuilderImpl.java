@@ -1,6 +1,7 @@
 package se.l4.graphql.binding.internal.builders;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import graphql.TypeResolutionEnvironment;
@@ -15,25 +16,31 @@ import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
+import se.l4.graphql.binding.resolver.output.GraphQLObjectMixinEncounter;
 
 public class GraphQLInterfaceBuilderImpl
 	implements GraphQLInterfaceBuilder
 {
 	private final GraphQLResolverContext context;
+	private final List<GraphQLObjectMixin> mixins;
 
 	private final GraphQLInterfaceType.Builder builder;
 
 	private final Set<String> fields;
 	private final ClassMatchingMap<Object, String> implementations;
 
+	private TypeRef type;
 	private Breadcrumb breadcrumb;
 
 	private String name;
 
 	public GraphQLInterfaceBuilderImpl(
+		List<GraphQLObjectMixin> mixins,
 		GraphQLResolverContext context
 	)
 	{
+		this.mixins = mixins;
 		this.context = context;
 
 		breadcrumb = Breadcrumb.empty();
@@ -46,6 +53,7 @@ public class GraphQLInterfaceBuilderImpl
 	@Override
 	public GraphQLInterfaceBuilder over(TypeRef type)
 	{
+		this.type = type;
 		this.breadcrumb = Breadcrumb.forType(type);
 
 		this.name = context.requestOutputTypeName(type);
@@ -98,6 +106,38 @@ public class GraphQLInterfaceBuilderImpl
 	@Override
 	public GraphQLInterfaceType build()
 	{
+		if(type != null)
+		{
+			GraphQLObjectMixinEncounter encounter = new GraphQLObjectMixinEncounter()
+			{
+
+				public GraphQLFieldBuilder<?> newField()
+				{
+					return GraphQLInterfaceBuilderImpl.this.newField();
+				}
+
+				@Override
+				public TypeRef getType()
+				{
+					return type;
+				}
+
+				@Override
+				public GraphQLResolverContext getContext()
+				{
+					return context;
+				}
+			};
+
+			for(GraphQLObjectMixin mixin : mixins)
+			{
+				if(mixin.supportsOutputMixin(type))
+				{
+					mixin.mixin(encounter);
+				}
+			}
+		}
+
 		builder.typeResolver(new TypeResolverImpl(implementations));
 		return builder.build();
 	}

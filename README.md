@@ -1,5 +1,8 @@
 # graphql-binding
 
+![Version](https://img.shields.io/maven-central/v/se.l4.commons/commons-base)
+![Dependencies](https://github.com/levelfourab/graphql-binding/workflows/CI/badge.svg)
+
 This is a Java library for binding types and interfaces into GraphQL services
 using annotations for use with [graphql-java](https://github.com/graphql-java/graphql-java).
 
@@ -26,11 +29,28 @@ public class ExampleService {
 * Automatic type discovery using an instance of `TypeFinder`
 * Integration with Dependency Injection via `InstanceFactory`
 
+## License
+
+This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0),
+see the file `LICENSE` and `NOTICE` for details.
+
+## Usage via Maven
+
+This library are available from Maven central:
+
+```xml
+<dependency>
+  <groupId>se.l4.graphql.binding</groupId>
+  <artifactId>grapqhl-binding</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 ## Creating a `GraphQLSchema`
 
 The `GraphQLSchema` for use with other GraphQL Java tooling, such as 
 [graphql-java-servlet](https://github.com/graphql-java-kickstart/graphql-java-servlet) is
-done via the type `GraphQLBinder`.
+created via the type `GraphQLBinder`.
 
 ```java
 GraphQLSchema schema = GraphQLBinder.newBinder()

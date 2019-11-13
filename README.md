@@ -1,6 +1,6 @@
 # graphql-binding
 
-![Version](https://img.shields.io/maven-central/v/se.l4.commons/commons-base)
+![Version](https://img.shields.io/maven-central/v/se.l4.graphql.binding/graphql-binding)
 ![Dependencies](https://github.com/levelfourab/graphql-binding/workflows/CI/badge.svg)
 
 This is a Java library for binding types and interfaces into GraphQL services

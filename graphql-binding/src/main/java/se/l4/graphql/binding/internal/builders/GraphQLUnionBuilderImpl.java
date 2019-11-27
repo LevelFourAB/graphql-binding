@@ -81,7 +81,7 @@ public class GraphQLUnionBuilderImpl
 		{
 			Breadcrumb typeCrumb = Breadcrumb.forType(type);
 			throw context.newError(
-				breadcrumb,
+				typeCrumb,
 				"Possible types in a union must resolve to an object type, but `"
 				+ type.toTypeName() + "` resolved to " + output.getClass().getSimpleName()
 			);

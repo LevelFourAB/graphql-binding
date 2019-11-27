@@ -9,6 +9,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
@@ -20,7 +21,7 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
  * Resolver for a list.
  */
 public class IterableResolver
-	implements GraphQLOutputResolver, GraphQLInputResolver
+	implements GraphQLOutputResolver, GraphQLInputResolver, GraphQLDelegatingResolver
 {
 	@Override
 	public boolean supportsOutput(TypeRef type)

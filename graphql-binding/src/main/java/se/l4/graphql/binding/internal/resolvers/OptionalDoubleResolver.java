@@ -5,6 +5,7 @@ import java.util.OptionalDouble;
 import graphql.Scalars;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
+import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
@@ -15,7 +16,7 @@ import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
  * Resolver for {@link OptionalDouble}.
  */
 public class OptionalDoubleResolver
-	implements TypedGraphQLInputResolver, TypedGraphQLOutputResolver
+	implements TypedGraphQLInputResolver, TypedGraphQLOutputResolver, GraphQLDelegatingResolver
 {
 
 	@Override

@@ -77,6 +77,7 @@ import se.l4.graphql.binding.naming.GraphQLNamingFunction;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLConversion;
+import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
 import se.l4.graphql.binding.resolver.GraphQLParameterEncounter;
 import se.l4.graphql.binding.resolver.GraphQLParameterResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
@@ -822,7 +823,7 @@ public class InternalGraphQLSchemaBuilder
 				{
 					try
 					{
-						if(! (resolver instanceof ConvertingTypeResolver))
+						if(! (resolver instanceof GraphQLDelegatingResolver))
 						{
 							/*
 							 * Only keep track of non-converting resolutions.

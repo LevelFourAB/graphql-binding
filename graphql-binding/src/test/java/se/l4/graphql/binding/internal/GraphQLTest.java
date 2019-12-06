@@ -92,6 +92,11 @@ public abstract class GraphQLTest
 			}
 		}
 
+		public <T> T getData()
+		{
+			return result.getData();
+		}
+
 		public <T> T pick(String... path)
 		{
 			return (T) pick((Map) result.getData(), path, 0);

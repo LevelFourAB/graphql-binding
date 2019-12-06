@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLInterfaceType;
@@ -61,7 +62,17 @@ public class ObjectTypeResolver
 		GraphQLObjectBuilder builder = encounter.newObjectType()
 			.over(encounter.getType());
 
-		resolve(encounter.getContext(), type, DEFAULT_FETCHING, builder, GraphQLField.class);
+		GraphQLResolverContext context = encounter.getContext();
+
+		resolve(
+			encounter.getContext(),
+			type,
+			DEFAULT_FETCHING,
+			builder,
+			GraphQLField.class,
+			true,
+			context::resolveOutput
+		);
 
 		return ResolvedGraphQLType.forType(builder.build());
 	}
@@ -72,14 +83,16 @@ public class ObjectTypeResolver
 		TypeRef initialType,
 		DataFetchingSupplier<Object> contextGetter,
 		GraphQLObjectBuilder builder,
-		Class<? extends Annotation> annotation
+		Class<? extends Annotation> annotation,
+		boolean allowInterfaces,
+		Function<TypeRef, ResolvedGraphQLType<? extends GraphQLOutputType>> resolveOutput
 	)
 	{
 		Set<MemberKey> handled = new HashSet<>();
 
 		initialType.visitHierarchy(type -> {
 			// Resolve if this type implements a certain interface
-			if(type.hasAnnotation(GraphQLInterface.class))
+			if(allowInterfaces && type.hasAnnotation(GraphQLInterface.class))
 			{
 				ResolvedGraphQLType<? extends GraphQLOutputType> resolved = context.resolveOutput(type);
 				builder.implement((GraphQLInterfaceType) resolved.getGraphQLType());
@@ -104,7 +117,7 @@ public class ObjectTypeResolver
 						);
 					}
 
-					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(field.getType());
+					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = resolveOutput.apply(field.getType());
 
 					builder.newField()
 						.over(field)
@@ -137,7 +150,7 @@ public class ObjectTypeResolver
 						);
 					}
 
-					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = context.resolveOutput(method.getReturnType());
+					ResolvedGraphQLType<? extends GraphQLOutputType> fieldType = resolveOutput.apply(method.getReturnType());
 
 					GraphQLFieldBuilder<?> fieldBuilder = builder.newField()
 						.over(method)

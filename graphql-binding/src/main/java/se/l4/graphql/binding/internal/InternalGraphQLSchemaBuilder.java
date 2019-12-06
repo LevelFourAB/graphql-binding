@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Defaults;
 
+import org.reactivestreams.Publisher;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLDirective;
@@ -47,6 +49,7 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.annotations.GraphQLSubscription;
 import se.l4.graphql.binding.annotations.GraphQLUnion;
 import se.l4.graphql.binding.internal.builders.GraphQLInterfaceBuilderImpl;
 import se.l4.graphql.binding.internal.builders.GraphQLObjectBuilderImpl;
@@ -340,7 +343,9 @@ public class InternalGraphQLSchemaBuilder
 					typeRef,
 					supplier,
 					builder,
-					GraphQLField.class
+					GraphQLField.class,
+					false,
+					ctx::resolveOutput
 				);
 			});
 		}
@@ -370,7 +375,56 @@ public class InternalGraphQLSchemaBuilder
 					typeRef,
 					supplier,
 					builder,
-					GraphQLMutation.class
+					GraphQLMutation.class,
+					false,
+					ctx::resolveOutput
+				);
+			});
+		}
+
+		return builder.build();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private GraphQLObjectType buildSubscription(ResolverContextImpl ctx)
+	{
+		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
+			Collections.emptyList(),
+			ctx,
+			ctx.codeRegistryBuilder
+		);
+
+		builder.setName("Subscription");
+
+		Function<TypeRef, ResolvedGraphQLType<? extends GraphQLOutputType>> resolveOutput =
+			type -> {
+				Optional<TypeRef> reactivePublisher = type.findInterface(Publisher.class);
+				if(reactivePublisher.isPresent())
+				{
+					TypeRef actualType = reactivePublisher.get()
+						.getTypeParameter(0).get();
+					return ctx.resolveOutput(actualType);
+				}
+				else
+				{
+					throw ctx.newError("Subscriptions must return a Publisher");
+				}
+			};
+
+		for(Map.Entry<Class<?>, DataFetchingSupplier<?>> e : rootTypes.entrySet())
+		{
+			DataFetchingSupplier supplier = e.getValue();
+			TypeRef typeRef = Types.reference(e.getKey());
+
+			ctx.breadcrumb(Breadcrumb.forType(typeRef), () -> {
+				ObjectTypeResolver.resolve(
+					ctx,
+					typeRef,
+					supplier,
+					builder,
+					GraphQLSubscription.class,
+					false,
+					resolveOutput
 				);
 			});
 		}
@@ -471,6 +525,9 @@ public class InternalGraphQLSchemaBuilder
 
 		// Build the mutation type
 		builder.mutation(buildMutation(ctx));
+
+		// Build the subscription type
+		builder.subscription(buildSubscription(ctx));
 
 		return builder.codeRegistry(codeRegistryBuilder.build())
 			.build();

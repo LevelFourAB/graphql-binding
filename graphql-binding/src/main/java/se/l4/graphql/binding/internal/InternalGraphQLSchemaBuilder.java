@@ -796,29 +796,28 @@ public class InternalGraphQLSchemaBuilder
 			{
 				graphQLType = builtOutputTypes.get(withoutUsage);
 			}
+			else if(outputsBeingResolved.contains(withoutUsage))
+			{
+				/*
+				 * This type is already being resolved, return a type
+				 * reference with a pending conversion.
+				 */
+
+				String name = getOutputTypeName(withoutUsage)
+					.orElseThrow(() ->  newError(
+						"Could not resolve name for type " + type.toTypeName()
+						+ ", during recursive resolution. Try reserving a "
+						+ "name the name earlier in your resolver"
+					));
+
+				PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions
+					.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
+
+				graphQLType = ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
+					.withOutputConversion(pending);
+			}
 			else
 			{
-				if(outputsBeingResolved.contains(withoutUsage))
-				{
-					/*
-					 * This type is already being resolved, return a type
-					 * reference with a pending conversion.
-					 */
-
-					String name = getOutputTypeName(withoutUsage)
-						.orElseThrow(() ->  newError(
-							"Could not resolve name for type " + type.toTypeName()
-							+ ", during recursive resolution. Try reserving a "
-							+ "name the name earlier in your resolver"
-						));
-
-					PendingDataFetchingConversion<?, ?> pending = pendingOutputConversions
-						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
-
-					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
-						.withOutputConversion(pending);
-				}
-
 				for(GraphQLOutputResolver resolver : typeResolvers.getOutputResolver(type))
 				{
 					try
@@ -904,29 +903,28 @@ public class InternalGraphQLSchemaBuilder
 			{
 				graphQLType = builtInputTypes.get(withoutUsage);
 			}
+			else if(inputsBeingResolved.contains(withoutUsage))
+			{
+				/*
+					* This type is already being resolved, return a type
+					* reference with a pending conversion.
+					*/
+
+				String name = getOutputTypeName(withoutUsage)
+					.orElseThrow(() ->  newError(
+						"Could not resolve name for type " + type.toTypeName()
+						+ ", during recursive resolution. Try reserving a "
+						+ "name the name earlier in your resolver"
+					));
+
+				PendingDataFetchingConversion<?, ?> pending = pendingInputConversions
+					.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
+
+				graphQLType = ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
+					.withInputConversion(pending);
+			}
 			else
 			{
-				if(inputsBeingResolved.contains(withoutUsage))
-				{
-					/*
-					 * This type is already being resolved, return a type
-					 * reference with a pending conversion.
-					 */
-
-					String name = getOutputTypeName(withoutUsage)
-						.orElseThrow(() ->  newError(
-							"Could not resolve name for type " + type.toTypeName()
-							+ ", during recursive resolution. Try reserving a "
-							+ "name the name earlier in your resolver"
-						));
-
-					PendingDataFetchingConversion<?, ?> pending = pendingInputConversions
-						.computeIfAbsent(withoutUsage, (key) -> new PendingDataFetchingConversion<>());
-
-					return ResolvedGraphQLType.forType(GraphQLTypeReference.typeRef(name))
-						.withInputConversion(pending);
-				}
-
 				for(GraphQLInputResolver resolver : typeResolvers.getInputResolver(type))
 				{
 					try

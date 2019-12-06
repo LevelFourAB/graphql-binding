@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -32,6 +33,14 @@ public class SelfReferencingTypeTest
 	{
 		binder.withRoot(new Root())
 			.withType(ConvertingDirectRef.class);
+	}
+
+	@Test
+	public void testDirectNonNullSchema()
+	{
+		GraphQLObjectType type = schema.getObjectType("DirectRef");
+		GraphQLFieldDefinition def =  type.getFieldDefinition("andNonNull");
+		assertThat(def.getType(), instanceOf(graphql.schema.GraphQLNonNull.class));
 	}
 
 	@Test
@@ -61,6 +70,15 @@ public class SelfReferencingTypeTest
 			.getType();
 
 		assertThat(childrenType, is(instanceOf(GraphQLList.class)));
+	}
+
+	@Test
+	public void testIndirectNonNullSchema()
+	{
+		GraphQLObjectType type = schema.getObjectType("IndirectRef");
+		GraphQLFieldDefinition def =  type.getFieldDefinition("childrenNonNull");
+		GraphQLList listType = (GraphQLList) def.getType();
+		assertThat(listType.getChildren().get(0), instanceOf(graphql.schema.GraphQLNonNull.class));
 	}
 
 	@Test
@@ -164,6 +182,7 @@ public class SelfReferencingTypeTest
 		}
 
 		@GraphQLField
+		@GraphQLNonNull
 		public String name()
 		{
 			return name;
@@ -171,6 +190,15 @@ public class SelfReferencingTypeTest
 
 		@GraphQLField
 		public DirectRef and(
+			@GraphQLNonNull @GraphQLName("other") String name
+		)
+		{
+			return new DirectRef(this.name + " " + name);
+		}
+
+		@GraphQLField
+		@GraphQLNonNull
+		public DirectRef andNonNull(
 			@GraphQLNonNull @GraphQLName("other") String name
 		)
 		{
@@ -196,6 +224,15 @@ public class SelfReferencingTypeTest
 
 		@GraphQLField
 		public List<IndirectRef> children()
+		{
+			return ImmutableList.of(
+				new IndirectRef(this.name + " 0"),
+				new IndirectRef(this.name + " 1")
+			);
+		}
+
+		@GraphQLField
+		public List<@GraphQLNonNull IndirectRef> childrenNonNull()
 		{
 			return ImmutableList.of(
 				new IndirectRef(this.name + " 0"),

@@ -6,6 +6,7 @@ import java.util.Set;
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLTypeReference;
 import graphql.schema.GraphQLUnionType;
 import graphql.schema.TypeResolver;
 import se.l4.commons.types.matching.ClassMatchingConcurrentHashMap;
@@ -77,7 +78,15 @@ public class GraphQLUnionBuilderImpl
 		ResolvedGraphQLType<? extends GraphQLOutputType> resolved = context.resolveOutput(type);
 		GraphQLOutputType output = resolved.getGraphQLType();
 
-		if(! (output instanceof GraphQLObjectType))
+		if(output instanceof GraphQLObjectType)
+		{
+			builder.possibleType((GraphQLObjectType) output);
+		}
+		else if(output instanceof GraphQLTypeReference)
+		{
+			builder.possibleType((GraphQLTypeReference) output);
+		}
+		else
 		{
 			Breadcrumb typeCrumb = Breadcrumb.forType(type);
 			throw context.newError(
@@ -87,7 +96,6 @@ public class GraphQLUnionBuilderImpl
 			);
 		}
 
-		builder.possibleType((GraphQLObjectType) output);
 		implementations.put(type.getErasedType(),  resolved.getGraphQLType().getName());
 		return this;
 	}

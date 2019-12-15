@@ -78,6 +78,7 @@ import se.l4.graphql.binding.naming.DefaultGraphQLNamingFunction;
 import se.l4.graphql.binding.naming.GraphQLNamingEncounter;
 import se.l4.graphql.binding.naming.GraphQLNamingFunction;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLConversion;
 import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
@@ -403,7 +404,21 @@ public class InternalGraphQLSchemaBuilder
 				{
 					TypeRef actualType = reactivePublisher.get()
 						.getTypeParameter(0).get();
-					return ctx.resolveOutput(actualType);
+
+					ResolvedGraphQLType outputType = ctx.resolveOutput(actualType);
+					if(outputType.hasConversion())
+					{
+						/*
+						 * When a subscription has a publisher it requires
+						 * transforming the emitted results.
+						 */
+						DataFetchingConversion<?, ?> conversion = outputType.getConversion();
+						outputType = ResolvedGraphQLType.forType(outputType.getGraphQLType())
+							.withOutputConversion((env, v) -> {
+								return new ConvertingPublisher((Publisher) v, conversion, env);
+							});
+					}
+					return outputType;
 				}
 				else
 				{

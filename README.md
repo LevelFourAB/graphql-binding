@@ -42,7 +42,7 @@ This library are available from Maven central:
 <dependency>
   <groupId>se.l4.graphql.binding</groupId>
   <artifactId>grapqhl-binding</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 

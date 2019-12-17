@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>graphql-binding-base</artifactId>
 		<groupId>se.l4.graphql.binding</groupId>
-		<version>1.2.1</version>
+		<version>1.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 

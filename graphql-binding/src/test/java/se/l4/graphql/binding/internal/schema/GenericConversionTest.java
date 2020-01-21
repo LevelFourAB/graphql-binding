@@ -12,6 +12,7 @@ import org.junit.Test;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNamedType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
@@ -86,7 +87,7 @@ public class GenericConversionTest
 	public void testFactoryConstructorStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("factoryConstructorString").getType();
-		assertThat(inferOutputType.getName(), is("StringGenericViaFactoryConstructor"));
+		assertThat(((GraphQLNamedType) inferOutputType).getName(), is("StringGenericViaFactoryConstructor"));
 	}
 
 	@Test
@@ -102,7 +103,7 @@ public class GenericConversionTest
 	public void testFactoryConstructorWithSimpleStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("factoryConstructorWithSimpleInteger").getType();
-		assertThat(inferOutputType.getName(), is("IntListGenericViaFactoryConstructor"));
+		assertThat(((GraphQLNamedType) inferOutputType).getName(), is("IntListGenericViaFactoryConstructor"));
 	}
 
 	@Test

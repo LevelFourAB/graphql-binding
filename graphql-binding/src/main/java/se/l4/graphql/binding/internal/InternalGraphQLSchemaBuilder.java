@@ -26,6 +26,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLModifiedType;
+import graphql.schema.GraphQLNamedType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
@@ -683,17 +684,32 @@ public class InternalGraphQLSchemaBuilder
 			}
 
 			GraphQLType gqlType = gql.getGraphQLType();
-			if(gqlType instanceof GraphQLList)
+			String suffix = "";
+
+			while(true)
 			{
-				return Optional.of(((GraphQLList) gqlType).getWrappedType().getName() + "List");
+				if(gqlType instanceof GraphQLList)
+				{
+					suffix += "List";
+					gqlType = ((GraphQLModifiedType) gqlType).getWrappedType();
+				}
+				else if(gqlType instanceof GraphQLModifiedType)
+				{
+					gqlType = ((GraphQLModifiedType) gqlType).getWrappedType();
+				}
+				else
+				{
+					break;
+				}
 			}
-			else if(gqlType instanceof GraphQLModifiedType)
+
+			if(gqlType instanceof GraphQLNamedType)
 			{
-				return Optional.of(((GraphQLModifiedType) gqlType).getWrappedType().getName());
+				return Optional.of(((GraphQLNamedType) gqlType).getName() + suffix);
 			}
 			else
 			{
-				return Optional.of(gqlType.getName());
+				return Optional.empty();
 			}
 		}
 
@@ -855,7 +871,10 @@ public class InternalGraphQLSchemaBuilder
 			}
 
 			// Register the name
-			names.reserveNameAllowDuplicate(type, gql.getName());
+			if(gql instanceof GraphQLNamedType)
+			{
+				names.reserveNameAllowDuplicate(type, ((GraphQLNamedType) gql).getName());
+			}
 		}
 
 		@Override

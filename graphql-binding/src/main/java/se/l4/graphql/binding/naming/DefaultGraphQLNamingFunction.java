@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLModifiedType;
+import graphql.schema.GraphQLNamedType;
 import graphql.schema.GraphQLType;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLName;
@@ -50,7 +51,10 @@ public class DefaultGraphQLNamingFunction
 					gql = ((GraphQLModifiedType) gql).getWrappedType();
 				}
 
-				items.add(0, gql.getName());
+				if(gql instanceof GraphQLNamedType)
+				{
+					items.add(0, ((GraphQLNamedType) gql).getName());
+				}
 			}
 		}
 

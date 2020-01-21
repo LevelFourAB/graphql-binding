@@ -78,12 +78,15 @@ public class GraphQLUnionBuilderImpl
 		ResolvedGraphQLType<? extends GraphQLOutputType> resolved = context.resolveOutput(type);
 		GraphQLOutputType output = resolved.getGraphQLType();
 
+		String name;
 		if(output instanceof GraphQLObjectType)
 		{
+			name = ((GraphQLObjectType) output).getName();
 			builder.possibleType((GraphQLObjectType) output);
 		}
 		else if(output instanceof GraphQLTypeReference)
 		{
+			name = ((GraphQLTypeReference) output).getName();
 			builder.possibleType((GraphQLTypeReference) output);
 		}
 		else
@@ -96,7 +99,7 @@ public class GraphQLUnionBuilderImpl
 			);
 		}
 
-		implementations.put(type.getErasedType(),  resolved.getGraphQLType().getName());
+		implementations.put(type.getErasedType(), name);
 		return this;
 	}
 

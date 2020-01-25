@@ -8,6 +8,7 @@ import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.TypeRef;
+import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLName;
@@ -74,10 +75,16 @@ public class EnumResolver
 				.map(a -> a.value())
 				.orElse(null);
 
+			String deprecationReason = field
+				.flatMap(t -> t.getAnnotation(GraphQLDeprecated.class))
+				.map(a -> a.value())
+				.orElse(null);
+
 			builder.value(GraphQLEnumValueDefinition.newEnumValueDefinition()
 				.name(name)
 				.value(constant)
 				.description(description)
+				.deprecationReason(deprecationReason)
 				.build()
 			);
 		}

@@ -5,7 +5,11 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import graphql.Scalars;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInterfaceType;
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLObject;
@@ -19,6 +23,18 @@ public class InterfaceTypeTest
 	{
 		binder.withRoot(new Root())
 			.withType(Impl.class);
+	}
+
+	@Test
+	public void testSchema()
+	{
+		GraphQLInterfaceType type = (GraphQLInterfaceType) schema.getType("Interface");
+
+		GraphQLFieldDefinition nameDef = type.getFieldDefinition("name");
+		assertThat(nameDef.getType(), is(Scalars.GraphQLString));
+
+		GraphQLFieldDefinition lastNameDef = type.getFieldDefinition("lastName");
+		assertThat(lastNameDef.getDeprecationReason(), is("use name instead"));
 	}
 
 	@Test
@@ -59,13 +75,24 @@ public class InterfaceTypeTest
 	{
 		@GraphQLField
 		String name();
+
+		@GraphQLDeprecated("use name instead")
+		@GraphQLField
+		String lastName();
 	}
 
 	@GraphQLObject
 	public class Impl implements Interface
 	{
 		@Override
-		public String name() {
+		public String name()
+		{
+			return "test";
+		}
+
+		@Override
+		public String lastName()
+		{
 			return "test";
 		}
 	}

@@ -3,12 +3,14 @@ package se.l4.graphql.binding.internal.builders;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLOutputType;
 import se.l4.commons.types.reflect.MemberRef;
+import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -65,6 +67,13 @@ public class GraphQLFieldBuilderImpl<Parent>
 		this.name = context.getMemberName(member);
 		this.description = context.getDescription(member);
 		this.annotations = member.getAnnotations();
+
+		Optional<GraphQLDeprecated> deprecated = member.findAnnotation(GraphQLDeprecated.class);
+		if(deprecated.isPresent())
+		{
+			this.setDeprecation(deprecated.get().value());
+		}
+
 		return this;
 	}
 

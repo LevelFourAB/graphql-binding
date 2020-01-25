@@ -5,7 +5,10 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLEnumValueDefinition;
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
@@ -19,6 +22,15 @@ public class EnumTypeTest
 	protected void setup(GraphQLBinder binder)
 	{
 		binder.withRoot(new Root());
+	}
+
+	@Test
+	public void testSchema()
+	{
+		GraphQLEnumType type = (GraphQLEnumType) schema.getType("TestEnum");
+
+		GraphQLEnumValueDefinition def = type.getValue("DEPRECATED");
+		assertThat(def.getDeprecationReason(), is(""));
 	}
 
 	@Test
@@ -77,6 +89,9 @@ public class EnumTypeTest
 		VALUE,
 
 		@GraphQLName("ValueWithName")
-		VALUE_WITH_NAME;
+		VALUE_WITH_NAME,
+
+		@GraphQLDeprecated
+		DEPRECATED;
 	}
 }

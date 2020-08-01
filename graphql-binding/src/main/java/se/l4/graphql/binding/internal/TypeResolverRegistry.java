@@ -3,10 +3,10 @@ package se.l4.graphql.binding.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Registry for keeping track of and finding resolvers for both input and

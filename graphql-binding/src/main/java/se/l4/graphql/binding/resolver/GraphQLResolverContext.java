@@ -8,14 +8,14 @@ import java.util.function.Supplier;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.InstanceFactory;
-import se.l4.commons.types.conversion.TypeConverter;
-import se.l4.commons.types.reflect.Annotated;
-import se.l4.commons.types.reflect.MemberRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResult;
+import se.l4.ylem.types.conversion.TypeConverter;
+import se.l4.ylem.types.instances.InstanceFactory;
+import se.l4.ylem.types.reflect.Annotated;
+import se.l4.ylem.types.reflect.MemberRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Context passed to bindings to perform mapping.
@@ -233,7 +233,7 @@ public interface GraphQLResolverContext
 	 * @return
 	 */
 	GraphQLDirectiveFieldResult applyFieldDirectives(
-		Annotation[] annotations,
+		Iterable<? extends Annotation> annotations,
 		GraphQLFieldDefinition field,
 		DataFetchingSupplier<?> supplier
 	);
@@ -247,7 +247,7 @@ public interface GraphQLResolverContext
 	 * @return
 	 */
 	Optional<DataFetchingSupplier<?>> resolveSupplier(
-		Annotation[] annotations,
+		Iterable<? extends Annotation> annotations,
 		TypeRef type
 	);
 }

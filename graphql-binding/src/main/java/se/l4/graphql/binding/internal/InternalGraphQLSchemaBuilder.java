@@ -15,8 +15,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.google.common.base.Defaults;
-
+import org.eclipse.collections.api.factory.Lists;
 import org.reactivestreams.Publisher;
 
 import graphql.Scalars;
@@ -33,15 +32,6 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
-import se.l4.commons.types.DefaultInstanceFactory;
-import se.l4.commons.types.InstanceFactory;
-import se.l4.commons.types.Types;
-import se.l4.commons.types.conversion.StandardTypeConverter;
-import se.l4.commons.types.conversion.TypeConverter;
-import se.l4.commons.types.reflect.Annotated;
-import se.l4.commons.types.reflect.MemberRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLContext;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
@@ -100,6 +90,15 @@ import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLUnionBuilder;
+import se.l4.ylem.types.conversion.StandardTypeConverter;
+import se.l4.ylem.types.conversion.TypeConverter;
+import se.l4.ylem.types.instances.DefaultInstanceFactory;
+import se.l4.ylem.types.instances.InstanceFactory;
+import se.l4.ylem.types.reflect.Annotated;
+import se.l4.ylem.types.reflect.MemberRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.Types;
 
 /**
  * Internal class that does the actual resolving of types.
@@ -180,7 +179,7 @@ public class InternalGraphQLSchemaBuilder
 
 		for(TypeRef type : types)
 		{
-			Object defaultValue = Defaults.defaultValue(type.getErasedType());
+			Object defaultValue = Types.defaultValue(type.getErasedType());
 			ResolvedGraphQLType<?> withDefault = resolved.withDefaultValue(env -> defaultValue);
 
 			builtOutputTypes.put(type, (ResolvedGraphQLType) withDefault);
@@ -1101,7 +1100,7 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		@SuppressWarnings({ "unchecked" })
-		private <T extends Annotation> Optional<T> findMetaAnnotation(Annotation[] annotations, Class<T> annotation)
+		private <T extends Annotation> Optional<T> findMetaAnnotation(Iterable<? extends Annotation> annotations, Class<T> annotation)
 		{
 			for(Annotation a : annotations)
 			{
@@ -1127,7 +1126,7 @@ public class InternalGraphQLSchemaBuilder
 
 				// Look one step deeper for the annotation
 				Optional<T> result = findMetaAnnotation(
-					a.annotationType().getAnnotations(),
+					Lists.immutable.of(a.annotationType().getAnnotations()),
 					annotation
 				);
 				cached.put(annotation, result.orElse(null));
@@ -1144,7 +1143,7 @@ public class InternalGraphQLSchemaBuilder
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public GraphQLDirectiveFieldResult applyFieldDirectives(
-			Annotation[] annotations,
+			Iterable<? extends Annotation> annotations,
 			GraphQLFieldDefinition field,
 			DataFetchingSupplier<?> supplier
 		)
@@ -1191,7 +1190,7 @@ public class InternalGraphQLSchemaBuilder
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public Optional<DataFetchingSupplier<?>> resolveSupplier(Annotation[] annotations, TypeRef type)
+		public Optional<DataFetchingSupplier<?>> resolveSupplier(Iterable<? extends Annotation> annotations, TypeRef type)
 		{
 			for(Map.Entry<Class<? extends Annotation>, GraphQLParameterResolver<?>> e : parameterResolvers.entrySet())
 			{

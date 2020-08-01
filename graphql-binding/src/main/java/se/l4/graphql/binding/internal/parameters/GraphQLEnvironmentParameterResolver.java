@@ -4,12 +4,12 @@ import graphql.cachecontrol.CacheControl;
 import graphql.execution.directives.QueryDirectives;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingFieldSelectionSet;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLEnvironment;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLParameterEncounter;
 import se.l4.graphql.binding.resolver.GraphQLParameterResolver;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver for parameters annotated with {@link GraphQLEnvironment}.

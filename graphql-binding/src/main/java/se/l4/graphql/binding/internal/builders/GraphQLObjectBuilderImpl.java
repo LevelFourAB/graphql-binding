@@ -9,7 +9,6 @@ import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -17,6 +16,7 @@ import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixinEncounter;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class GraphQLObjectBuilderImpl
 	implements GraphQLObjectBuilder

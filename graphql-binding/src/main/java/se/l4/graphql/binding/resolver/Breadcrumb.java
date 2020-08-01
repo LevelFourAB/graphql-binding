@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.resolver;
 
-import se.l4.commons.types.reflect.MemberRef;
-import se.l4.commons.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.MemberRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Breadcrumb used when resolving types to make error messages nicer.

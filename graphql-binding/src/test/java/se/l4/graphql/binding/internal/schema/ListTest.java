@@ -1,11 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
@@ -82,26 +80,26 @@ public class ListTest
 		@GraphQLField
 		public List<String> outputString()
 		{
-			return ImmutableList.of("one", "two");
+			return List.of("one", "two");
 		}
 
 		@GraphQLField
 		@GraphQLNonNull
 		public List<String> outputStringNonNull()
 		{
-			return ImmutableList.of("one", "two");
+			return List.of("one", "two");
 		}
 
 		@GraphQLField
 		public List<@GraphQLNonNull String> outputStringNonNullItems()
 		{
-			return ImmutableList.of("one", "two");
+			return List.of("one", "two");
 		}
 
 		@GraphQLField
 		public List<Sub> outputSub()
 		{
-			return ImmutableList.of(
+			return List.of(
 				new Sub("one"),
 				new Sub("two")
 			);

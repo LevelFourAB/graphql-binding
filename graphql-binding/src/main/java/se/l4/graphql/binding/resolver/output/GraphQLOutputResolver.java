@@ -2,9 +2,9 @@ package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver responsible for creating a {@link GraphQLOutputType} for a certain

@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver for {@link Optional}.

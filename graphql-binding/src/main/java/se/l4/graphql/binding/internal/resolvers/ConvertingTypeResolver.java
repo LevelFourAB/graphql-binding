@@ -3,9 +3,6 @@ package se.l4.graphql.binding.internal.resolvers;
 import java.util.Optional;
 
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.Types;
-import se.l4.commons.types.reflect.TypeInferrer;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.internal.factory.Factory;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
 import se.l4.graphql.binding.resolver.GraphQLDelegatingResolver;
@@ -13,6 +10,9 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.reflect.TypeInferrer;
+import se.l4.ylem.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.Types;
 
 public class ConvertingTypeResolver<I, O>
 	implements GraphQLOutputResolver, GraphQLDelegatingResolver

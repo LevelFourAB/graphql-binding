@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.resolver.input;
 
 import graphql.schema.GraphQLInputType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver responsible for creating a {@link GraphQLInputType} for a certain

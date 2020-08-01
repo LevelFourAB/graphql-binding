@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class MutationTest
 	public void testScalarMutation()
 	{
 		Result result = execute("mutation($in: String) { mutateWithScalar(input: $in) }",
-			ImmutableMap.of("in", "test")
+			Map.of("in", "test")
 		);
 
 		result.assertNoErrors();

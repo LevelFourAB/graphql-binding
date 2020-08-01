@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLInputType;
-import se.l4.commons.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.ParameterRef;
 
 /**
  * Builder for an argument within a {@link GraphQLFieldBuilder}.

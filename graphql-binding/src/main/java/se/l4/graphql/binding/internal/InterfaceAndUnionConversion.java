@@ -7,16 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.multimap.MutableMultimap;
+import org.eclipse.collections.impl.factory.Multimaps;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.Types;
-import se.l4.commons.types.matching.MatchedTypeRef;
-import se.l4.commons.types.matching.TypeMatchingHashMap;
-import se.l4.commons.types.matching.TypeMatchingMap;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLConvertFrom;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
@@ -24,6 +20,11 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.matching.MatchedTypeRef;
+import se.l4.ylem.types.matching.MutableTypeMatchingMap;
+import se.l4.ylem.types.matching.TypeMatchingUnifiedSetMap;
+import se.l4.ylem.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.Types;
 
 /**
  * Helper for creating conversions between a Java interface and a GraphQL
@@ -31,11 +32,11 @@ import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
  */
 public class InterfaceAndUnionConversion
 {
-	private final TypeMatchingMap<Set<TrackedConversion>> types;
+	private final MutableTypeMatchingMap<Set<TrackedConversion>> types;
 
 	public InterfaceAndUnionConversion()
 	{
-		types = new TypeMatchingHashMap<>();
+		types = new TypeMatchingUnifiedSetMap<>();
 	}
 
 	public void trackUnionOrInterface(TypeRef type)
@@ -45,7 +46,7 @@ public class InterfaceAndUnionConversion
 
 	public void add(TypeRef input, TypeRef output, DataFetchingConversion<?, ?> conversion)
 	{
-		List<MatchedTypeRef<Set<TrackedConversion>>> mappingTo = types.getAll(output);
+		ListIterable<MatchedTypeRef<Set<TrackedConversion>>> mappingTo = types.getAll(output);
 		for(MatchedTypeRef<Set<TrackedConversion>> m : mappingTo)
 		{
 			/*
@@ -83,7 +84,7 @@ public class InterfaceAndUnionConversion
 			}
 
 			// Check which conversions fit what type
-			Multimap<TypeRef, TrackedConversion>  conversions = HashMultimap.create();
+			MutableMultimap<TypeRef, TrackedConversion>  conversions = Multimaps.mutable.set.empty();
 
 			for(TrackedConversion conversion : abstractType.getData())
 			{

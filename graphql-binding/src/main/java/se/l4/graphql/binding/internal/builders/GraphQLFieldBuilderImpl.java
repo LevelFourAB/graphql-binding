@@ -9,7 +9,6 @@ import java.util.function.BiConsumer;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.MemberRef;
 import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
@@ -17,6 +16,7 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveFieldResult;
 import se.l4.graphql.binding.resolver.output.GraphQLArgumentBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
+import se.l4.ylem.types.reflect.MemberRef;
 
 public class GraphQLFieldBuilderImpl<Parent>
 	implements GraphQLFieldBuilder<Parent>
@@ -29,7 +29,7 @@ public class GraphQLFieldBuilderImpl<Parent>
 
 	private String name;
 	private String description;
-	private Annotation[] annotations;
+	private Iterable<? extends Annotation> annotations;
 
 	private boolean isDeprecated;
 	private String deprecationReason;

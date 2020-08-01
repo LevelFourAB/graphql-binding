@@ -2,13 +2,13 @@ package se.l4.graphql.binding.internal.parameters;
 
 import java.util.Optional;
 
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.ContextValue;
 import se.l4.graphql.binding.annotations.GraphQLContext;
 import se.l4.graphql.binding.internal.ContextValueImpl;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLParameterEncounter;
 import se.l4.graphql.binding.resolver.GraphQLParameterResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver for parameters annotated with {@link GraphQLContext}.

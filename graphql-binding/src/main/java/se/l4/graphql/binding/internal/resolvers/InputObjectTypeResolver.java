@@ -11,8 +11,6 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
-import se.l4.commons.types.reflect.FieldRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.internal.datafetchers.FieldInjector;
@@ -24,6 +22,8 @@ import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
+import se.l4.ylem.types.reflect.FieldRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class InputObjectTypeResolver
 	implements GraphQLInputResolver
@@ -94,7 +94,7 @@ public class InputObjectTypeResolver
 		});
 
 		Supplier<Object> supplier = context.getInstanceFactory()
-			.supplier(initialType.getType());
+			.supplier(initialType);
 
 		InputObjectFactory factory = new InputObjectFactory(
 			(env, source) -> supplier.get(),

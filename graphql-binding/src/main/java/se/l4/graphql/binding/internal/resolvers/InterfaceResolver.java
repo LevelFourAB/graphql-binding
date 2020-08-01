@@ -1,15 +1,13 @@
 package se.l4.graphql.binding.internal.resolvers;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.collections.api.list.ListIterable;
+
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.MethodRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.internal.factory.MemberKey;
@@ -21,6 +19,9 @@ import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.reflect.MethodRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class InterfaceResolver
 	implements GraphQLOutputResolver
@@ -71,7 +72,7 @@ public class InterfaceResolver
 					.over(method)
 					.setType(fieldType.getGraphQLType());
 
-				List<ParameterRef> parameters = method.getParameters();
+				ListIterable<ParameterRef> parameters = method.getParameters();
 
 				for(ParameterRef parameter : parameters)
 				{

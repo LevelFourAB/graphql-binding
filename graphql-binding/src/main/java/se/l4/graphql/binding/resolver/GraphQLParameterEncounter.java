@@ -2,7 +2,7 @@ package se.l4.graphql.binding.resolver;
 
 import java.lang.annotation.Annotation;
 
-import se.l4.commons.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Encounter used together with {@link GraphQLParameterResolver}.

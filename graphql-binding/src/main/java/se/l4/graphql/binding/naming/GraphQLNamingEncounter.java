@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.naming;
 
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Encounter used when naming types.

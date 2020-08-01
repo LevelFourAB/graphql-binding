@@ -1,8 +1,8 @@
 package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.MemberRef;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
+import se.l4.ylem.types.reflect.MemberRef;
 
 /**
  * Builder for a field within a GraphQL object.

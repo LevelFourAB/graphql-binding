@@ -8,14 +8,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.eclipse.collections.api.list.ListIterable;
+
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.FieldRef;
-import se.l4.commons.types.reflect.MethodRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLObject;
@@ -32,6 +30,10 @@ import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.reflect.FieldRef;
+import se.l4.ylem.types.reflect.MethodRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Resolver for types annotated with {@link GraphQLObject} that resolve to
@@ -156,7 +158,7 @@ public class ObjectTypeResolver
 						.over(method)
 						.setType(fieldType.getGraphQLType());
 
-					List<ParameterRef> parameters = method.getParameters();
+					ListIterable<ParameterRef> parameters = method.getParameters();
 					List<DataFetchingSupplier<?>> arguments = new ArrayList<>();
 
 					for(ParameterRef parameter : parameters)

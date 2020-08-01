@@ -8,10 +8,10 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLModifiedType;
 import graphql.schema.GraphQLNamedType;
 import graphql.schema.GraphQLType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class DefaultGraphQLNamingFunction
 	implements GraphQLNamingFunction

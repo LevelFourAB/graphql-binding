@@ -2,13 +2,13 @@ package se.l4.graphql.binding.internal.resolvers;
 
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.GraphQLScalarResolver;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.TypedGraphQLOutputResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Custom resolver that is registered whenever a scalar that uses

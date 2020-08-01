@@ -8,9 +8,6 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
-import se.l4.commons.types.matching.ClassMatchingConcurrentHashMap;
-import se.l4.commons.types.matching.ClassMatchingMap;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
@@ -18,6 +15,10 @@ import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLInterfaceBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixinEncounter;
+import se.l4.ylem.types.matching.ClassMatchingConcurrentHashMap;
+import se.l4.ylem.types.matching.ClassMatchingMap;
+import se.l4.ylem.types.matching.MutableClassMatchingMap;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class GraphQLInterfaceBuilderImpl
 	implements GraphQLInterfaceBuilder
@@ -28,7 +29,7 @@ public class GraphQLInterfaceBuilderImpl
 	private final GraphQLInterfaceType.Builder builder;
 
 	private final Set<String> fields;
-	private final ClassMatchingMap<Object, String> implementations;
+	private final MutableClassMatchingMap<Object, String> implementations;
 
 	private TypeRef type;
 	private Breadcrumb breadcrumb;

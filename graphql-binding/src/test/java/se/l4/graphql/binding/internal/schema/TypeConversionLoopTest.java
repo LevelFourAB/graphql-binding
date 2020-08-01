@@ -1,12 +1,10 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
 import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
@@ -71,7 +69,7 @@ public class TypeConversionLoopTest
 		@GraphQLField
 		public List<TypeA> list()
 		{
-			return ImmutableList.of(new TypeA("v0"), new TypeA("v1"));
+			return List.of(new TypeA("v0"), new TypeA("v1"));
 		}
 
 		@GraphQLField

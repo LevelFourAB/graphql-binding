@@ -1,10 +1,10 @@
 package se.l4.graphql.binding;
 
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import graphql.schema.GraphQLSchema;
-import se.l4.commons.types.InstanceFactory;
-import se.l4.commons.types.TypeFinder;
 import se.l4.graphql.binding.annotations.GraphQLAutoRegister;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
@@ -15,6 +15,8 @@ import se.l4.graphql.binding.annotations.GraphQLUnion;
 import se.l4.graphql.binding.internal.InternalGraphQLSchemaBuilder;
 import se.l4.graphql.binding.resolver.GraphQLResolver;
 import se.l4.graphql.binding.resolver.directive.GraphQLDirectiveResolver;
+import se.l4.ylem.types.discovery.TypeDiscovery;
+import se.l4.ylem.types.instances.InstanceFactory;
 
 /**
  * Mapper for taking annotated classes and interfaces and turning them into
@@ -24,50 +26,69 @@ public class GraphQLBinder
 {
 	private final InternalGraphQLSchemaBuilder builder;
 
-	private TypeFinder typeFinder;
+	private TypeDiscovery typeDiscovery;
 
 	private GraphQLBinder()
 	{
 		builder = new InternalGraphQLSchemaBuilder();
 	}
 
+	@NonNull
 	public static GraphQLBinder newBinder()
 	{
 		return new GraphQLBinder();
 	}
 
-	public GraphQLBinder setInstanceFactory(InstanceFactory factory)
+	@NonNull
+	public GraphQLBinder setInstanceFactory(@NonNull InstanceFactory factory)
 	{
+		Objects.requireNonNull(factory);
+
 		builder.setInstanceFactory(factory);
 		return this;
 	}
 
-	public GraphQLBinder setTypeFinder(TypeFinder finder)
+	@NonNull
+	public GraphQLBinder setTypeDiscovery(@NonNull TypeDiscovery discovery)
 	{
-		this.typeFinder = finder;
+		Objects.requireNonNull(discovery);
+
+		this.typeDiscovery = discovery;
 		return this;
 	}
 
-	public GraphQLBinder withType(Class<?> type)
+	@NonNull
+	public GraphQLBinder withType(@NonNull Class<?> type)
 	{
+		Objects.requireNonNull(type);
+
 		builder.addType(type);
 		return this;
 	}
 
-	public GraphQLBinder withResolver(GraphQLResolver resolver)
+	@NonNull
+	public GraphQLBinder withResolver(@NonNull GraphQLResolver resolver)
 	{
+		Objects.requireNonNull(resolver);
+
 		builder.addResolver(resolver);
 		return this;
 	}
 
-	public GraphQLBinder withRoot(Object instance)
+	@NonNull
+	public GraphQLBinder withRoot(@NonNull Object instance)
 	{
+		Objects.requireNonNull(instance);
+
 		builder.addRootType(instance.getClass(), (env) -> instance);
 		return this;
 	}
 
-	public GraphQLBinder withDirective(GraphQLDirectiveResolver<? extends Annotation> directive)
+	@NonNull
+	public GraphQLBinder withDirective(@NonNull GraphQLDirectiveResolver<? extends Annotation> directive)
 	{
+		Objects.requireNonNull(directive);
+
 		builder.addDirective(directive);
 		return this;
 	}
@@ -77,41 +98,42 @@ public class GraphQLBinder
 	 *
 	 * @return
 	 */
+	@NonNull
 	public GraphQLSchema build()
 	{
-		if(typeFinder != null)
+		if(typeDiscovery != null)
 		{
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLObject.class))
+			for(Class<?> c : typeDiscovery.getTypesAnnotatedWith(GraphQLObject.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInputObject.class))
+			for(Class<?> c : typeDiscovery.getTypesAnnotatedWith(GraphQLInputObject.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLEnum.class))
+			for(Class<?> c : typeDiscovery.getTypesAnnotatedWith(GraphQLEnum.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLInterface.class))
+			for(Class<?> c : typeDiscovery.getTypesAnnotatedWith(GraphQLInterface.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Class<?> c : typeFinder.getTypesAnnotatedWith(GraphQLUnion.class))
+			for(Class<?> c : typeDiscovery.getTypesAnnotatedWith(GraphQLUnion.class))
 			{
 				builder.addType(c);
 			}
 
-			for(Object instance : typeFinder.getTypesAnnotatedWithAsInstances(GraphQLRoot.class))
+			for(Object instance : typeDiscovery.getTypesAnnotatedWithAsInstances(GraphQLRoot.class))
 			{
 				builder.addRootType(instance.getClass(), env -> instance);
 			}
 
-			for(Object instance : typeFinder.getTypesAnnotatedWithAsInstances(GraphQLAutoRegister.class))
+			for(Object instance : typeDiscovery.getTypesAnnotatedWithAsInstances(GraphQLAutoRegister.class))
 			{
 				if(instance instanceof GraphQLResolver)
 				{

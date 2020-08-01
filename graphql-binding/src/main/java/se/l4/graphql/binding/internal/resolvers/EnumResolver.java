@@ -6,8 +6,6 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLEnumValueDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.FieldRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLEnum;
@@ -18,6 +16,8 @@ import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.reflect.FieldRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class EnumResolver
 	implements GraphQLOutputResolver, GraphQLInputResolver

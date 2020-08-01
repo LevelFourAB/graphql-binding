@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class AnnotatedScalarTest
 	public void testInputVariables()
 	{
 		Result result = execute("query($id: OpaqueID) { input(id: $id) }",
-			ImmutableMap.of("id", "1234")
+			Map.of("id", "1234")
 		);
 		result.assertNoErrors();
 
@@ -66,7 +66,7 @@ public class AnnotatedScalarTest
 	public void testInputVariablesConverting()
 	{
 		Result result = execute("query($id: OpaqueID) { input(id: $id) }",
-			ImmutableMap.of("id", 1234)
+			Map.of("id", 1234)
 		);
 		result.assertNoErrors();
 

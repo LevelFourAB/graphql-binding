@@ -5,11 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.collections.api.list.ListIterable;
+
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.MethodRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLMixinField;
 import se.l4.graphql.binding.annotations.GraphQLSource;
 import se.l4.graphql.binding.internal.datafetchers.MethodDataFetcher;
@@ -23,6 +22,9 @@ import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLFieldBuilder;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixin;
 import se.l4.graphql.binding.resolver.output.GraphQLObjectMixinEncounter;
+import se.l4.ylem.types.reflect.MethodRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link GraphQLObjectMixin} that wraps a root object
@@ -76,7 +78,7 @@ public class RootObjectMixin
 					);
 				}
 
-				List<ParameterRef> parameters = method.getParameters();
+				ListIterable<ParameterRef> parameters = method.getParameters();
 				if(parameters.isEmpty()
 					|| ! parameters.get(0).hasAnnotation(GraphQLSource.class)
 					|| ! parameters.get(0).getType().getErasedType().isAssignableFrom(erasedType))

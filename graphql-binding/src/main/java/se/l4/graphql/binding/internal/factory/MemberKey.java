@@ -2,8 +2,8 @@ package se.l4.graphql.binding.internal.factory;
 
 import java.util.Arrays;
 
-import se.l4.commons.types.reflect.ExecutableRef;
-import se.l4.commons.types.reflect.MemberRef;
+import se.l4.ylem.types.reflect.ExecutableRef;
+import se.l4.ylem.types.reflect.MemberRef;
 
 /**
  * A key representing a {@link MemberRef}. Use during type resolving to keep

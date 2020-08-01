@@ -5,8 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-
 import org.junit.Test;
 
 import graphql.Scalars;
@@ -164,7 +162,7 @@ public class GenericConversionTest
 		@Override
 		public List<T> convert(DataFetchingEnvironment environment, Generic<T> object)
 		{
-			return ImmutableList.of(object.item);
+			return List.of(object.item);
 		}
 	}
 
@@ -184,7 +182,7 @@ public class GenericConversionTest
 		@Override
 		public List<T> convert(DataFetchingEnvironment environment, GenericNonNull<T> object)
 		{
-			return ImmutableList.of(object.item);
+			return List.of(object.item);
 		}
 	}
 

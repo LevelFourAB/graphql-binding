@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import se.l4.commons.types.reflect.MemberRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.resolver.Breadcrumb;
+import se.l4.ylem.types.reflect.MemberRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class NameRegistry
 {

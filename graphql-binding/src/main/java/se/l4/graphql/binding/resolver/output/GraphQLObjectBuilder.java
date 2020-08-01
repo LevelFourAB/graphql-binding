@@ -2,7 +2,7 @@ package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
-import se.l4.commons.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Builder for creating GraphQL object types.

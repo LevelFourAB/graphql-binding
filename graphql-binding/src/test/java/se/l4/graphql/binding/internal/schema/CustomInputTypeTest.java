@@ -1,12 +1,11 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
 import graphql.Scalars;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
@@ -16,6 +15,7 @@ import se.l4.graphql.binding.internal.GraphQLTest;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.TypedGraphQLInputResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class CustomInputTypeTest
 	extends GraphQLTest

@@ -4,10 +4,10 @@ import java.util.function.Consumer;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
-import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.output.GraphQLArgumentBuilder;
+import se.l4.ylem.types.reflect.ParameterRef;
 
 public class GraphQLArgumentBuilderImpl<Parent>
 	implements GraphQLArgumentBuilder<Parent>

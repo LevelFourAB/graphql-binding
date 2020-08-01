@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -35,8 +35,8 @@ public class InputObjectTypeTest
 	@Test
 	public void testVariable()
 	{
-		Result result = execute("query($in: TestInput) { doStuff(in: $in) }", ImmutableMap.of("in",
-			ImmutableMap.of("name", "test")
+		Result result = execute("query($in: TestInput) { doStuff(in: $in) }", Map.of("in",
+			Map.of("name", "test")
 		));
 		result.assertNoErrors();
 
@@ -55,8 +55,8 @@ public class InputObjectTypeTest
 	@Test
 	public void testSubVariable()
 	{
-		Result result = execute("query($in: TestInput) { doStuff(in: $in) }", ImmutableMap.of("in",
-			ImmutableMap.of("name", "test", "sub", ImmutableMap.of("active", "true"))
+		Result result = execute("query($in: TestInput) { doStuff(in: $in) }", Map.of("in",
+			Map.of("name", "test", "sub", Map.of("active", "true"))
 		));
 		result.assertNoErrors();
 

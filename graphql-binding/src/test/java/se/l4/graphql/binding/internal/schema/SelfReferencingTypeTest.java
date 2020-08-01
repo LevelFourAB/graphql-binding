@@ -2,11 +2,9 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
@@ -225,7 +223,7 @@ public class SelfReferencingTypeTest
 		@GraphQLField
 		public List<IndirectRef> children()
 		{
-			return ImmutableList.of(
+			return List.of(
 				new IndirectRef(this.name + " 0"),
 				new IndirectRef(this.name + " 1")
 			);
@@ -234,7 +232,7 @@ public class SelfReferencingTypeTest
 		@GraphQLField
 		public List<@GraphQLNonNull IndirectRef> childrenNonNull()
 		{
-			return ImmutableList.of(
+			return List.of(
 				new IndirectRef(this.name + " 0"),
 				new IndirectRef(this.name + " 1")
 			);

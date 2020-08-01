@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.internal.factory;
 
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.DataFetchingConversion;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Factory that can create an object based on the current environment and a

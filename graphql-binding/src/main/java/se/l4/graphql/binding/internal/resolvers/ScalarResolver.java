@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.collector.Collectors2;
 
 import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
@@ -26,9 +27,6 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
-import se.l4.commons.types.Types;
-import se.l4.commons.types.conversion.Conversion;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLDescription;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLScalar;
@@ -40,6 +38,9 @@ import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
 import se.l4.graphql.binding.resolver.input.GraphQLInputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
+import se.l4.ylem.types.conversion.Conversion;
+import se.l4.ylem.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.Types;
 
 /**
  * Custom resolver that is registered whenever a scalar that uses
@@ -264,17 +265,17 @@ public class ScalarResolver
 				List<Value> values = ((ArrayValue) input).getValues();
 				return values.stream()
 					.map(v -> convertLiteral(v, variables))
-					.collect(ImmutableList.toImmutableList());
+					.collect(Collectors2.toImmutableList());
 			}
 			else if(input instanceof ObjectValue)
 			{
 				List<ObjectField> values = ((ObjectValue) input).getObjectFields();
-				ImmutableMap.Builder<String, Object> parsedValues = ImmutableMap.builder();
+				MutableMap<String, Object> parsedValues = Maps.mutable.empty();
 				values.forEach(field -> {
 					Object parsedValue = convertLiteral(field.getValue(), variables);
 					parsedValues.put(field.getName(), parsedValue);
 				});
-				return parsedValues.build();
+				return parsedValues.toImmutable();
 			}
 
 			throw new CoercingParseLiteralException();

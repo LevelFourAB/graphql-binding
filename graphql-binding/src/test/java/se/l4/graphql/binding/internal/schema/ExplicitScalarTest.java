@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -58,7 +58,7 @@ public class ExplicitScalarTest
 	@Test
 	public void testInputVariable()
 	{
-		Result result = execute("query($in: TestScalar) { input(in: $in) }", ImmutableMap.of(
+		Result result = execute("query($in: TestScalar) { input(in: $in) }", Map.of(
 			"in", "test"
 		));
 		result.assertNoErrors();

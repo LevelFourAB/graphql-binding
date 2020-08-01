@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.resolver.input;
 
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.resolver.TypedGraphQLResolver;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Extension to {@link GraphQLInputResolver} that acts only on a certain type.

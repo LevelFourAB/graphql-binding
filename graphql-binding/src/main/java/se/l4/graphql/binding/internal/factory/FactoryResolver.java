@@ -9,18 +9,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.eclipse.collections.api.list.ListIterable;
+
 import graphql.schema.DataFetchingEnvironment;
-import se.l4.commons.types.reflect.ConstructorRef;
-import se.l4.commons.types.reflect.ExecutableRef;
-import se.l4.commons.types.reflect.MethodRef;
-import se.l4.commons.types.reflect.ParameterRef;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.GraphQLMappingException;
 import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLSource;
 import se.l4.graphql.binding.resolver.Breadcrumb;
 import se.l4.graphql.binding.resolver.DataFetchingSupplier;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
+import se.l4.ylem.types.reflect.ConstructorRef;
+import se.l4.ylem.types.reflect.ExecutableRef;
+import se.l4.ylem.types.reflect.MethodRef;
+import se.l4.ylem.types.reflect.ParameterRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class FactoryResolver
 {
@@ -137,7 +139,7 @@ public class FactoryResolver
 		ExecutableRef executable
 	)
 	{
-		List<ParameterRef> parameters = executable.getParameters();
+		ListIterable<ParameterRef> parameters = executable.getParameters();
 		DataFetchingSupplier<?>[] suppliers = new DataFetchingSupplier[parameters.size()];
 		int i = 0;
 		for(ParameterRef parameter : parameters)
@@ -160,7 +162,7 @@ public class FactoryResolver
 			{
 				// Default to letting the instance factory handle it
 				Supplier<?> instanceSupplier = context.getInstanceFactory().supplier(
-					parameter.getType().getType(),
+					parameter.getType(),
 					parameter.getAnnotations()
 				);
 				suppliers[i] = env -> instanceSupplier.get();

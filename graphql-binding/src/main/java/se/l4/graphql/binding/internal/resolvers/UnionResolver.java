@@ -1,13 +1,13 @@
 package se.l4.graphql.binding.internal.resolvers;
 
 import graphql.schema.GraphQLOutputType;
-import se.l4.commons.types.reflect.TypeRef;
 import se.l4.graphql.binding.annotations.GraphQLUnion;
 import se.l4.graphql.binding.resolver.GraphQLResolverContext;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputEncounter;
 import se.l4.graphql.binding.resolver.output.GraphQLOutputResolver;
 import se.l4.graphql.binding.resolver.output.GraphQLUnionBuilder;
+import se.l4.ylem.types.reflect.TypeRef;
 
 public class UnionResolver
 	implements GraphQLOutputResolver

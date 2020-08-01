@@ -1,7 +1,7 @@
 package se.l4.graphql.binding.resolver.output;
 
 import graphql.schema.GraphQLUnionType;
-import se.l4.commons.types.reflect.TypeRef;
+import se.l4.ylem.types.reflect.TypeRef;
 
 /**
  * Builder for creating GraphQL union types.

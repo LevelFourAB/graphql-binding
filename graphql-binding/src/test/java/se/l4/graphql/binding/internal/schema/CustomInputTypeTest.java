@@ -3,7 +3,7 @@ package se.l4.graphql.binding.internal.schema;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import se.l4.graphql.binding.GraphQLBinder;
@@ -11,6 +11,7 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInputObject;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 import se.l4.graphql.binding.resolver.ResolvedGraphQLType;
 import se.l4.graphql.binding.resolver.input.GraphQLInputEncounter;
@@ -36,13 +37,13 @@ public class CustomInputTypeTest
 			.getArgument("name")
 			.getType();
 
-		assertThat(nameType, is(Scalars.GraphQLString));
+		assertThat(nameType, GraphQLMatchers.isSameType(Scalars.GraphQLString));
 
 		graphql.schema.GraphQLType nameType2 = schema.getQueryType().getFieldDefinition("asScalarParameterNonNull")
 			.getArgument("name")
 			.getType();
 
-		assertThat(nameType2, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
+		assertThat(nameType2, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
 	}
 
 	@Test

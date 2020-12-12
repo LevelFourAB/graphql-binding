@@ -1,9 +1,9 @@
 package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
@@ -13,6 +13,7 @@ import se.l4.graphql.binding.annotations.GraphQLDeprecated;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLInterface;
 import se.l4.graphql.binding.annotations.GraphQLObject;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class InterfaceTypeTest
@@ -31,7 +32,7 @@ public class InterfaceTypeTest
 		GraphQLInterfaceType type = (GraphQLInterfaceType) schema.getType("Interface");
 
 		GraphQLFieldDefinition nameDef = type.getFieldDefinition("name");
-		assertThat(nameDef.getType(), is(Scalars.GraphQLString));
+		assertThat(nameDef.getType(), GraphQLMatchers.isSameType(Scalars.GraphQLString));
 
 		GraphQLFieldDefinition lastNameDef = type.getFieldDefinition("lastName");
 		assertThat(lastNameDef.getDeprecationReason(), is("use name instead"));

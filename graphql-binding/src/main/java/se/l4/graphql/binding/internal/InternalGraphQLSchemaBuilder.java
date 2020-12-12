@@ -323,7 +323,7 @@ public class InternalGraphQLSchemaBuilder
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GraphQLObjectType buildRootQuery(ResolverContextImpl ctx)
+	private Optional<GraphQLObjectType> buildRootQuery(ResolverContextImpl ctx)
 	{
 		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
 			Collections.emptyList(),
@@ -351,11 +351,17 @@ public class InternalGraphQLSchemaBuilder
 			});
 		}
 
-		return builder.build();
+		GraphQLObjectType type = builder.build();
+		if(type.getFieldDefinitions().isEmpty())
+		{
+			return Optional.empty();
+		}
+
+		return Optional.of(type);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GraphQLObjectType buildMutation(ResolverContextImpl ctx)
+	private Optional<GraphQLObjectType> buildMutation(ResolverContextImpl ctx)
 	{
 		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
 			Collections.emptyList(),
@@ -383,11 +389,17 @@ public class InternalGraphQLSchemaBuilder
 			});
 		}
 
-		return builder.build();
+		GraphQLObjectType type = builder.build();
+		if(type.getFieldDefinitions().isEmpty())
+		{
+			return Optional.empty();
+		}
+
+		return Optional.of(type);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GraphQLObjectType buildSubscription(ResolverContextImpl ctx)
+	private Optional<GraphQLObjectType> buildSubscription(ResolverContextImpl ctx)
 	{
 		GraphQLObjectBuilderImpl builder = new GraphQLObjectBuilderImpl(
 			Collections.emptyList(),
@@ -444,7 +456,13 @@ public class InternalGraphQLSchemaBuilder
 			});
 		}
 
-		return builder.build();
+		GraphQLObjectType type = builder.build();
+		if(type.getFieldDefinitions().isEmpty())
+		{
+			return Optional.empty();
+		}
+
+		return Optional.of(type);
 	}
 
 	public GraphQLSchema build()
@@ -536,13 +554,16 @@ public class InternalGraphQLSchemaBuilder
 		}
 
 		// Build the root type
-		builder.query(buildRootQuery(ctx));
+		GraphQLObjectType queryType = buildRootQuery(ctx)
+			.orElseThrow(() -> new GraphQLMappingException("At least one field is required for the root query"));
+
+		builder.query(queryType);
 
 		// Build the mutation type
-		builder.mutation(buildMutation(ctx));
+		buildMutation(ctx).ifPresent(builder::mutation);
 
 		// Build the subscription type
-		builder.subscription(buildSubscription(ctx));
+		buildSubscription(ctx).ifPresent(builder::subscription);
 
 		return builder.codeRegistry(codeRegistryBuilder.build())
 			.build();

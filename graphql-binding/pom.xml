@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>com.graphql-java</groupId>
 			<artifactId>graphql-java</artifactId>
-			<version>15.0</version>
+			<version>16.1</version>
 		</dependency>
 
 		<dependency>
@@ -64,4 +64,16 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<configuration>
+					<argLine>--add-opens se.l4.graphql.binding/se.l4.graphql.binding.internal.schema=se.l4.ylem.types.instances</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

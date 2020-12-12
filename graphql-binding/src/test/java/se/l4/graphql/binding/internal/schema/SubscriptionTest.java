@@ -3,11 +3,11 @@ package se.l4.graphql.binding.internal.schema;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -16,6 +16,7 @@ import graphql.ExecutionResult;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLSubscription;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
@@ -74,6 +75,11 @@ public class SubscriptionTest
 	public class Root
 		extends Parent
 	{
+		@GraphQLField
+		public String none()
+		{
+			return null;
+		}
 	}
 
 	public class Parent

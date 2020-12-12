@@ -2,9 +2,9 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
@@ -14,6 +14,7 @@ import se.l4.graphql.binding.annotations.GraphQLFactory;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLSource;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class GenericTypeTest
@@ -35,7 +36,7 @@ public class GenericTypeTest
 
 		GraphQLFieldDefinition field = stringWrapper.getFieldDefinition("item");
 		assertThat(field, notNullValue());
-		assertThat(field.getType(), is(Scalars.GraphQLString));
+		assertThat(field.getType(), GraphQLMatchers.isSameType(Scalars.GraphQLString));
 
 		GraphQLObjectType stringHolderWrapper = schema.getObjectType("StringHolderQueryTypeWrapper");
 		assertThat(stringHolderWrapper, notNullValue());

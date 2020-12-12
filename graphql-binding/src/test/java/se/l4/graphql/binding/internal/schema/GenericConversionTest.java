@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -18,6 +18,7 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.annotations.GraphQLObject;
 import se.l4.graphql.binding.annotations.GraphQLSource;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 import se.l4.graphql.binding.resolver.GraphQLConversion;
 
@@ -37,7 +38,7 @@ public class GenericConversionTest
 	public void testStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("simpleString").getType();
-		assertThat(inferOutputType, is(GraphQLList.list(Scalars.GraphQLString)));
+		assertThat(inferOutputType, GraphQLMatchers.isSameType(GraphQLList.list(Scalars.GraphQLString)));
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class GenericConversionTest
 	public void testNonNullStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("simpleNonNullString").getType();
-		assertThat(inferOutputType, is(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
+		assertThat(inferOutputType, GraphQLMatchers.isSameType(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class GenericConversionTest
 	public void testEnforcedNonNullStringSchema()
 	{
 		GraphQLOutputType inferOutputType = schema.getQueryType().getFieldDefinition("enforcedNonNullString").getType();
-		assertThat(inferOutputType, is(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
+		assertThat(inferOutputType, GraphQLMatchers.isSameType(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
 	}
 
 	@Test

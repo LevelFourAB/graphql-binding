@@ -2,11 +2,11 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.OptionalLong;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLInputType;
@@ -15,6 +15,7 @@ import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class OptionalLongTest
@@ -31,7 +32,7 @@ public class OptionalLongTest
 	public void testOutputEmpty()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputEmpty").getType();
-		assertThat(type, is(Scalars.GraphQLLong));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLLong));
 
 		Result result = execute("{ outputEmpty }");
 		result.assertNoErrors();
@@ -43,7 +44,7 @@ public class OptionalLongTest
 	public void testOutputLong()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputLong").getType();
-		assertThat(type, is(Scalars.GraphQLLong));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLLong));
 
 		Result result = execute("{ outputLong }");
 		result.assertNoErrors();
@@ -55,7 +56,7 @@ public class OptionalLongTest
 	public void testOutputLongNonNull()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputLongNonNull").getType();
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLLong)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLLong)));
 
 		Result result = execute("{ outputLongNonNull }");
 		result.assertNoErrors();
@@ -71,7 +72,7 @@ public class OptionalLongTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(Scalars.GraphQLLong));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLLong));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class OptionalLongTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLLong)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLLong)));
 
 		Result result = execute("{ inputNonNull(value: 6) }");
 		result.assertNoErrors();

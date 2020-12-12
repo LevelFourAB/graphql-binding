@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import graphql.ExceptionWhileDataFetching;
 import graphql.ExecutionInput;
@@ -20,7 +20,7 @@ public abstract class GraphQLTest
 	protected GraphQLSchema schema;
 	protected GraphQL ql;
 
-	@Before
+	@BeforeEach
 	public void beforeTest()
 	{
 		GraphQLBinder binder = GraphQLBinder.newBinder();

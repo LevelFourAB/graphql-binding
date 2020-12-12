@@ -5,9 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
+import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLMutation;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.internal.GraphQLTest;
@@ -35,6 +36,12 @@ public class MutationTest
 
 	public class Root
 	{
+		@GraphQLField
+		public String none()
+		{
+			return null;
+		}
+
 		@GraphQLMutation
 		public String mutateWithScalar(
 			@GraphQLName("input") String input

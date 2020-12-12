@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLList;
@@ -14,6 +14,7 @@ import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
 import se.l4.graphql.binding.annotations.GraphQLObject;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class ListTest
@@ -32,17 +33,17 @@ public class ListTest
 		graphql.schema.GraphQLType type = schema.getQueryType().getFieldDefinition("outputString")
 			.getType();
 
-		assertThat("outputString returns list of strings", type, is(GraphQLList.list(Scalars.GraphQLString)));
+		assertThat("outputString returns list of strings", type, GraphQLMatchers.isSameType(GraphQLList.list(Scalars.GraphQLString)));
 
 		type = schema.getQueryType().getFieldDefinition("outputStringNonNull")
 			.getType();
 
-		assertThat("outputStringNonNull returns non-null list of strings", type, is(graphql.schema.GraphQLNonNull.nonNull(GraphQLList.list(Scalars.GraphQLString))));
+		assertThat("outputStringNonNull returns non-null list of strings", type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(GraphQLList.list(Scalars.GraphQLString))));
 
 		type = schema.getQueryType().getFieldDefinition("outputStringNonNullItems")
 			.getType();
 
-		assertThat("outputStringNonNullItems returns list of non-null strings", type, is(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
+		assertThat("outputStringNonNullItems returns list of non-null strings", type, GraphQLMatchers.isSameType(GraphQLList.list(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString))));
 	}
 
 

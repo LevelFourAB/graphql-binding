@@ -84,7 +84,7 @@ public class InputObjectTypeResolver
 					builder.field(
 						GraphQLInputObjectField.newInputObjectField()
 							.name(name)
-							.description(context.getDescription(type))
+							.description(context.getDescription(field))
 							.type(fieldType.getGraphQLType())
 					);
 				});

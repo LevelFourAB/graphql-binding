@@ -1,10 +1,10 @@
 package se.l4.graphql.binding.internal.schema;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.GraphQLMappingException;

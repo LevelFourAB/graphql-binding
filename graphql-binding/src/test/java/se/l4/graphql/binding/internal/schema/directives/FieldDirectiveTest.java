@@ -2,12 +2,12 @@ package se.l4.graphql.binding.internal.schema.directives;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.introspection.Introspection.DirectiveLocation;
 import graphql.schema.GraphQLDirective;

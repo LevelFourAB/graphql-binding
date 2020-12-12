@@ -2,11 +2,11 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.OptionalDouble;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLInputType;
@@ -15,6 +15,7 @@ import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class OptionalDoubleTest
@@ -31,7 +32,7 @@ public class OptionalDoubleTest
 	public void testOutputEmpty()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputEmpty").getType();
-		assertThat(type, is(Scalars.GraphQLFloat));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLFloat));
 
 		Result result = execute("{ outputEmpty }");
 		result.assertNoErrors();
@@ -43,7 +44,7 @@ public class OptionalDoubleTest
 	public void testOutputDouble()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputDouble").getType();
-		assertThat(type, is(Scalars.GraphQLFloat));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLFloat));
 
 		Result result = execute("{ outputDouble }");
 		result.assertNoErrors();
@@ -55,7 +56,7 @@ public class OptionalDoubleTest
 	public void testOutputDoubleNonNull()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputDoubleNonNull").getType();
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLFloat)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLFloat)));
 
 		Result result = execute("{ outputDoubleNonNull }");
 		result.assertNoErrors();
@@ -71,7 +72,7 @@ public class OptionalDoubleTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(Scalars.GraphQLFloat));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLFloat));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class OptionalDoubleTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLFloat)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLFloat)));
 
 		Result result = execute("{ inputNonNull(value: 6019.2) }");
 		result.assertNoErrors();

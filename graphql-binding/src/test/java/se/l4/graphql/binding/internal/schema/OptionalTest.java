@@ -2,11 +2,11 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLInputType;
@@ -15,6 +15,7 @@ import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class OptionalTest
@@ -31,7 +32,7 @@ public class OptionalTest
 	public void testOutputEmpty()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputEmpty").getType();
-		assertThat(type, is(Scalars.GraphQLString));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLString));
 
 		Result result = execute("{ outputEmpty }");
 		result.assertNoErrors();
@@ -43,7 +44,7 @@ public class OptionalTest
 	public void testOutputString()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputString").getType();
-		assertThat(type, is(Scalars.GraphQLString));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLString));
 
 		Result result = execute("{ outputString }");
 		result.assertNoErrors();
@@ -55,7 +56,7 @@ public class OptionalTest
 	public void testOutputStringNonNull()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputStringNonNull").getType();
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
 
 		Result result = execute("{ outputStringNonNull }");
 		result.assertNoErrors();
@@ -67,7 +68,7 @@ public class OptionalTest
 	public void testOutputStringNonNullOuter()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputStringNonNullOuter").getType();
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
 
 		Result result = execute("{ outputStringNonNullOuter }");
 		result.assertNoErrors();
@@ -83,7 +84,7 @@ public class OptionalTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(Scalars.GraphQLString));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLString));
 	}
 
 	@Test
@@ -121,7 +122,7 @@ public class OptionalTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
 
 		Result result = execute("{ inputNonNull(value: \"value\") }");
 		result.assertNoErrors();
@@ -138,7 +139,7 @@ public class OptionalTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLString)));
 
 		Result result = execute("{ inputNonNull2(value: \"value\") }");
 		result.assertNoErrors();

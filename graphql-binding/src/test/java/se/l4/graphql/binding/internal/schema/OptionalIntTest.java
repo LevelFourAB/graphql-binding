@@ -2,11 +2,11 @@ package se.l4.graphql.binding.internal.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.OptionalInt;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLInputType;
@@ -15,6 +15,7 @@ import se.l4.graphql.binding.GraphQLBinder;
 import se.l4.graphql.binding.annotations.GraphQLField;
 import se.l4.graphql.binding.annotations.GraphQLName;
 import se.l4.graphql.binding.annotations.GraphQLNonNull;
+import se.l4.graphql.binding.internal.GraphQLMatchers;
 import se.l4.graphql.binding.internal.GraphQLTest;
 
 public class OptionalIntTest
@@ -31,7 +32,7 @@ public class OptionalIntTest
 	public void testOutputEmpty()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputEmpty").getType();
-		assertThat(type, is(Scalars.GraphQLInt));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLInt));
 
 		Result result = execute("{ outputEmpty }");
 		result.assertNoErrors();
@@ -43,7 +44,7 @@ public class OptionalIntTest
 	public void testOutputInteger()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputInteger").getType();
-		assertThat(type, is(Scalars.GraphQLInt));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLInt));
 
 		Result result = execute("{ outputInteger }");
 		result.assertNoErrors();
@@ -55,7 +56,7 @@ public class OptionalIntTest
 	public void testOutputIntegerNonNull()
 	{
 		GraphQLOutputType type = schema.getQueryType().getFieldDefinition("outputIntegerNonNull").getType();
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLInt)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLInt)));
 
 		Result result = execute("{ outputIntegerNonNull }");
 		result.assertNoErrors();
@@ -71,7 +72,7 @@ public class OptionalIntTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(Scalars.GraphQLInt));
+		assertThat(type, GraphQLMatchers.isSameType(Scalars.GraphQLInt));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class OptionalIntTest
 			.getArgument("value")
 			.getType();
 
-		assertThat(type, is(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLInt)));
+		assertThat(type, GraphQLMatchers.isSameType(graphql.schema.GraphQLNonNull.nonNull(Scalars.GraphQLInt)));
 
 		Result result = execute("{ inputNonNull(value: 6) }");
 		result.assertNoErrors();
